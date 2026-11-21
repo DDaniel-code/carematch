@@ -144,6 +144,11 @@ def render_result(r):
         skipped = r['considered'].get('recommendable_without_location')
         if skipped:
             st.caption(f'{skipped} facilities with credible evidence were skipped because their location is unknown.')
+        if r.get('runner_ups'):
+            st.markdown('**Why not these nearby facilities?**')
+            for c in r['runner_ups']:
+                dist = f"{c['distance_km']} km" if c.get('distance_km') is not None else 'distance unknown'
+                st.markdown(f"- **{esc(c['name'])}** ({dist}): {esc(c.get('why_not', ''))}")
         if review:
             for chk in review.get('checks', []):
                 st.markdown(f"{'✅' if chk.get('passed') else '❌'} {esc(chk.get('name'))}"

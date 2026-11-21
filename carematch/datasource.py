@@ -32,6 +32,10 @@ GROUP BY pincode, TRIM(district), TRIM(statename)
 """
 EXPORT_DIR = '/Volumes/workspace/carematch/exports'
 FILES = ('facilities.csv', 'pincodes.csv')
+# The SDK retries failed requests for 5 minutes by default, which made a missing permission look like a hung app.
+# Bounded retries surface the real error quickly; the warehouse gets longer because a stopped one must start first.
+SDK_RETRY_SECONDS = 30
+WAREHOUSE_RETRY_SECONDS = 180
 
 
 def cell(value):
@@ -80,10 +84,12 @@ def load_warehouse(warehouse_id=None):
     warehouse_id = warehouse_id or os.environ.get('DATABRICKS_WAREHOUSE_ID')
     if not warehouse_id:
         raise RuntimeError('DATABRICKS_WAREHOUSE_ID is not set (attach a SQL warehouse resource to the app)')
-    cfg = Config()
+    cfg = Config(retry_timeout_seconds=SDK_RETRY_SECONDS)
     host = cfg.host.replace('https://', '').rstrip('/')
     with sql.connect(server_hostname=host, http_path=f'/sql/1.0/warehouses/{warehouse_id}',
-                     credentials_provider=lambda: cfg.authenticate) as conn:
+                     credentials_provider=lambda: cfg.authenticate,
+                     _retry_stop_after_attempts_duration=WAREHOUSE_RETRY_SECONDS,
+                     _socket_timeout=WAREHOUSE_RETRY_SECONDS) as conn:
         def query(sql_text):
             with conn.cursor() as cur:
                 cur.execute(sql_text)
@@ -96,7 +102,8 @@ def load_volume(directory=EXPORT_DIR):
     if os.path.isdir(directory):
         return load_local(directory)
     from databricks.sdk import WorkspaceClient
-    w = WorkspaceClient()
+    from databricks.sdk.core import Config
+    w = WorkspaceClient(config=Config(retry_timeout_seconds=SDK_RETRY_SECONDS))
     out = []
     for name in FILES:
         data = w.files.download(f'{directory}/{name}').contents.read()
