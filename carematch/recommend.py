@@ -3,22 +3,26 @@
 Ranking rule (docs/design.md):
   1. Only facilities with Strong or Moderate evidence are recommended.
   2. Distance bands from the user: 25, 75, 150, 300 km. Use the nearest band that has any recommendable facility.
-  3. Inside the band: evidence tier first, then distance, then number of distinct claims.
+  3. Inside the band: evidence tier first, then distance, then amount of evidence.
   4. If the band has only Moderate options and the next band has a Strong one, add it as "farther, stronger evidence".
   5. Nothing within 300 km -> no recommendation; show the nearest option beyond and nearby weak mentions, labelled.
+Every result also lists runner-ups with the reason each was not chosen, and carries an automatic quality review.
 """
 import csv
 import re
 import sys
 
-from .evidence import TIERS, assess
-from .geo import Gazetteer, facility_location
+from .evidence import TIERS, assess, foreign_mentions
+from .geo import CITY_ALIASES, Gazetteer, city_key, facility_location
 from .services import SERVICES, resolve_service
 from .textutil import fragments, haversine_km, normalize, source_urls, text
 
+CONTRACT_VERSION = '1.1'
 BANDS_KM = (25, 75, 150, 300)
 MAX_RESULTS = 3
+MAX_RUNNER_UPS = 3
 DEDUP_KM = 2.0
+CITY_MENTION_MIN_FACILITIES = 15     # cities this well represented are used to spot claims about another place
 
 FLAG_TEXT = {
     'contradictory_claims': 'the record contains a statement that this service is not available',
@@ -32,6 +36,7 @@ FLAG_TEXT = {
     'position_from_city': 'no map coordinates or PIN; distance is from the city centre',
     'state_pin_mismatch': 'the state in the record does not match its PIN code',
     'possible_duplicate_listing': 'the same facility appears more than once in the data; listings were merged',
+    'possible_merged_record': 'some claims may describe a different facility (the record may merge two sources)',
 }
 AGGREGATORS = ('practo.com', 'justdial.com', 'facebook.com', 'medindia.net', 'onefivenine.com', 'lybrate.com')
 
@@ -67,6 +72,13 @@ class CareIndex:
         self.rows = facility_rows
         self.gaz = Gazetteer(pincode_rows, facility_rows)
         self.locations = [facility_location(r, self.gaz) for r in facility_rows]
+        self.by_id = {}
+        for i, r in enumerate(facility_rows):
+            self.by_id.setdefault(text(r.get('unique_id')), []).append(i)
+        big = {k for k, opts in self.gaz.cities.items() if sum(o['n'] for o in opts) >= CITY_MENTION_MIN_FACILITIES}
+        names = {n for n in big | {a for a, k in CITY_ALIASES.items() if k in big} if len(n) >= 4}
+        self.city_regex = re.compile(r'\b(' + '|'.join(sorted(map(re.escape, names), key=len, reverse=True)) + r')\b') \
+            if names else None
         self._assessed = {}
 
     @classmethod
@@ -75,21 +87,30 @@ class CareIndex:
 
     def assessments(self, service):
         if service not in self._assessed:
-            self._assessed[service] = [assess(r, service) for r in self.rows]
+            out = []
+            for r in self.rows:
+                a = assess(r, service)
+                if a['tier'] in ('strong', 'moderate'):
+                    merged = foreign_mentions(a['evidence'], r, self.city_regex, city_key)
+                    if merged:
+                        a['flags'] = sorted(set(a['flags']) | {'possible_merged_record'})
+                        a['merge_reasons'] = merged
+                out.append(a)
+            self._assessed[service] = out
         return self._assessed[service]
 
 
-def _card(index, i, a, origin, dist):
+def _card(index, i, a, dist):
     row, loc = index.rows[i], index.locations[i]
     phones = fragments(row.get('phone_numbers'))
     official = text(row.get('officialPhone'))
     website = text(row.get('officialWebsite'))
     urls = source_urls(row.get('source_urls'))
     urls = sorted(urls, key=lambda u: (any(d in u for d in AGGREGATORS), len(u)))
-    quotes = [e for e in a['evidence'] if e['kind'] in ('direct', 'listed')][:3]
-    if not quotes:
-        quotes = a['evidence'][:2]
+    quotes = [e for e in a['evidence'] if e['kind'] in ('direct', 'listed')][:3] or a['evidence'][:2]
     flags = sorted(set(a['flags']) | set(f for f in loc['flags'] if f in FLAG_TEXT))
+    uncertainties = [FLAG_TEXT[f] for f in flags if f in FLAG_TEXT]
+    uncertainties += [r[0].upper() + r[1:] for r in a.get('merge_reasons', [])]
     return {
         'facility_id': row.get('unique_id'),
         'name': text(row.get('name')) or '(name missing)',
@@ -100,13 +121,14 @@ def _card(index, i, a, origin, dist):
         'phone': official if official and official != 'null' else (phones[0] if phones else None),
         'website': website if website and website != 'null' else None,
         'beds': _int(row.get('capacity')), 'doctors': _int(row.get('numberDoctors')),
-        'distance_km': round(dist, 1) if dist is not None else None,
+        'distance_km': max(0.1, round(dist, 1)) if dist is not None else None,
         'distance_basis': loc['basis'], 'location_confidence': loc['confidence'],
         'tier': a['tier'], 'tier_reasons': a['reasons'],
-        'evidence': [{'evidence_id': e['evidence_id'], 'field': e['field'], 'quote': e['text'], 'kind': e['kind']} for e in quotes],
+        'evidence': [{'evidence_id': e['evidence_id'], 'field': e['field'], 'quote': e['text'],
+                      'verbatim': e.get('raw', e['text']), 'kind': e['kind']} for e in quotes],
         'all_evidence_count': len(a['evidence']),
         'n_claims': len({normalize(e['text']) for e in a['evidence'] if e['kind'] in ('direct', 'listed')}),
-        'flags': flags, 'uncertainties': [FLAG_TEXT[f] for f in flags if f in FLAG_TEXT],
+        'flags': flags, 'uncertainties': uncertainties,
         'source_urls': urls[:3],
         'ask_when_calling': SERVICES[a['service']]['ask'],
     }
@@ -129,7 +151,27 @@ def _dedupe(cards):
     return kept
 
 
-def recommend(index, service_text, location_text, k=MAX_RESULTS):
+def _why_not(c, last):
+    """One sentence on why a runner-up is below the last recommendation."""
+    if c['tier'] == 'weak':
+        return 'Not recommended: ' + (c['tier_reasons'][0] if c['tier_reasons'] else 'weak evidence') + '.'
+    if TIERS.index(c['tier']) > TIERS.index(last['tier']):
+        return f"{c['tier'].capitalize()} evidence ({c['tier_reasons'][0]}) versus {last['tier']} for those above."
+    if c['distance_km'] is not None and last['distance_km'] is not None and c['distance_km'] > last['distance_km']:
+        return f"Same {c['tier']} evidence, but farther ({c['distance_km']} km vs {last['distance_km']} km)."
+    return f"Same {c['tier']} evidence and distance, but fewer supporting claims ({c['n_claims']} vs {last['n_claims']})."
+
+
+def _apply_variant(a, strong_min_claims):
+    """Sensitivity variant: require more distinct claims for Strong."""
+    if strong_min_claims and a['tier'] == 'strong':
+        n = len({normalize(e['text']) for e in a['evidence'] if e['kind'] == 'direct'})
+        if n < strong_min_claims:
+            return {**a, 'tier': 'moderate', 'reasons': a['reasons'] + [f'fewer than {strong_min_claims} distinct claims']}
+    return a
+
+
+def recommend(index, service_text, location_text, k=MAX_RESULTS, bands=BANDS_KM, strong_min_claims=None, review=True):
     service = resolve_service(service_text)
     if not service:
         return {'error': f'Unknown service "{service_text}". Choose one of: '
@@ -139,66 +181,81 @@ def recommend(index, service_text, location_text, k=MAX_RESULTS):
         return {'error': origin['error']}
     o = (origin['lat'], origin['lon'])
 
-    scored = []          # (tier_rank, distance, -claims, i, assessment)
+    scored = []          # (tier_rank, distance, i, assessment)
     no_distance = 0
     for i, a in enumerate(index.assessments(service)):
         if a['tier'] == 'none':
             continue
+        a = _apply_variant(a, strong_min_claims)
         dist = _distance(o, index.locations[i])
         if dist is None:
             no_distance += a['tier'] in ('strong', 'moderate')
             continue
-        tier = a['tier']
-        if index.locations[i]['confidence'] == 'low' and tier == 'strong':
+        if a['tier'] == 'strong' and index.locations[i]['confidence'] == 'low':
             a = {**a, 'tier': 'moderate', 'reasons': a['reasons'] + ['location data conflicts, so treated as moderate'],
-                 'flags': a['flags'] + ['location_conflict']}
-            tier = 'moderate'
-        scored.append((TIERS.index(tier), dist, i, a))
+                 'flags': sorted(set(a['flags']) | {'location_conflict'})}
+        if a['tier'] == 'strong' and a.get('merge_reasons') and all(
+                foreign_mentions([e], index.rows[i], index.city_regex, city_key)
+                for e in a['evidence'] if e['kind'] == 'direct'):
+            a = {**a, 'tier': 'moderate', 'reasons': a['reasons'] + ['every claim may describe another facility']}
+        scored.append((TIERS.index(a['tier']), dist, i, a))
 
     eligible = [s for s in scored if s[0] <= 1]
-    counts = {}
-    for b in BANDS_KM:
-        counts[b] = {t: sum(1 for s in scored if s[1] <= b and TIERS[s[0]] == t) for t in ('strong', 'moderate', 'weak')}
+    order = lambda s: (s[0], round(s[1], 1), -len(s[3]['evidence']), text(index.rows[s[2]].get('unique_id')))
+    counts = {b: {t: sum(1 for s in scored if s[1] <= b and TIERS[s[0]] == t) for t in ('strong', 'moderate', 'weak')}
+              for b in bands}
 
-    chosen_band, results, extra = None, [], None
-    for b in BANDS_KM:
-        in_band = [s for s in eligible if s[1] <= b]
-        if not in_band:
+    chosen_band, results, extra, runner_ups = None, [], None, []
+    for b in bands:
+        in_band = sorted([s for s in scored if s[1] <= b], key=order)
+        if not any(s[0] <= 1 for s in in_band):
             continue
         chosen_band = b
-        in_band.sort(key=lambda s: (s[0], round(s[1], 1), -len(s[3]['evidence'])))
-        cards = _dedupe([_card(index, s[2], s[3], o, s[1]) for s in in_band])
+        cards = _dedupe([_card(index, s[2], s[3], s[1]) for s in in_band if s[0] <= 1])
         results = cards[:k]
+        weak = _dedupe([_card(index, s[2], s[3], s[1]) for s in in_band if s[0] == 2])
+        shown = {_name_key(c['name']) for c in results}
+        pool = cards[k:] + [w for w in weak if _name_key(w['name']) not in shown]
+        for c in pool[:MAX_RUNNER_UPS]:
+            c['why_not'] = _why_not(c, results[-1])
+            runner_ups.append(c)
         if all(c['tier'] != 'strong' for c in results):
-            nxt = BANDS_KM[BANDS_KM.index(b) + 1] if b != BANDS_KM[-1] else None
-            stronger = sorted([s for s in eligible if s[0] == 0 and (nxt is None or s[1] <= nxt) and s[1] > b],
-                              key=lambda s: s[1])
+            nxt = bands[bands.index(b) + 1] if b != bands[-1] else None
+            stronger = sorted([s for s in eligible if s[0] == 0 and s[1] > b and (nxt is None or s[1] <= nxt)],
+                              key=order)
             if stronger:
-                extra = _card(index, stronger[0][2], stronger[0][3], o, stronger[0][1])
+                extra = _card(index, stronger[0][2], stronger[0][3], stronger[0][1])
                 extra['note'] = 'Farther away, but stronger evidence than the options above.'
         break
 
     beyond, weak_nearby = None, []
     if not results:
-        far = sorted(eligible, key=lambda s: (s[1], s[0]))
+        far = sorted(eligible, key=lambda s: (round(s[1], 1), s[0]))
         if far:
-            beyond = _card(index, far[0][2], far[0][3], o, far[0][1])
-            beyond['note'] = f'Nearest facility with credible evidence, beyond {BANDS_KM[-1]} km.'
-        weak = sorted([s for s in scored if s[0] == 2 and s[1] <= BANDS_KM[1]], key=lambda s: s[1])[:3]
-        weak_nearby = [_card(index, s[2], s[3], o, s[1]) for s in weak]
+            beyond = _card(index, far[0][2], far[0][3], far[0][1])
+            beyond['note'] = f'Nearest facility with credible evidence, beyond {bands[-1]} km.'
+        weak = sorted([s for s in scored if s[0] == 2 and s[1] <= bands[1]], key=order)[:3]
+        weak_nearby = [_card(index, s[2], s[3], s[1]) for s in weak]
 
+    n_in_band = len([s for s in eligible if chosen_band and s[1] <= chosen_band])
     for rank, c in enumerate(results, 1):
         c['rank'] = rank
-        c['why_ranked'] = (f"#{rank} of {len([s for s in eligible if s[1] <= chosen_band])} facilities with credible "
-                           f"evidence within {chosen_band} km; ordered by evidence strength, then distance.")
+        c['why_ranked'] = (f"#{rank} of {n_in_band} facilities with credible evidence within {chosen_band} km; "
+                           f"ordered by evidence strength, then distance.")
 
-    return {
+    result = {
+        'contract_version': CONTRACT_VERSION,
         'service': service, 'service_label': SERVICES[service]['label'],
-        'origin': origin, 'band_km': chosen_band, 'results': results, 'farther_stronger': extra,
-        'nearest_beyond': beyond, 'weak_nearby': weak_nearby,
+        'origin': origin, 'band_km': chosen_band, 'results': results, 'runner_ups': runner_ups,
+        'farther_stronger': extra, 'nearest_beyond': beyond, 'weak_nearby': weak_nearby,
         'considered': {'by_band': counts, 'recommendable_without_location': no_distance},
-        'method': ('Strong/Moderate evidence only; nearest distance band (25/75/150/300 km) that has any; '
-                   'within it, stronger evidence first, then shorter straight-line distance.'),
+        'parameters': {'bands_km': list(bands), 'max_results': k, 'strong_min_claims': strong_min_claims},
+        'method': ('Strong/Moderate evidence only; nearest distance band (' + '/'.join(map(str, bands)) + ' km) that has '
+                   'any; within it, stronger evidence first, then shorter straight-line distance.'),
         'disclaimer': ('Based on public web listings, not verified by the facility. Availability today is unknown: '
                        'call before travelling. Distances are straight-line, not road travel time.'),
     }
+    if review:
+        from .review import review as run_review
+        result['review'] = run_review(index, result)
+    return result

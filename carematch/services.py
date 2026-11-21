@@ -117,7 +117,7 @@ INDIRECT = (r'\btie[- ]?up|\boutsourc|\breferr(al|ed|ing)\b|\brefer(s)? (patient
             r'|\bto be (started|launched|set up)\b|\bwas located\b|\bformerly\b|\bpreviously\b')
 
 # Negation must sit right next to the service term (checked in a short window before / after the hit).
-NEG_BEFORE = r'\b(no|without|lacks?|lacking|not)\s+(\w+\s+){0,2}$'
+NEG_BEFORE = r'\b(no|without|lacks?|lacking|not|excluding|except|other than)\s+(\w+\s+){0,2}$'
 NEG_AFTER = (r'^\W{0,3}(\w+\W+){0,3}?(is |are )?(not (available|offered|provided|done|performed)|unavailable'
              r'|discontinued|closed (down|permanently)|suspended)\b')
 
@@ -127,6 +127,10 @@ LIST_MIN_COMMAS = 4
 
 # Facility types that cannot plausibly provide any of these services.
 INCOMPATIBLE_TYPES = {'dentist', 'pharmacy', 'farmacy', 'doctor'}
+# facilityTypeId is often just "clinic"; a name like "Patra Dental Clinic" tells us more.
+SPECIALTY_NAME = (r'\b(dental|dentist|dentistry|teeth|tooth|orthodont|eye|netra|vision|ophthalm|optical|skin|derma'
+                  r'|cosmetic|hair|homoeo|homeo|ayurved|unani|siddha|physiotherap|rehab|de-?addiction|nasha mukti'
+                  r'|psychiatr|pathology lab|diagnostic lab|laborator)\w*\b')
 
 
 def service_keys():

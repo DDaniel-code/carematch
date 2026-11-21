@@ -4,9 +4,10 @@ Every evidence item is a single claim fragment copied verbatim from a named colu
 statement we make can be traced back to the facility text.
 """
 import re
+from difflib import SequenceMatcher
 
-from .services import INCOMPATIBLE_TYPES, INDIRECT, LIST_MIN_COMMAS, NEG_AFTER, NEG_BEFORE, SERVICES
-from .textutil import fragments, normalize, split_camel, stable_id
+from .services import INCOMPATIBLE_TYPES, INDIRECT, LIST_MIN_COMMAS, NEG_AFTER, NEG_BEFORE, SERVICES, SPECIALTY_NAME
+from .textutil import fragments, normalize, split_camel, stable_id, text
 
 CLAIM_FIELDS = ('procedure', 'equipment', 'capability')   # structured claim lists
 TEXT_FIELDS = ('description',)                            # free prose
@@ -74,11 +75,54 @@ def extract_evidence(row, service):
     listed = sorted({s for s in fragments(row.get('specialties')) if s.lower() in wanted})
     for spec in listed:
         items.append({'evidence_id': 'ev-' + stable_id([fid, 'specialties', spec], 12),
-                      'field': 'specialties', 'text': split_camel(spec), 'matched': spec, 'kind': 'related'})
+                      'field': 'specialties', 'text': split_camel(spec), 'raw': spec, 'matched': spec, 'kind': 'related'})
     order = {'direct': 0, 'listed': 1, 'negative': 2, 'indirect': 3, 'mention': 4, 'related': 5}
     field_order = {'procedure': 0, 'equipment': 1, 'capability': 2, 'description': 3, 'specialties': 4}
     items.sort(key=lambda e: (order[e['kind']], field_order[e['field']], len(e['text'])))
     return items
+
+
+GENERIC_NAME_WORDS = {
+    'hospital', 'hospitals', 'clinic', 'clinics', 'nursing', 'home', 'medical', 'centre', 'center', 'care', 'health',
+    'healthcare', 'multispeciality', 'multispecialty', 'multi', 'super', 'speciality', 'specialty', 'the', 'and', 'of',
+    'dr', 'research', 'institute', 'dental', 'eye', 'children', 'child', 'women', 'womens', 'general', 'city',
+    'government', 'govt', 'district', 'civil', 'memorial', 'trust', 'charitable', 'maternity', 'surgical', 'heart',
+    'kidney', 'cancer', 'diagnostic', 'diagnostics', 'pvt', 'ltd', 'private', 'limited', 'new', 'sri', 'shri', 'st',
+    'fertility', 'ivf', 'dialysis', 'ortho', 'orthopaedic', 'orthopedic', 'neuro', 'skin', 'ent', 'mother', 'baby',
+}
+_FACILITY_NAME_RE = re.compile(
+    r"\b((?:[A-Z][\w&'.-]*\.?\s+){1,5})(Hospitals?|Clinic|Nursing Home|Medical (?:Centre|Center|College)|Health ?Care)\b")
+
+
+def _name_tokens(name):
+    return {t for t in re.findall(r'[a-z]+', normalize(name)) if t not in GENERIC_NAME_WORDS and len(t) > 1}
+
+
+def foreign_mentions(evidence, row, other_cities, canon=lambda c: c):
+    """Signs that a claim describes a different facility (records that merged two sources).
+
+    other_cities: compiled regex of well-known city names, or None; canon maps spelling variants to one key
+    (Bangalore/Bengaluru). Returns a list of short reasons.
+    """
+    own_city = canon(normalize(row.get('address_city')))
+    own = _name_tokens(row.get('name'))
+    home = {normalize(row.get(k)) for k in ('address_city', 'address_stateOrRegion', 'address_line2', 'address_line3')}
+    home_text = ' '.join(home)
+    reasons = []
+    for e in evidence:
+        if e['kind'] not in ('direct', 'listed'):
+            continue
+        for m in _FACILITY_NAME_RE.finditer(e['text']):
+            tokens = _name_tokens(m.group(0))
+            similar = SequenceMatcher(None, ''.join(sorted(tokens)), ''.join(sorted(own))).ratio() >= 0.75
+            if tokens and own and not tokens & own and not similar:
+                reasons.append(f'a claim names another facility ("{m.group(0).strip()}")')
+        if other_cities is not None:
+            for m in other_cities.finditer(normalize(e['text'])):
+                city = m.group(0)
+                if canon(city) != own_city and city not in home_text and city not in normalize(row.get('name')):
+                    reasons.append(f'a claim places the facility in {city.title()}')
+    return sorted(set(reasons))
 
 
 def _number(value):
@@ -152,8 +196,15 @@ def assess(row, service, evidence=None):
             tier = 'none'
     ftype = normalize(row.get('facilityTypeId'))
     capacity = _number(row.get('capacity'))
+    name_hit = re.search(SPECIALTY_NAME, text(row.get('name')), re.I)
+    if name_hit and service in ('mri', 'ct_scan') and re.match(r'(lab|patholog|diagnostic)', name_hit.group(0), re.I):
+        name_hit = None   # diagnostic labs can legitimately run scanners
     if ftype in INCOMPATIBLE_TYPES and tier in ('strong', 'moderate'):
         cap('weak', f"listed as a {ftype}, which is unlikely to provide {spec['label'].lower()}", 'facility_type_mismatch')
+    elif name_hit and not re.search(r'\bhospital|\bmedical college|\binstitute of medical', text(row.get('name')), re.I) \
+            and tier in ('strong', 'moderate'):
+        cap('weak', f'the name suggests a {name_hit.group(0).lower()} specialist, unlikely to provide '
+                    f"{spec['label'].lower()}", 'facility_type_mismatch')
     elif (spec['needs_inpatient'] and ftype == 'clinic' and (capacity is None or capacity < 20)
           and tier in ('strong', 'moderate')):
         cap('moderate', 'listed as a small clinic; inpatient capability unconfirmed', 'small_clinic_claim')

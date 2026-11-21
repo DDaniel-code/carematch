@@ -35,15 +35,15 @@ Only Strong and Moderate are recommended; Weak is shown as "mentioned, unverifie
 
 | Service | Strong | Moderate | Weak | None |
 | --- | ---: | ---: | ---: | ---: |
-| Dialysis | 602 | 436 | 1,510 | 7,540 |
-| Emergency C-section | 126 | 315 | 4,714 | 4,933 |
-| NICU | 279 | 431 | 1,043 | 8,335 |
-| Trauma care | 626 | 721 | 4,175 | 4,566 |
-| 24x7 emergency | 1,297 | 1,528 | 2,127 | 5,136 |
-| Burn care | 38 | 148 | 1,756 | 8,146 |
-| Cardiac surgery | 277 | 326 | 3,381 | 6,104 |
-| MRI | 604 | 324 | 3,683 | 5,477 |
-| CT scan | 958 | 505 | 3,122 | 5,503 |
+| Dialysis | 600 | 435 | 1,513 | 7,540 |
+| Emergency C-section | 126 | 313 | 4,716 | 4,933 |
+| NICU | 277 | 430 | 1,046 | 8,335 |
+| Trauma care | 623 | 700 | 4,199 | 4,566 |
+| 24x7 emergency | 1,294 | 1,478 | 2,180 | 5,136 |
+| Burn care | 38 | 143 | 1,761 | 8,146 |
+| Cardiac surgery | 275 | 326 | 3,383 | 6,104 |
+| MRI | 602 | 318 | 3,691 | 5,477 |
+| CT scan | 944 | 485 | 3,156 | 5,503 |
 
 Reading it: C-section's large Weak count is mostly hospitals that list obstetrics but never name caesarean delivery;
 burn care is genuinely rare (38 Strong nationwide), so many locations will honestly have no strong option.
@@ -60,6 +60,11 @@ burn care is genuinely rare (38 Strong nationwide), so many locations will hones
 | identical sentence in `equipment` and `capability` counted as corroboration | dedupe sentences before counting |
 | department lists counted as specific claims | new `listed` kind, cannot make a facility Strong alone |
 | "MRI (via tie-up)", "outsourced" counted as in-house | new `indirect` kind → Weak |
+| "General surgeries are performed **excluding** cardiothoracic…" read as positive (found by evaluation) | `excluding / except / other than` are negations |
+| "Patra Dental Clinic" recommended for emergency care; type field said only "clinic" (found by evaluation) | specialist names (dental, eye, homoeo, ayurveda, rehab, …) cap at Weak unless the name says hospital |
+
+Records whose claims name another facility or another well-known city are flagged `possible_merged_record`
+(e.g. a Durg district hospital whose claim places it in Agra); if every specific claim is affected, Strong becomes Moderate.
 
 Known limits: English-only regexes; claims may describe a different facility when a record was merged
 (handled later by identity checks); a claim is evidence that a web page said it, not that the service runs today.

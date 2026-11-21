@@ -1,0 +1,39 @@
+id,service,place,place_type,scenario
+q01,dialysis,Delhi,metro,metro baseline
+q02,dialysis,Patna,tier2,state capital in a low-income state
+q03,dialysis,855107,rural_pin,rural Bihar PIN (Kishanganj)
+q04,dialysis,Kohima,remote,northeast state capital
+q05,emergency C-section,Mumbai,metro,metro baseline
+q06,emergency C-section,Lucknow,tier2,tier-2 city
+q07,emergency C-section,"Aurangabad, Bihar",rural_district,same-name district in another state
+q08,emergency C-section,Mon,remote,lowest institutional-birth district (NFHS)
+q09,NICU,Chennai,metro,metro baseline
+q10,NICU,Ranchi,tier2,tier-2 city
+q11,NICU,835207,rural_pin,rural Jharkhand PIN (Gumla)
+q12,NICU,Aizawl,remote,northeast state capital
+q13,trauma,Kolkata,metro,metro baseline
+q14,trauma,Indore,tier2,tier-2 city
+q15,trauma,271801,rural_pin,rural UP PIN (Bahraich)
+q16,trauma,Kohima,remote,hill state; straight-line underestimates travel
+q17,emergency,Hyderabad,metro,metro baseline
+q18,emergency,Bhubaneswar,tier2,tier-2 city
+q19,emergency,764020,rural_pin,rural Odisha PIN (Koraput)
+q20,emergency,Tawang,remote,remote border district
+q21,burn care,Bengaluru,metro,metro baseline
+q22,burn care,Gaya,tier2,rare service from a tier-2 city
+q23,burn care,852201,rural_pin,rural Bihar PIN (Saharsa)
+q24,burn care,Mon,remote,rare service in a remote district
+q25,cardiac surgery,Ahmedabad,metro,metro baseline
+q26,cardiac surgery,Bhopal,tier2,tier-2 city
+q27,cardiac surgery,822101,rural_pin,rural Jharkhand PIN (Palamu)
+q28,cardiac surgery,Shillong,remote,northeast state capital
+q29,MRI,Pune,metro,metro baseline
+q30,MRI,Darbhanga,tier2,moderate nearby vs strong farther
+q31,MRI,473001,rural_pin,rural MP PIN (Guna)
+q32,MRI,Leh,remote,high-altitude remote district
+q33,CT scan,Kolkata,metro,metro baseline
+q34,CT scan,Varanasi,tier2,tier-2 city
+q35,CT scan,845401,rural_pin,PIN without reliable location (falls back to PIN area)
+q36,CT scan,Kargil,remote,remote district
+q37,burn care,Port Blair,remote,island territory: honest no-answer expected
+q38,cardiac surgery,Port Blair,remote,island territory

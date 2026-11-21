@@ -1,0 +1,69 @@
+{
+  "queries": 38,
+  "errors": 0,
+  "answered_within_300km": 36,
+  "honest_no_answer": 2,
+  "quality_checks_all_passed": 38,
+  "citation_fidelity": {
+    "quotes_checked": 231,
+    "queries_failing": []
+  },
+  "duplicates_in_top3": [],
+  "recommendations": 98,
+  "tier_mix": {
+    "strong": 83,
+    "moderate": 15
+  },
+  "location_confidence_mix": {
+    "high": 91,
+    "medium": 3,
+    "approximate": 4,
+    "low": 0
+  },
+  "by_place_type": {
+    "metro": {
+      "queries": 9,
+      "answered": 9,
+      "median_top1_km": 2.4
+    },
+    "tier2": {
+      "queries": 9,
+      "answered": 9,
+      "median_top1_km": 1.3
+    },
+    "rural_pin": {
+      "queries": 8,
+      "answered": 8,
+      "median_top1_km": 113.5
+    },
+    "remote": {
+      "queries": 11,
+      "answered": 9,
+      "median_top1_km": 116.9
+    },
+    "rural_district": {
+      "queries": 1,
+      "answered": 1,
+      "median_top1_km": 113.9
+    }
+  },
+  "latency_ms": {
+    "p50": 13.11,
+    "p95": 73.92
+  },
+  "index_warm_seconds": 25.8,
+  "sensitivity_vs_baseline": {
+    "bands_20_60_120_250": {
+      "same_top1_share": 0.947,
+      "mean_top3_jaccard": 0.875
+    },
+    "bands_30_90_180_350": {
+      "same_top1_share": 0.974,
+      "mean_top3_jaccard": 0.917
+    },
+    "strong_needs_3_claims": {
+      "same_top1_share": 0.737,
+      "mean_top3_jaccard": 0.668
+    }
+  }
+}

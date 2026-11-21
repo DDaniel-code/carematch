@@ -87,6 +87,21 @@ class AssessTests(unittest.TestCase):
         self.assertEqual(a['tier'], 'weak')
         self.assertIn('facility_type_mismatch', a['flags'])
 
+    def test_excluding_is_negation(self):
+        frag = 'General surgeries are performed excluding cardiothoracic and vascular surgery'
+        self.assertEqual(classify_fragment(frag, 'cardiac_surgery', 'procedure')[0], 'negative')
+
+    def test_specialty_name_capped(self):
+        a = assess(row(name='Patra Dental Clinic', facilityTypeId='clinic',
+                       procedure=['Emergency care 24x7'], capability=['Emergency service available 24 hours']), 'emergency')
+        self.assertEqual(a['tier'], 'weak')
+        self.assertIn('facility_type_mismatch', a['flags'])
+
+    def test_specialty_word_in_hospital_name_not_capped(self):
+        a = assess(row(name='City Eye and General Hospital', procedure=['Provides emergency care'],
+                       capability=['24/7 emergency department']), 'emergency')
+        self.assertEqual(a['tier'], 'strong')
+
     def test_small_clinic_capped_for_inpatient_service(self):
         a = assess(row(facilityTypeId='clinic', procedure=['NICU care'], equipment=['Neonatal intensive care unit']), 'nicu')
         self.assertEqual(a['tier'], 'moderate')
