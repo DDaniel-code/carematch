@@ -1,0 +1,90 @@
+{
+  "definitions": {
+    "unit": "India Post PIN areas with a reliable centre, weighted by number of post offices",
+    "far": "more than 50 km straight-line from the nearest facility with Strong or Moderate evidence",
+    "access_gap_district": "at least 50% of the district's post offices are far",
+    "maternal_priority": "access gap for C-section AND NFHS-5 caesarean rate below 5% (WHO unmet-need signal)",
+    "dialysis_priority": "access gap for dialysis AND top-quarter share of adults with raised blood sugar (NFHS-5)"
+  },
+  "districts": 702,
+  "nfhs_match": {
+    "exact": 537,
+    "close_spelling": 35,
+    "unmatched": 130
+  },
+  "national_coverage": {
+    "dialysis": {
+      "within_25km": 0.351,
+      "within_50km": 0.652,
+      "within_100km": 0.914,
+      "districts_with_access_gap": 268,
+      "districts": 702
+    },
+    "c_section": {
+      "within_25km": 0.208,
+      "within_50km": 0.46,
+      "within_100km": 0.802,
+      "districts_with_access_gap": 405,
+      "districts": 702
+    },
+    "nicu": {
+      "within_25km": 0.299,
+      "within_50km": 0.589,
+      "within_100km": 0.895,
+      "districts_with_access_gap": 308,
+      "districts": 702
+    },
+    "trauma": {
+      "within_25km": 0.361,
+      "within_50km": 0.667,
+      "within_100km": 0.909,
+      "districts_with_access_gap": 269,
+      "districts": 702
+    },
+    "emergency": {
+      "within_25km": 0.516,
+      "within_50km": 0.839,
+      "within_100km": 0.989,
+      "districts_with_access_gap": 123,
+      "districts": 702
+    },
+    "burn": {
+      "within_25km": 0.148,
+      "within_50km": 0.334,
+      "within_100km": 0.669,
+      "districts_with_access_gap": 477,
+      "districts": 702
+    },
+    "cardiac_surgery": {
+      "within_25km": 0.242,
+      "within_50km": 0.49,
+      "within_100km": 0.821,
+      "districts_with_access_gap": 380,
+      "districts": 702
+    },
+    "mri": {
+      "within_25km": 0.294,
+      "within_50km": 0.579,
+      "within_100km": 0.899,
+      "districts_with_access_gap": 308,
+      "districts": 702
+    },
+    "ct_scan": {
+      "within_25km": 0.377,
+      "within_50km": 0.701,
+      "within_100km": 0.954,
+      "districts_with_access_gap": 214,
+      "districts": 702
+    }
+  },
+  "priority_counts": {
+    "maternal": 27,
+    "dialysis": 36,
+    "maternal_by_gap_kind": {
+      "data gap (few listings at all)": 21,
+      "service gap (hospitals listed, none documents this service)": 6
+    }
+  },
+  "source": "local",
+  "seconds": 32.5
+}

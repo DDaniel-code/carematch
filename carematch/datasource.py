@@ -111,6 +111,20 @@ def load_volume(directory=EXPORT_DIR):
     return out[0], out[1]
 
 
+NFHS_SQL = f'SELECT * FROM {SOURCE_SCHEMA}.nfhs_5_district_health_indicators'
+
+
+def load_nfhs(spark=None, directory=None):
+    """NFHS-5 district indicators (planner view only; never used to rank facilities for a patient)."""
+    if spark is not None:
+        df = spark.sql(NFHS_SQL)
+        return to_rows(df.columns, df.collect())
+    directory = directory or os.environ.get('CAREMATCH_DATA_DIR') or os.path.join(
+        os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'data')
+    with open(os.path.join(directory, 'nfhs5.csv'), newline='', encoding='utf-8') as fh:
+        return _read_csv(fh)
+
+
 # ---- entry point -----------------------------------------------------------------------------------------------
 
 def load(spark=None, order=None):

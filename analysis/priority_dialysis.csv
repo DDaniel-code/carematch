@@ -1,0 +1,37 @@
+district,state,dialysis_median_km,dialysis_share_far,dialysis_credible_within_50km,hospitals_listed_within_50km,high_sugar_women_pct,high_sugar_men_pct,gap_kind,post_offices
+Ganjam,Odisha,134.6,1.0,0,3,15.3,21.8,"service gap (hospitals listed, none documents this service)",667
+Prakasam,Andhra Pradesh,126.7,1.0,0,5,23.2,30.2,"service gap (hospitals listed, none documents this service)",490
+Srikakulam,Andhra Pradesh,109.9,1.0,0,2,17.4,17.6,data gap (few listings at all),472
+Suryapet,Telangana,102.6,1.0,0,0,17.7,23.9,data gap (few listings at all),143
+Porbandar,Gujarat,95.6,0.989,0,3,16.4,19.5,"service gap (hospitals listed, none documents this service)",91
+Y.S.R.,Andhra Pradesh,91.3,0.947,0,2,18.4,22.3,data gap (few listings at all),698
+Karimnagar,Telangana,91.0,1.0,0,8,16.8,20.0,"service gap (hospitals listed, none documents this service)",156
+Bhadradri Kothagudem,Telangana,81.1,1.0,0,0,18.3,18.4,data gap (few listings at all),154
+Jagitial,Telangana,79.1,1.0,0,8,15.5,19.5,"service gap (hospitals listed, none documents this service)",184
+Murshidabad,West Bengal,78.2,0.898,0,4,18.4,19.5,"service gap (hospitals listed, none documents this service)",187
+Unakoti,Tripura,77.9,1.0,0,0,16.9,19.9,data gap (few listings at all),79
+North Tripura,Tripura,77.8,0.935,0,0,18.3,22.9,data gap (few listings at all),108
+Surendranagar,Gujarat,76.6,1.0,0,2,16.4,19.3,data gap (few listings at all),197
+Bhavnagar,Gujarat,74.4,0.882,0,8,16.4,17.1,"service gap (hospitals listed, none documents this service)",246
+Pakur,Jharkhand,72.9,1.0,0,2,13.3,19.7,data gap (few listings at all),18
+Nagapattinam,Tamil Nadu,71.4,0.988,0,3,19.4,19.9,"service gap (hospitals listed, none documents this service)",164
+South Garo Hills,Meghalaya,69.3,1.0,0,1,12.8,23.7,data gap (few listings at all),11
+South Tripura,Tripura,69.3,0.73,1,4,18.2,20.4,"service gap (hospitals listed, none documents this service)",74
+Karaikal,Puducherry,67.9,1.0,0,3,22.4,22.8,"service gap (hospitals listed, none documents this service)",22
+Davangere,Karnataka,66.7,0.852,0,14,16.1,17.5,"service gap (hospitals listed, none documents this service)",81
+Tumakuru,Karnataka,65.9,0.956,0,11,15.4,19.9,"service gap (hospitals listed, none documents this service)",226
+Nayagarh,Odisha,65.2,0.802,0,1,20.7,24.0,data gap (few listings at all),227
+Kodagu,Karnataka,64.6,0.863,0,2,17.4,19.3,data gap (few listings at all),197
+Koderma,Jharkhand,64.4,0.746,0,1,11.2,22.4,data gap (few listings at all),59
+Khammam,Telangana,63.7,0.813,0,1,17.7,17.7,data gap (few listings at all),193
+Tinsukia,Assam,63.2,0.589,3,10,13.9,19.5,"service gap (hospitals listed, none documents this service)",129
+Botad,Gujarat,62.9,0.786,0,1,16.7,16.8,data gap (few listings at all),56
+Kendrapara,Odisha,62.3,0.646,0,1,15.7,21.6,data gap (few listings at all),243
+Jharsuguda,Odisha,61.6,0.783,0,1,16.6,19.0,data gap (few listings at all),92
+Morbi,Gujarat,60.9,0.92,0,8,17.8,18.7,"service gap (hospitals listed, none documents this service)",25
+Nadia,West Bengal,58.6,0.599,1,8,20.0,21.2,"service gap (hospitals listed, none documents this service)",262
+Birbhum,West Bengal,55.1,0.571,0,3,16.4,20.9,"service gap (hospitals listed, none documents this service)",247
+Fatehabad,Haryana,53.9,0.544,3,27,16.1,17.0,"service gap (hospitals listed, none documents this service)",125
+Perambalur,Tamil Nadu,52.4,0.56,0,7,21.0,23.2,"service gap (hospitals listed, none documents this service)",134
+Siddipet,Telangana,50.3,0.553,0,3,14.7,20.0,"service gap (hospitals listed, none documents this service)",208
+Rajanna Sircilla,Telangana,50.2,0.505,1,9,13.2,20.3,"service gap (hospitals listed, none documents this service)",109
