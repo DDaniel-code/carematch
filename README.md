@@ -14,6 +14,15 @@ Python 3.10+, standard library only for the core package.
 
 ```bash
 python -m unittest discover -s tests -v
+python -m scripts.ask "dialysis|Sitamarhi" "emergency C-section|Aurangabad, Bihar" "NICU|845401"
+python -m scripts.calibrate_evidence          # tier counts + review samples on the full data
+```
+
+```python
+from carematch.recommend import CareIndex, recommend
+from carematch.render import to_text
+index = CareIndex.from_csv('data/facilities.csv', 'data/pincodes.csv')
+print(to_text(recommend(index, 'dialysis', '800001')))
 ```
 
 Raw data exports go in `data/` (git-ignored); the dataset is not committed.
