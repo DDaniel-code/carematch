@@ -5,17 +5,17 @@
   "honest_no_answer": 2,
   "quality_checks_all_passed": 38,
   "citation_fidelity": {
-    "quotes_checked": 231,
+    "quotes_checked": 248,
     "queries_failing": []
   },
   "duplicates_in_top3": [],
-  "recommendations": 98,
+  "recommendations": 104,
   "tier_mix": {
-    "strong": 83,
+    "strong": 89,
     "moderate": 15
   },
   "location_confidence_mix": {
-    "high": 91,
+    "high": 97,
     "medium": 3,
     "approximate": 4,
     "low": 0
@@ -48,22 +48,22 @@
     }
   },
   "latency_ms": {
-    "p50": 13.49,
-    "p95": 77.17
+    "p50": 13.27,
+    "p95": 77.8
   },
-  "index_warm_seconds": 30.1,
+  "index_warm_seconds": 29.5,
   "sensitivity_vs_baseline": {
     "bands_20_60_120_250": {
       "same_top1_share": 0.947,
-      "mean_top3_jaccard": 0.875
+      "mean_top3_jaccard": 0.897
     },
     "bands_30_90_180_350": {
       "same_top1_share": 0.974,
-      "mean_top3_jaccard": 0.917
+      "mean_top3_jaccard": 0.961
     },
     "strong_needs_3_claims": {
       "same_top1_share": 0.737,
-      "mean_top3_jaccard": 0.668
+      "mean_top3_jaccard": 0.642
     }
   }
 }

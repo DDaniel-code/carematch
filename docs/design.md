@@ -57,6 +57,10 @@ other facilities listed in its city (radius 25–60 km depending on city size):
    "farther, stronger evidence".
 5. Nothing within 300 km → no recommendation; show the nearest credible facility beyond, and weak mentions within 75 km,
    each clearly labelled.
+6. Approximate locations (a PIN known only to its area, a district, a PIN whose post offices are spread out) start at the
+   first band ≥ 2× the location uncertainty and widen until 3 options are found; nearer finds stay first.
+7. Every answer carries an action line: with ≤ 2 options or a radius ≥ 75 km it tells the user to call before setting off
+   and keep the second option ready; each service also states what its evidence can and cannot show.
 
 Why bands instead of one weighted score: the trade-off between distance and evidence is visible and explainable in one
 sentence ("nearest area with credible evidence, then strongest evidence first"). A single number would hide it.

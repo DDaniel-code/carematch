@@ -6,7 +6,8 @@ statement we make can be traced back to the facility text.
 import re
 from difflib import SequenceMatcher
 
-from .services import INCOMPATIBLE_TYPES, INDIRECT, LIST_MIN_COMMAS, NEG_AFTER, NEG_BEFORE, SERVICES, SPECIALTY_NAME
+from .services import (INCOMPATIBLE_TYPES, INDIRECT, LIST_MIN_COMMAS, NEG_AFTER, NEG_BEFORE, PARTNER, SERVICES,
+                       SPECIALTY_NAME)
 from .textutil import fragments, normalize, split_camel, stable_id, text
 
 CLAIM_FIELDS = ('procedure', 'equipment', 'capability')   # structured claim lists
@@ -275,5 +276,7 @@ def assess(row, service, evidence=None):
         cap('moderate', 'listed as a small clinic; inpatient capability unconfirmed', 'small_clinic_claim')
     if indirect and tier in ('strong', 'moderate'):
         flags.append('also_has_indirect_claims')
+    if tier in ('strong', 'moderate') and any(re.search(PARTNER, e['text'], re.I) for e in specific + listed):
+        flags.append('partner_claim')
 
     return {'service': service, 'tier': tier, 'reasons': reasons, 'flags': sorted(set(flags)), 'evidence': ev}

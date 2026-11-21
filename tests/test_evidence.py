@@ -87,6 +87,13 @@ class AssessTests(unittest.TestCase):
         self.assertEqual(a['tier'], 'weak')
         self.assertIn('facility_type_mismatch', a['flags'])
 
+    def test_partnership_is_direct_but_flagged(self):
+        frag = 'Integrated diagnostics center featuring PET-CT in partnership with Neuberg Diagnostics'
+        self.assertEqual(classify_fragment(frag, 'ct_scan', 'capability')[0], 'direct')
+        a = assess(row(capability=[frag], equipment=['CT scanner']), 'ct_scan')
+        self.assertIn('partner_claim', a['flags'])
+        self.assertEqual(classify_fragment('CT scan via tie-up with a nearby centre', 'ct_scan', 'capability')[0], 'indirect')
+
     def test_excluding_is_negation(self):
         frag = 'General surgeries are performed excluding cardiothoracic and vascular surgery'
         self.assertEqual(classify_fragment(frag, 'cardiac_surgery', 'procedure')[0], 'negative')

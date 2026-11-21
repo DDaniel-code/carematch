@@ -37,6 +37,7 @@ FLAG_TEXT = {
     'state_pin_mismatch': 'the state in the record does not match its PIN code',
     'possible_duplicate_listing': 'the same facility appears more than once in the data; listings were merged',
     'possible_merged_record': 'some claims may describe a different facility (the record may merge two sources)',
+    'partner_claim': 'a claim says this is run with a partner organisation (not outsourced); confirm the equipment or unit is on site and working',
 }
 AGGREGATORS = ('practo.com', 'justdial.com', 'facebook.com', 'medindia.net', 'onefivenine.com', 'lybrate.com')
 
@@ -248,17 +249,39 @@ def recommend(index, service_text, location_text, k=MAX_RESULTS, bands=BANDS_KM,
     counts = {b: {t: sum(1 for s in scored if s[1] <= b and TIERS[s[0]] == t) for t in ('strong', 'moderate', 'weak')}
               for b in bands}
 
+    # An approximate location (a PIN known only to its area, +-25 km, or a whole district) cannot support a
+    # 25 km answer: start at the first band at least twice the location's uncertainty. City names are exempt:
+    # their "precision" is the city's size, and a city user is somewhere inside it.
+    coarse = origin['kind'] in ('pin', 'pin_area', 'district')
+    start = [b for b in bands if not coarse or b >= 2 * origin['precision_km']] or [bands[-1]]
+    if start[0] != bands[0]:
+        origin = {**origin, 'notes': origin['notes'] + [
+            f"Your location is only known to about ±{origin['precision_km']:g} km, so the search starts at {start[0]} km."]}
+
     chosen_band, results, extra, runner_ups = None, [], None, []
-    for b in bands:
+    found = []          # recommendable cards, nearest band first; each remembers the band it was found in
+    for b in start:
         in_band = sorted([s for s in scored if s[1] <= b], key=order)
         if not any(s[0] <= 1 for s in in_band):
             continue
         chosen_band = b
         cards = _dedupe([_card(index, s[2], s[3], s[1]) for s in in_band if s[0] <= 1])
-        results = cards[:k]
+        known = {c['facility_id'] for c in found} | {m for c in found for m in c.get('merged_ids', [])}
+        for c in cards:
+            if c['facility_id'] not in known and not set(c.get('merged_ids', [])) & known:
+                c['found_within_km'] = b
+                found.append(c)
+        found = _dedupe(found)
+        if coarse and len(found) < k and b != bands[-1]:
+            continue   # approximate location: widen until there are k options to compare (or the last band)
+        if coarse and b != start[0] and len({c['found_within_km'] for c in found[:k]}) > 1:
+            origin = {**origin, 'notes': origin['notes'] + [
+                f'Fewer than {k} credible options nearby; widened the search to {b} km because the location is approximate. '
+                'Nearer options are listed first.']}
+        results = found[:k]
         weak = _dedupe([_card(index, s[2], s[3], s[1]) for s in in_band if s[0] == 2])
         shown = {_name_key(c['name']) for c in results}
-        pool = cards[k:] + [w for w in weak if _name_key(w['name']) not in shown]
+        pool = found[k:] + [w for w in weak if _name_key(w['name']) not in shown]
         for c in pool[:MAX_RUNNER_UPS]:
             c['why_not'] = _why_not(c, results[-1])
             runner_ups.append(c)
@@ -283,13 +306,28 @@ def recommend(index, service_text, location_text, k=MAX_RESULTS, bands=BANDS_KM,
     n_in_band = len([s for s in eligible if chosen_band and s[1] <= chosen_band])
     for rank, c in enumerate(results, 1):
         c['rank'] = rank
-        c['why_ranked'] = (f"#{rank} of {n_in_band} facilities with credible evidence within {chosen_band} km; "
-                           f"ordered by evidence strength, then distance.")
+        if c.get('found_within_km', chosen_band) != chosen_band:
+            c['why_ranked'] = (f"#{rank}: found within {c['found_within_km']} km, the nearest search radius with credible "
+                               f"evidence; listed before options found only after widening to {chosen_band} km.")
+        else:
+            c['why_ranked'] = (f"#{rank} of {n_in_band} facilities with credible evidence within {chosen_band} km; "
+                               f"ordered by evidence strength, then distance.")
+
+    first_ask = SERVICES[service]['ask'][0]
+    if not results:
+        advice = ('No facility with credible evidence within reach. Call the nearest option shown before travelling, '
+                  'and check with the district hospital or 108 ambulance service.')
+    elif n_in_band <= 2 or chosen_band >= 75:
+        advice = (f'Few alternatives within reach ({n_in_band} within {chosen_band} km): call the first option before '
+                  f'setting off and ask: "{first_ask}" Keep the second option ready in case it cannot confirm.')
+    else:
+        advice = (f'{n_in_band} facilities with credible evidence within {chosen_band} km. Call the first option; '
+                  f'if it cannot confirm, move to the next one.')
 
     result = {
         'contract_version': CONTRACT_VERSION,
         'service': service, 'service_label': SERVICES[service]['label'], 'service_scope': SERVICES[service]['scope'],
-        'origin': origin, 'band_km': chosen_band, 'results': results, 'runner_ups': runner_ups,
+        'origin': origin, 'band_km': chosen_band, 'action_advice': advice, 'results': results, 'runner_ups': runner_ups,
         'farther_stronger': extra, 'nearest_beyond': beyond, 'weak_nearby': weak_nearby,
         'considered': {'by_band': counts, 'recommendable_without_location': no_distance},
         'parameters': {'bands_km': list(bands), 'max_results': k, 'strong_min_claims': strong_min_claims},

@@ -120,10 +120,14 @@ SERVICES = {
 }
 
 # A direct hit in the same fragment as one of these is not an in-house claim.
-INDIRECT = (r'\btie[- ]?up|\boutsourc|\breferr(al|ed|ing)\b|\brefer(s)? (patients )?to\b|\bpartner(ed|ship)?\b'
+INDIRECT = (r'\btie[- ]?up|\boutsourc|\breferr(al|ed|ing)\b|\brefer(s)? (patients )?to\b'
             r'|\bvia\b|\bthrough (a |an )?(partner|associate)|\bvisible in (the )?(photo|image)|\bphotos? (show|indicate)'
             r'|\bplanned\b|\bproposed\b|\bcoming soon\b|\bupcoming\b|\bunder construction\b|\bwill (be|soon)\b'
             r'|\bto be (started|launched|set up)\b|\bwas located\b|\bformerly\b|\bpreviously\b')
+
+# Run jointly with another organisation ("PET-CT in partnership with Neuberg Diagnostics"): still an on-site claim,
+# not outsourcing, but the card asks the user to confirm the equipment or unit is there and working.
+PARTNER = r'\bpartner(ed|ship|s)?\b|\bin association with\b|\bin collaboration with\b|\bcollaborat'
 
 # Negation must sit right next to the service term (checked in a short window before / after the hit).
 NEG_BEFORE = r'\b(no|without|lacks?|lacking|not|excluding|except|other than)\s+(\w+\s+){0,2}$'

@@ -118,6 +118,14 @@ class RecommendTests(unittest.TestCase):
         self.assertIsNotNone(r['nearest_beyond'])      # Patna/Muzaffarpur, > 300 km
         self.assertGreater(r['nearest_beyond']['distance_km'], 300)
 
+    def test_approximate_location_widens_and_keeps_nearer_first(self):
+        r = recommend(self.idx, 'dialysis', '800050')          # unknown PIN -> PIN area, +-25 km
+        self.assertEqual(r['origin']['kind'], 'pin_area')
+        self.assertGreaterEqual(r['band_km'], 75)
+        self.assertTrue(any('search starts at' in n for n in r['origin']['notes']))
+        self.assertTrue(r['review']['passed'])
+        self.assertIn('action_advice', r)
+
     def test_bad_inputs(self):
         self.assertIn('error', recommend(self.idx, 'acupuncture', 'Patna'))
         self.assertIn('error', recommend(self.idx, 'dialysis', ''))

@@ -53,10 +53,13 @@ def review(index, result):
                          f'bad distance: {bad_dist}'))
 
     band = result.get('band_km')
-    keyseq = [(TIERS.index(c['tier']), c['distance_km'] if c['distance_km'] is not None else float('inf')) for c in results]
-    ordered = all(a[0] < b[0] or (a[0] == b[0] and a[1] <= b[1] + 0.05) for a, b in zip(keyseq, keyseq[1:]))
+    # nearest search radius first; inside one radius, tier then distance
+    keyseq = [(c.get('found_within_km', band) or 0, TIERS.index(c['tier']),
+               c['distance_km'] if c['distance_km'] is not None else float('inf')) for c in results]
+    ordered = all(a[0] < b[0] or (a[0] == b[0] and (a[1] < b[1] or (a[1] == b[1] and a[2] <= b[2] + 0.05)))
+                  for a, b in zip(keyseq, keyseq[1:]))
     inside = all(c['distance_km'] is not None and band is not None and c['distance_km'] <= band + 0.05 for c in results)
-    checks.append(_check('Ordered by evidence tier then distance, all within the search radius',
+    checks.append(_check('Ordered nearest search radius first, then evidence tier, then distance; all within the radius',
                          ordered and inside, f'order ok={ordered}, inside {band} km={inside}'))
 
     ranked_extra = [c['name'] for c in extras + result.get('runner_ups', []) if 'rank' in c]

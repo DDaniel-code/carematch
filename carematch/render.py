@@ -33,6 +33,8 @@ def to_text(result):
     out += [f"  note: {n}" for n in o['notes']]
     if result.get('service_scope'):
         out.append(f"  what the evidence can show: {result['service_scope']}")
+    if result.get('action_advice'):
+        out.append(f"What to do: {result['action_advice']}")
     if result['results']:
         out.append(f"Searched up to {result['band_km']} km.")
         for c in result['results']:
