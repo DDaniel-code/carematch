@@ -34,18 +34,36 @@ Median straight-line distance to the top recommendation by place type:
 The gap between cities (1–3 km) and rural / remote places (~100 km) is the access problem the challenge describes, and it
 is visible directly in our output.
 
-## Human review of top-1 answers
+## Review of top-1 answers: two independent model reviewers + human adjudication
 
-`eval/review_sheet.csv` lists each top-1 quote. The model pre-filled a judgement and reason (`model_*` columns);
-**the `human_*` columns are for the team and are the numbers we report.**
+Reading 36 records by hand is slow, so review is layered (`eval/review_sheet.csv`):
 
-| | Model pre-judgement | Human (to fill) |
+1. **Engine-author model (Claude)** pre-judges each top-1 quote (`model_*`).
+2. **Independent second model (ChatGPT)** judges the same quote *and reads the whole facility record* (`xcheck_*`).
+3. **Humans adjudicate only where the two disagree**, plus a random spot check of agreements, using
+   `eval/review.html` — one page with the card, every quote, warnings and both opinions (`python -m scripts.make_review_page`).
+
+| | Claude | ChatGPT |
 | --- | --- | --- |
-| Quote directly supports the service | 32 / 36 yes, 4 partly, 0 no | |
-| Quote is about this one facility | 36 / 36 (no merge signal) | |
+| Quote supports the service | 32 yes, 4 partly, 0 no | 27 yes, 9 partly, 0 no |
+| One real facility | 32 yes, 3 merged, 1 duplicate | 32 yes, 3 merged, 1 duplicate |
+| Agreement on both questions | 31 / 36 | |
 
-The 4 "partly" cases are labelled honestly in the product: two are department-list mentions shown as Moderate, one is
-neuro-trauma for a trauma query, one is a transcatheter valve device for a cardiac-surgery query.
+No reviewer found a quote that contradicts the service. The remaining 5 disagreements (q05–q08, q20) are all the same
+question: a quote proves caesarean deliveries / emergency care, not *emergency readiness right now* or *24x7 cover*.
+
+### What the cross-check found, and what we changed
+
+| Finding (ChatGPT, verified against the data) | Fix |
+| --- | --- |
+| Sarla Hospital, Mumbai has two rows with the same PIN; one has coordinates 600 km away, so the 2 km duplicate rule missed it | duplicate groups now use same name + (same PIN **or** within 2 km), across the whole dataset |
+| SPARSH Hennur Road record also describes the Infantry Road and Sarjapur Road branches | whole-record check for other branches of the same brand |
+| CIMS Ahmedabad record contains 5 statements about Life Care Hospital and 4 placing it in Vadodara | whole-record check: another facility named in ≥ 3 statements, or another city in ≥ 3 |
+| North Kashmir Nursing Home (Handwara) record contains Kashmir Nursing Home, Srinagar statements | same whole-record check |
+| "Emergency C-section" and "24x7 emergency" overstated what a quote can prove | services relabelled "C-section (caesarean delivery)" and "Emergency care"; each service now states what the records can and cannot show |
+
+The whole-record check flags 1,216 of 10,088 records (12%); flagged cards say "some claims may describe a different
+facility" and quote the reason. It does not change the tier unless the service claims themselves name another place.
 
 ## Errors found by this evaluation and fixed
 

@@ -12,6 +12,7 @@ Calibrated on the full facilities table on 2026-11-21; see docs/evidence_calibra
 SERVICES = {
     'dialysis': {
         'label': 'Dialysis',
+        'scope': 'Records show a dialysis unit or dialysis treatment; whether a slot is free today must be confirmed.',
         'direct': [r'\b(ha?emo|peritoneal\s+)?dialy[sz](is|es)\b', r'\bartificial kidney\b', r'\bcrrt\b', r'\bcapd\b'],
         'related': [r'\bnephrolog', r'\bkidney transplant', r'\brenal (care|unit|replacement)'],
         'related_specialties': ['nephrology', 'pediatricNephrology', 'renalTransplantationUrology'],
@@ -22,7 +23,8 @@ SERVICES = {
                 'Is it free or covered under PM-JAY / the national dialysis programme?'],
     },
     'c_section': {
-        'label': 'Emergency C-section',
+        'label': 'C-section (caesarean delivery)',
+        'scope': 'Records show caesarean deliveries are performed. They cannot show emergency readiness (surgeon, anaesthetist and blood on duty now); confirm by phone.',
         'direct': [r'\bca?esarean', r'\bc[- ]?sections?\b', r'\blscs\b', r'\bcemonc\b',
                    r'\bemergency obstetric (care|surgery)'],
         'related': [r'\bobstetric', r'\blabou?r (room|ward|suite)', r'\bmaternity\b', r'\bhigh[- ]risk pregnanc',
@@ -36,6 +38,7 @@ SERVICES = {
     },
     'nicu': {
         'label': 'NICU (newborn intensive care)',
+        'scope': 'Records show a NICU or neonatal intensive care; bed availability must be confirmed.',
         'direct': [r'\bnicu\b', r'\bneonatal intensive', r'\bnewborn intensive', r'\bsncu\b',
                    r'\bspecial newborn care', r'\blevel[- ](ii|iii|2|3)\b.{0,20}neonat'],
         'related': [r'\bneonat', r'\bincubator', r'\bradiant warmer', r'\bphototherapy', r'\bpicu\b', r'\bpaediatric icu|\bpediatric icu'],
@@ -47,6 +50,7 @@ SERVICES = {
     },
     'trauma': {
         'label': 'Trauma care',
+        'scope': 'Records show trauma or accident care; whether the team can receive a patient now must be confirmed.',
         'direct': [r'\btrauma\b', r'\bpolytrauma', r'\baccident (and|&) emergency', r'\baccident care\b', r'\btraumatology'],
         'related': [r'\bemergency\b', r'\bcasualty\b', r'\bicu\b', r'\bintensive care', r'\bneurosurg', r'\borthopa?edic', r'\bblood bank'],
         'related_specialties': ['emergencyMedicine', 'criticalCareMedicine', 'neurosurgery', 'orthopedicSurgery',
@@ -58,7 +62,8 @@ SERVICES = {
                 'Is there an ICU bed free?', 'Do you have a neurosurgeon / orthopaedic surgeon on call?'],
     },
     'emergency': {
-        'label': '24x7 emergency department',
+        'label': 'Emergency care',
+        'scope': 'Records show emergency care is offered. Round-the-clock cover is only shown when the quote says 24x7; confirm by phone.',
         'direct': [r'\bemergency (department|room|ward|services?|care|unit|medicine|wing)', r'\bcasualty\b',
                    r'\baccident (and|&) emergency', r'\b24\s*[x×/*]\s*7 emergency', r'\bemergency 24\s*[x×/*]\s*7'],
         'related': [r'\bambulance', r'\b24\s*[x×/*]\s*7', r'\bicu\b', r'\bintensive care', r'\bround[- ]the[- ]clock'],
@@ -69,6 +74,7 @@ SERVICES = {
     },
     'burn': {
         'label': 'Burn care',
+        'scope': 'Records show burn treatment or a burn unit; bed availability must be confirmed.',
         'direct': [r'\bburns?\s+(unit|ward|care|centre|center|management|treatment|surgery|patients?|injur|icu|wound)',
                    r'\b(treatment|management|care|surgery) of burns?\b', r'\bburns? (and|&) (plastic|trauma|reconstruct)',
                    r'\bpost[- ]?burn', r'\bplastic surgery including burns'],
@@ -80,6 +86,7 @@ SERVICES = {
     },
     'cardiac_surgery': {
         'label': 'Cardiac surgery',
+        'scope': 'Records show heart surgery (bypass, valve, cardiothoracic); scheduling and cost must be confirmed.',
         'direct': [r'\bcardiac surg', r'\bheart surg', r'\bopen[- ]heart', r'\bcabg\b', r'\bcoronary artery bypass',
                    r'\bcardio[- ]?thoracic', r'\bvalve (replacement|repair|surgery)', r'\bctvs\b'],
         'related': [r'\bcath(eteri[sz]ation)? ?lab', r'\bangioplast', r'\bangiograph', r'\bcardiolog', r'\bicu\b|\bccu\b'],
@@ -92,6 +99,7 @@ SERVICES = {
     },
     'mri': {
         'label': 'MRI scan',
+        'scope': 'Records show an MRI scanner or MRI scans; whether the machine is working today must be confirmed.',
         'direct': [r'\bmri\b', r'\bmagnetic resonance'],
         'related': [r'\bradiolog', r'\bct scan|\bct\b', r'\bimaging\b'],
         'related_specialties': ['radiology', 'diagnosticRadiology', 'neuroradiology', 'interventionalRadiology'],
@@ -101,6 +109,7 @@ SERVICES = {
     },
     'ct_scan': {
         'label': 'CT scan',
+        'scope': 'Records show a CT scanner or CT scans; night-time availability must be confirmed.',
         'direct': [r'\bct\b(?!\s*(?:g|scan(?:ning)? report))', r'\bcomputed tomography', r'\bcat scan', r'\b\d+[- ]slice'],
         'related': [r'\bradiolog', r'\bmri\b', r'\bimaging\b'],
         'related_specialties': ['radiology', 'diagnosticRadiology', 'neuroradiology'],

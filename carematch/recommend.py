@@ -12,7 +12,7 @@ import csv
 import re
 import sys
 
-from .evidence import TIERS, assess, foreign_mentions
+from .evidence import TIERS, assess, foreign_mentions, record_mixing
 from .geo import CITY_ALIASES, Gazetteer, city_key, facility_location
 from .services import SERVICES, resolve_service
 from .textutil import fragments, haversine_km, normalize, source_urls, text
@@ -79,7 +79,40 @@ class CareIndex:
         names = {n for n in big | {a for a, k in CITY_ALIASES.items() if k in big} if len(n) >= 4}
         self.city_regex = re.compile(r'\b(' + '|'.join(sorted(map(re.escape, names), key=len, reverse=True)) + r')\b') \
             if names else None
+        self.mixing = [record_mixing(r, self.city_regex, city_key) for r in facility_rows]
+        self.dup_group = self._duplicate_groups()
         self._assessed = {}
+
+    def _duplicate_groups(self):
+        """Rows that are the same facility: same normalized name and (same PIN or positions within DEDUP_KM)."""
+        parent = list(range(len(self.rows)))
+
+        def find(i):
+            while parent[i] != i:
+                parent[i] = parent[parent[i]]
+                i = parent[i]
+            return i
+        by_name = {}
+        for i, r in enumerate(self.rows):
+            key = _name_key(r.get('name'))
+            if key and key not in ('null', 'none'):
+                by_name.setdefault(key, []).append(i)
+        for idxs in by_name.values():
+            for a_pos, a in enumerate(idxs):
+                for b in idxs[a_pos + 1:]:
+                    la, lb = self.locations[a], self.locations[b]
+                    same_pin = la['pin'] and la['pin'] == lb['pin']
+                    close = la['position'] and lb['position'] and haversine_km(la['position'], lb['position']) <= DEDUP_KM
+                    if same_pin or close:
+                        parent[find(b)] = find(a)
+        groups = [find(i) for i in range(len(self.rows))]
+        self._members = {}
+        for i, g in enumerate(groups):
+            self._members.setdefault(g, []).append(i)
+        return groups
+
+    def duplicates_of(self, i):
+        return [j for j in self._members[self.dup_group[i]] if j != i]
 
     @classmethod
     def from_csv(cls, facilities_path='data/facilities.csv', pincodes_path='data/pincodes.csv'):
@@ -108,9 +141,16 @@ def _card(index, i, a, dist):
     urls = source_urls(row.get('source_urls'))
     urls = sorted(urls, key=lambda u: (any(d in u for d in AGGREGATORS), len(u)))
     quotes = [e for e in a['evidence'] if e['kind'] in ('direct', 'listed')][:3] or a['evidence'][:2]
-    flags = sorted(set(a['flags']) | set(f for f in loc['flags'] if f in FLAG_TEXT))
+    dups = index.duplicates_of(i)
+    mixing = index.mixing[i]
+    flags = set(a['flags']) | set(f for f in loc['flags'] if f in FLAG_TEXT)
+    if dups:
+        flags.add('possible_duplicate_listing')
+    if mixing:
+        flags.add('possible_merged_record')
+    flags = sorted(flags)
     uncertainties = [FLAG_TEXT[f] for f in flags if f in FLAG_TEXT]
-    uncertainties += [r[0].upper() + r[1:] for r in a.get('merge_reasons', [])]
+    uncertainties += [r[0].upper() + r[1:] for r in sorted(set(a.get('merge_reasons', [])) | set(mixing))]
     return {
         'facility_id': row.get('unique_id'),
         'name': text(row.get('name')) or '(name missing)',
@@ -131,6 +171,7 @@ def _card(index, i, a, dist):
         'flags': flags, 'uncertainties': uncertainties,
         'source_urls': urls[:3],
         'ask_when_calling': SERVICES[a['service']]['ask'],
+        **({'merged_ids': [index.rows[j].get('unique_id') for j in dups]} if dups else {}),
     }
 
 
@@ -138,11 +179,13 @@ def _dedupe(cards):
     """Merge listings with the same normalized name within DEDUP_KM (or same name and no distance)."""
     kept = []
     for c in cards:
-        dup = next((k for k in kept if _name_key(k['name']) == _name_key(c['name'])
-                    and (k['distance_km'] is None or c['distance_km'] is None
-                         or abs(k['distance_km'] - c['distance_km']) <= DEDUP_KM)), None)
+        dup = next((k for k in kept if c['facility_id'] in k.get('merged_ids', [])
+                    or (_name_key(k['name']) == _name_key(c['name'])
+                        and (k['distance_km'] is None or c['distance_km'] is None
+                             or abs(k['distance_km'] - c['distance_km']) <= DEDUP_KM))), None)
         if dup:
-            dup.setdefault('merged_ids', []).append(c['facility_id'])
+            if c['facility_id'] not in dup.setdefault('merged_ids', []):
+                dup['merged_ids'].append(c['facility_id'])
             if 'possible_duplicate_listing' not in dup['flags']:
                 dup['flags'].append('possible_duplicate_listing')
                 dup['uncertainties'].append(FLAG_TEXT['possible_duplicate_listing'])
@@ -245,7 +288,7 @@ def recommend(index, service_text, location_text, k=MAX_RESULTS, bands=BANDS_KM,
 
     result = {
         'contract_version': CONTRACT_VERSION,
-        'service': service, 'service_label': SERVICES[service]['label'],
+        'service': service, 'service_label': SERVICES[service]['label'], 'service_scope': SERVICES[service]['scope'],
         'origin': origin, 'band_km': chosen_band, 'results': results, 'runner_ups': runner_ups,
         'farther_stronger': extra, 'nearest_beyond': beyond, 'weak_nearby': weak_nearby,
         'considered': {'by_band': counts, 'recommendable_without_location': no_distance},

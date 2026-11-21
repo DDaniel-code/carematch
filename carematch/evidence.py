@@ -125,6 +125,71 @@ def foreign_mentions(evidence, row, other_cities, canon=lambda c: c):
     return sorted(set(reasons))
 
 
+_BRANCH_SPLIT = re.compile(r'\s*(?:,|\s-\s|\s–\s|\()\s*')
+
+
+def record_mixing(row, other_cities, canon=lambda c: c, limit=3):
+    """Whole-record check: does the record carry text about other facilities, branches or cities?
+
+    Looks at every claim and the description, not only the service evidence. Returns up to `limit` reasons.
+    """
+    name = text(row.get('name'))
+    parts = _BRANCH_SPLIT.split(name, maxsplit=1)
+    brand, branch = parts[0], (parts[1] if len(parts) > 1 else '')
+    brand_re = re.compile(re.escape(brand) + r'\s*(?:,|-|–)\s*([A-Z][\w .]{2,30})') if len(brand) >= 5 else None
+    branch_tokens = _name_tokens(branch)
+    frags = [f for field in ('procedure', 'equipment', 'capability', 'description') for f in fragments(row.get(field))]
+    own = _name_tokens(name)
+    initials = ''.join(w[0] for w in re.findall(r'[a-z]+', normalize(name)) if w not in ('of', 'and', 'the'))
+    own_city = canon(normalize(row.get('address_city')))
+    home_text = ' '.join(normalize(row.get(k)) for k in ('address_city', 'address_stateOrRegion', 'address_line1',
+                                                          'address_line2', 'address_line3', 'name'))
+    names, cities, reasons = {}, {}, set()
+    for f in frags:
+        seen = set()
+        for m in _FACILITY_NAME_RE.finditer(f):
+            words = re.findall(r'[a-z]+', normalize(m.group(1)))
+            tokens = _name_tokens(m.group(0))
+            if not tokens or not own or tokens & own or (words and words[0] in GENERIC_LEADS):
+                continue
+            if initials.startswith(''.join(sorted(tokens))) or ''.join(sorted(tokens)) in initials:
+                continue   # "CIMS Hospital" is Care Institute of Medical Sciences itself
+            if SequenceMatcher(None, ''.join(sorted(tokens)), ''.join(sorted(own))).ratio() >= 0.75:
+                continue
+            seen.add((' '.join(sorted(tokens)), m.group(0).strip()))
+        for key, label in seen:
+            names.setdefault(key, {'label': label, 'frags': []})['frags'].append(f)
+        if other_cities is not None:
+            for city in {m.group(0) for m in other_cities.finditer(normalize(f))}:
+                if canon(city) != own_city and city not in home_text:
+                    cities.setdefault(canon(city), []).append(f)
+        if brand_re and branch_tokens:
+            for m in brand_re.finditer(f):
+                other = _name_tokens(m.group(1)) - LOCALITY_WORDS
+                first = m.group(1).split()[0].lower()
+                if other and not other & (branch_tokens - LOCALITY_WORDS) and first not in BRANCH_STOP \
+                        and len(m.group(1).split()) <= 4:
+                    reasons.add(f'the record also describes another branch ("{brand}, {m.group(1).strip()}")')
+    for entry in names.values():
+        if len(entry['frags']) >= 3:
+            reasons.add(f'{len(entry["frags"])} statements describe another facility ("{entry["label"]}")')
+    for city, fs in cities.items():
+        if len(fs) >= 3:
+            reasons.add(f'{len(fs)} statements place the facility in {city.title()}')
+    return sorted(reasons)[:limit]
+
+
+GENERIC_LEADS = {'top', 'find', 'best', 'related', 'associated', 'special', 'general', 'government', 'govt', 'medical',
+                 'super', 'multi', 'first', 'leading', 'nearby', 'other', 'private', 'public', 'all', 'private', 'list',
+                 'empanelled', 'ayushman', 'district', 'civil', 'teaching', 'partner', 'affiliated', 'tertiary',
+                 'breast', 'liver', 'heart', 'kidney', 'eye', 'skin', 'dental', 'cancer', 'fertility', 'women', 'child',
+                 'medindia', 'practo', 'justdial', 'lybrate', 'credihealth', 'more', 'hexahealth', 'docindia', 'sehat'}
+LOCALITY_WORDS = {'road', 'rd', 'nagar', 'street', 'colony', 'sector', 'layout', 'main', 'cross', 'marg', 'chowk',
+                  'branch', 'campus', 'unit', 'east', 'west', 'north', 'south', 'extension', 'phase'}
+BRANCH_STOP = {'providing', 'provides', 'offers', 'offering', 'is', 'has', 'with', 'located', 'a', 'an', 'the', 'and',
+               'india', 'pvt', 'private', 'limited', 'ltd'}
+
+
 def _number(value):
     m = re.search(r'\d+(\.\d+)?', str(value or ''))
     return float(m.group(0)) if m else None

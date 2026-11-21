@@ -31,6 +31,8 @@ def to_text(result):
     o = result['origin']
     out = [f"{result['service_label']} near {o['label']}  (location precision ~{o['precision_km']} km)"]
     out += [f"  note: {n}" for n in o['notes']]
+    if result.get('service_scope'):
+        out.append(f"  what the evidence can show: {result['service_scope']}")
     if result['results']:
         out.append(f"Searched up to {result['band_km']} km.")
         for c in result['results']:

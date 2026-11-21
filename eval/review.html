@@ -1,0 +1,98 @@
+<!doctype html><meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><title>CareMatch review</title><style>
+:root{--bg:#fafaf9;--card:#fff;--ink:#1c1917;--mute:#57534e;--line:#e7e5e4;--warn:#b45309;--ok:#15803d;--accent:#1d4ed8}
+@media (prefers-color-scheme:dark){:root{--bg:#1c1917;--card:#292524;--ink:#f5f5f4;--mute:#a8a29e;--line:#44403c;--warn:#f59e0b;--ok:#4ade80;--accent:#93c5fd}}
+body{background:var(--bg);color:var(--ink);font:15px/1.5 system-ui,sans-serif;margin:0;padding:16px}
+main{max-width:860px;margin:auto}.row{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px;margin:16px 0}
+h1{font-size:22px}h2{font-size:17px;margin:0 0 4px}.mute{color:var(--mute)}blockquote{margin:6px 0;padding:4px 10px;border-left:3px solid var(--accent)}
+.warn{color:var(--warn)}.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}@media(max-width:640px){.grid{grid-template-columns:1fr}}
+.op{border:1px solid var(--line);border-radius:8px;padding:8px}.tag{font-weight:600}.ask{background:var(--bg);border-radius:8px;padding:8px;margin-top:8px}
+</style><main><h1>CareMatch: human review</h1><p>5 answers where the two model reviewers disagree, then 4 random agreements as a spot check. For each, decide two things and reply with the id: <b>does the quote support the service</b> (yes / partly / no) and <b>is it one real facility</b> (yes / merged / duplicate). The page already shows everything from the record.</p>
+<h1>Disagreements</h1>
+<section class=row><h2>q05 · C-section (caesarean delivery) near Mumbai, Maharashtra</h2><p class=mute>metro baseline · evidence can show: Records show caesarean deliveries are performed. They cannot show emergency readiness (surgeon, anaesthetist and blood on duty now); confirm by phone.</p>
+<p><b>Sarla Hospital</b> — 1.1 km · <b>strong</b> evidence · hospital · Mumbai, Maharashtra</p>
+<p class=mute>Why this tier: 2 distinct claims in procedure, plus related department evidence</p>
+<blockquote>“Caesarean Section” <span class=mute>— procedure</span></blockquote>
+<blockquote>“Performs cesarean deliveries for breech presentation” <span class=mute>— procedure</span></blockquote>
+<p class=warn>⚠ the same facility appears more than once in the data; listings were merged</p>
+<div class=grid>
+<div class=op><span class=tag>Claude (engine author)</span><br>quote supports: <b>yes</b> · one facility: <b>duplicate (now merged and flagged)</b><br><span class=mute>Verified: a second &quot;Sarla Hospital&quot; row with the same PIN 400054 has coordinates 600 km away. Rows are now grouped and the card shows &quot;listings were merged&quot;. Quote supports C-section; emergency readiness is not claimed (service relabelled).</span></div>
+<div class=op><span class=tag>ChatGPT (independent)</span><br>quote supports: <b>partly</b> · one facility: <b>duplicate</b><br><span class=mute>The quote establishes C-section capability but not emergency readiness or current staff/blood availability. A second same-name record at the same Mumbai address indicates a duplicate listing.</span></div>
+</div></section>
+<section class=row><h2>q06 · C-section (caesarean delivery) near Lucknow, Uttar Pradesh</h2><p class=mute>tier-2 city · evidence can show: Records show caesarean deliveries are performed. They cannot show emergency readiness (surgeon, anaesthetist and blood on duty now); confirm by phone.</p>
+<p><b>BNK Hospital</b> — 2.1 km · <b>strong</b> evidence · hospital · Lucknow, Uttar Pradesh</p>
+<p class=mute>Why this tier: 2 distinct claims in procedure, plus related department evidence</p>
+<blockquote>“Lower Segment Caesarean Section (LSCS)” <span class=mute>— procedure</span></blockquote>
+<blockquote>“Performs Lower Segment Caesarean Section (LSCS)” <span class=mute>— procedure</span></blockquote>
+<div class=grid>
+<div class=op><span class=tag>Claude (engine author)</span><br>quote supports: <b>yes</b> · one facility: <b>yes (no merge signal)</b><br><span class=mute>Quote shows caesarean delivery. The service is now labelled &quot;C-section (caesarean delivery)&quot; and states that emergency readiness must be confirmed by phone, so the claim we make matches the quote.</span></div>
+<div class=op><span class=tag>ChatGPT (independent)</span><br>quote supports: <b>partly</b> · one facility: <b>yes</b><br><span class=mute>LSCS is explicitly offered, but the quote does not establish emergency obstetric readiness, on-duty anaesthesia, or blood availability.</span></div>
+</div></section>
+<section class=row><h2>q07 · C-section (caesarean delivery) near Aurangabad district, Bihar</h2><p class=mute>same-name district in another state · evidence can show: Records show caesarean deliveries are performed. They cannot show emergency readiness (surgeon, anaesthetist and blood on duty now); confirm by phone.</p>
+<p><b>Medizone Hospitals</b> — 113.9 km · <b>strong</b> evidence · hospital · Patna, Bihar</p>
+<p class=mute>Why this tier: 3 distinct claims across capability, procedure</p>
+<blockquote>“Cesarean delivery” <span class=mute>— procedure</span></blockquote>
+<blockquote>“Performs cesarean deliveries” <span class=mute>— procedure</span></blockquote>
+<blockquote>“24x7 Normal &amp; Cesarean Delivery Services” <span class=mute>— capability</span></blockquote>
+<div class=grid>
+<div class=op><span class=tag>Claude (engine author)</span><br>quote supports: <b>yes</b> · one facility: <b>yes (no merge signal)</b><br><span class=mute>Quote shows caesarean delivery. The service is now labelled &quot;C-section (caesarean delivery)&quot; and states that emergency readiness must be confirmed by phone, so the claim we make matches the quote.</span></div>
+<div class=op><span class=tag>ChatGPT (independent)</span><br>quote supports: <b>partly</b> · one facility: <b>yes</b><br><span class=mute>Cesarean delivery is explicit, but the quote does not establish emergency availability or readiness. No facility-identity conflict was found.</span></div>
+</div></section>
+<section class=row><h2>q08 · C-section (caesarean delivery) near Mon district, Nagaland</h2><p class=mute>lowest institutional-birth district (NFHS) · evidence can show: Records show caesarean deliveries are performed. They cannot show emergency readiness (surgeon, anaesthetist and blood on duty now); confirm by phone.</p>
+<p><b>Srimanta Sankardeva Hospital &amp; Research Institute</b> — 89.0 km · <b>moderate</b> evidence · hospital · Dibrugarh, Assam</p>
+<p class=mute>Why this tier: one specific claim (procedure)</p>
+<blockquote>“Cesarean delivery” <span class=mute>— procedure</span></blockquote>
+<div class=grid>
+<div class=op><span class=tag>Claude (engine author)</span><br>quote supports: <b>yes</b> · one facility: <b>yes (no merge signal)</b><br><span class=mute>Quote shows caesarean delivery. The service is now labelled &quot;C-section (caesarean delivery)&quot; and states that emergency readiness must be confirmed by phone, so the claim we make matches the quote.</span></div>
+<div class=op><span class=tag>ChatGPT (independent)</span><br>quote supports: <b>partly</b> · one facility: <b>yes</b><br><span class=mute>Cesarean delivery is explicit, but the quote does not establish emergency availability or readiness. No facility-identity conflict was found.</span></div>
+</div></section>
+<section class=row><h2>q20 · Emergency care near Tawang district, Arunachal Pradesh</h2><p class=mute>remote border district · evidence can show: Records show emergency care is offered. Round-the-clock cover is only shown when the quote says 24x7; confirm by phone.</p>
+<p><b>Sarathi Hospital</b> — 116.9 km · <b>strong</b> evidence · hospital · Nalbari, Assam</p>
+<p class=mute>Why this tier: 4 distinct claims across capability, procedure</p>
+<blockquote>“Provides emergency care” <span class=mute>— procedure</span></blockquote>
+<blockquote>“Provides emergency procedures through 24x7 emergency services” <span class=mute>— procedure</span></blockquote>
+<blockquote>“24/7 emergency care” <span class=mute>— capability</span></blockquote>
+<div class=grid>
+<div class=op><span class=tag>Claude (engine author)</span><br>quote supports: <b>yes</b> · one facility: <b>yes (no merge signal)</b><br><span class=mute>Quote shows emergency care, not 24x7. Service relabelled &quot;Emergency care&quot;; 24x7 cover is listed as something to confirm.</span></div>
+<div class=op><span class=tag>ChatGPT (independent)</span><br>quote supports: <b>partly</b> · one facility: <b>yes</b><br><span class=mute>The quote establishes emergency care, but not a 24x7 emergency department or current availability. No identity conflict was found.</span></div>
+</div></section>
+<h1>Spot check (models agree)</h1>
+<section class=row><h2>q19 · Emergency care near PIN 764020 (Koraput, Odisha)</h2><p class=mute>rural Odisha PIN (Koraput) · evidence can show: Records show emergency care is offered. Round-the-clock cover is only shown when the quote says 24x7; confirm by phone.</p>
+<p><b>Usha Prime Hospital</b> — 129.5 km · <b>strong</b> evidence · hospital · Anakapalle, Andhra Pradesh</p>
+<p class=mute>Why this tier: 2 distinct claims in capability, plus related department evidence</p>
+<blockquote>“24/7 emergency care” <span class=mute>— capability</span></blockquote>
+<blockquote>“Provides 24/7 emergency services” <span class=mute>— capability</span></blockquote>
+<div class=grid>
+<div class=op><span class=tag>Claude (engine author)</span><br>quote supports: <b>yes</b> · one facility: <b>yes (no merge signal)</b><br><span class=mute>Quote names the service directly.</span></div>
+<div class=op><span class=tag>ChatGPT (independent)</span><br>quote supports: <b>yes</b> · one facility: <b>yes</b><br><span class=mute>The quote explicitly states 24/7 emergency care; no facility-identity conflict was found.</span></div>
+</div></section>
+<section class=row><h2>q33 · CT scan near Kolkata, West Bengal</h2><p class=mute>metro baseline · evidence can show: Records show a CT scanner or CT scans; night-time availability must be confirmed.</p>
+<p><b>Pulse Diagnostics</b> — 0.2 km · <b>strong</b> evidence · clinic · Kolkata, West Bengal</p>
+<p class=mute>Why this tier: 3 distinct claims across equipment, procedure</p>
+<blockquote>“CT Coronary Angiography” <span class=mute>— procedure</span></blockquote>
+<blockquote>“CT scanner” <span class=mute>— equipment</span></blockquote>
+<blockquote>“PET-CT imaging equipment” <span class=mute>— equipment</span></blockquote>
+<p class=warn>⚠ some text describes referral or outsourcing for this service</p>
+<div class=grid>
+<div class=op><span class=tag>Claude (engine author)</span><br>quote supports: <b>yes</b> · one facility: <b>yes (no merge signal)</b><br><span class=mute>CT coronary angiography is performed on a CT scanner.</span></div>
+<div class=op><span class=tag>ChatGPT (independent)</span><br>quote supports: <b>yes</b> · one facility: <b>yes</b><br><span class=mute>CT coronary angiography directly demonstrates CT imaging capability; no facility-identity conflict was found.</span></div>
+</div></section>
+<section class=row><h2>q23 · Burn care near PIN 852201 (Saharsa, Bihar)</h2><p class=mute>rural Bihar PIN (Saharsa) · evidence can show: Records show burn treatment or a burn unit; bed availability must be confirmed.</p>
+<p><b>Palika Vinayak Hospital</b> — 146.4 km · <b>strong</b> evidence · hospital · Patna, Bihar</p>
+<p class=mute>Why this tier: 2 distinct claims across capability, procedure</p>
+<blockquote>“Burns management” <span class=mute>— procedure</span></blockquote>
+<blockquote>“Specializes in Burns Management” <span class=mute>— capability</span></blockquote>
+<div class=grid>
+<div class=op><span class=tag>Claude (engine author)</span><br>quote supports: <b>yes</b> · one facility: <b>yes (no merge signal)</b><br><span class=mute>Quote names the service directly.</span></div>
+<div class=op><span class=tag>ChatGPT (independent)</span><br>quote supports: <b>yes</b> · one facility: <b>yes</b><br><span class=mute>Burns management directly supports burn care; no facility-identity conflict was found.</span></div>
+</div></section>
+<section class=row><h2>q35 · CT scan near PIN area 8454xx</h2><p class=mute>PIN without reliable location (falls back to PIN area) · evidence can show: Records show a CT scanner or CT scans; night-time availability must be confirmed.</p>
+<p><b>Harsh Hospital</b> — 16.2 km · <b>strong</b> evidence · hospital · Motihari, Bihar</p>
+<p class=mute>Why this tier: 2 distinct claims across equipment, procedure</p>
+<blockquote>“Performs CT scan imaging.” <span class=mute>— procedure</span></blockquote>
+<blockquote>“CT scanner.” <span class=mute>— equipment</span></blockquote>
+<p class=warn>⚠ the PIN code does not match the facility location</p>
+<div class=grid>
+<div class=op><span class=tag>Claude (engine author)</span><br>quote supports: <b>yes</b> · one facility: <b>yes (no merge signal)</b><br><span class=mute>Direct claim; PIN does not match location (flagged), user PIN itself is approximate.</span></div>
+<div class=op><span class=tag>ChatGPT (independent)</span><br>quote supports: <b>yes</b> · one facility: <b>yes</b><br><span class=mute>The quote explicitly states CT scan imaging. The PIN inconsistency affects location confidence, not the service claim.</span></div>
+</div></section>
+</main>

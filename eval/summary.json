@@ -48,10 +48,10 @@
     }
   },
   "latency_ms": {
-    "p50": 13.11,
-    "p95": 73.92
+    "p50": 13.49,
+    "p95": 77.17
   },
-  "index_warm_seconds": 25.8,
+  "index_warm_seconds": 30.1,
   "sensitivity_vs_baseline": {
     "bands_20_60_120_250": {
       "same_top1_share": 0.947,

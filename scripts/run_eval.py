@@ -129,8 +129,12 @@ def main():
     if os.path.exists(review_path):   # keep judgements already entered for unchanged top-1 answers
         with open(review_path, newline='', encoding='utf-8') as fh:
             previous = {(r['id'], r['top1_name']): r for r in csv.DictReader(fh)}
+    # model_*  : this engine's author model (Claude) pre-judgement
+    # xcheck_* : an independent second model (ChatGPT) reading the same quote and the full record
+    # human_*  : the team's final call; required where the two models disagree
     judge_cols = ['model_quote_supports', 'model_one_facility', 'model_note',
-                  'human_quote_supports', 'human_one_facility', 'human_note']
+                  'xcheck_quote_supports', 'xcheck_one_facility', 'xcheck_note',
+                  'models_agree', 'human_quote_supports', 'human_one_facility', 'human_note']
     with open(review_path, 'w', newline='', encoding='utf-8') as fh:
         cols = ['id', 'service', 'place', 'top1_name', 'top1_tier', 'top1_km', 'top1_field', 'top1_quote', 'top1_flags']
         w = csv.DictWriter(fh, fieldnames=cols + judge_cols)
@@ -138,7 +142,12 @@ def main():
         for r in rows:
             if r.get('top1_name'):
                 prev = previous.get((r['id'], r['top1_name']), {})
-                w.writerow({**{c: r.get(c, '') for c in cols}, **{c: prev.get(c, '') for c in judge_cols}})
+                out = {**{c: r.get(c, '') for c in cols}, **{c: prev.get(c, '') for c in judge_cols}}
+                if out['model_quote_supports'] and out['xcheck_quote_supports']:
+                    agree = (out['model_quote_supports'] == out['xcheck_quote_supports']
+                             and out['model_one_facility'].split(' ')[0] == out['xcheck_one_facility'].split(' ')[0])
+                    out['models_agree'] = 'yes' if agree else 'no'
+                w.writerow(out)
     with open(os.path.join(args.out, 'summary.json'), 'w', encoding='utf-8') as fh:
         json.dump(summary, fh, indent=2)
     print(json.dumps(summary, indent=2))
