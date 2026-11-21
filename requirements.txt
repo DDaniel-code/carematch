@@ -1,0 +1,4 @@
+# Databricks App runtime. The carematch engine itself needs only the Python standard library.
+streamlit
+databricks-sql-connector
+databricks-sdk
