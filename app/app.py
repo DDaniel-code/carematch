@@ -63,7 +63,9 @@ def render_card(c, heading):
         dist = (f"**{c['distance_km']} km** away" if c['distance_km'] is not None else '**distance unknown**')
         basis = '' if c.get('distance_basis') in (None, 'facility coordinates') else f" (from {esc(c['distance_basis'])})"
         meta = ' · '.join(esc(x) for x in (c.get('type'), c.get('operator'),
-                                           f"{c['beds']} beds" if c.get('beds') else None) if x)
+                                           f"{c['beds']} beds" if c.get('beds') else None,
+                                           f"found within {c['found_within_km']} km" if c.get('found_within_km') else None)
+                          if x)
         st.markdown(f"{TIER_TEXT.get(c['tier'], esc(c['tier']))}  \n{dist}{basis}" + (f" · {meta}" if meta else ''))
         place = ', '.join(esc(x) for x in (c.get('address') or c.get('city'), f"PIN {c['pin']}" if c.get('pin') else None) if x)
         if place:
@@ -104,6 +106,8 @@ def render_result(r):
     st.markdown(f"**{esc(r['service_label'])}** near **{esc(o['label'])}** "
                 f"<span style='color:gray'>(location precision about {o['precision_km']} km)</span>",
                 unsafe_allow_html=True)
+    if r.get('service_scope'):
+        st.caption(f"**What the records can show:** {esc(r['service_scope'])}")
     for note in o.get('notes', []):
         st.caption(note)
     if o.get('alternatives'):
@@ -118,6 +122,8 @@ def render_result(r):
         total = len(review.get('checks', []))
         (st.success if review.get('passed') else st.error)(f'Quality checks: {ok}/{total} passed')
 
+    if r.get('action_advice'):
+        st.info(f"**Next step:** {esc(r['action_advice'])}", icon='📞')
     if r['results']:
         st.markdown(f"Showing facilities with credible evidence within **{r['band_km']} km**.")
         for c in r['results']:

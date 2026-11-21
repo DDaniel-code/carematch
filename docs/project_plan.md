@@ -4,6 +4,45 @@
 系统架构见 [system_design.md](system_design.md)，排序规则见 [design.md](design.md)。
 本文件是团队内部的工作计划。仓库里给评委看的文档用英文，这份用中文。
 
+## 0. 迭代阶段（11/21 18:00 起）
+
+define → prototype → evaluation → deployment 已完成：App 在 Databricks 上从 Unity Catalog 读数据，演示查询的质量检查都是 8/8。
+
+**官方评分标准**（cmudsc.com/datathon-fall2026，没有权重）：
+- **Exploration**："Uncover novel datasets and provide insightful analysis"
+- **Modeling**："Develop advanced models to find meaningful data relationships"
+- **Impact**："Propose actionable and impactful policies"
+
+官网写的截止时间是周日 12:30 PM，标注 tentative。我们仍按 11:30 提交。
+
+**目前最大的缺口是 Impact，不是缺一个 Agent。** 现在的产品回答的是"这个病人去哪"，还没回答"规划者该优先改善哪些地区"；NFHS 表也还没用上。所以这一轮迭代做三件事：
+
+| 目标 | 内容 | 对应评分项 | 负责 |
+| --- | --- | --- | --- |
+| 1. 区分"服务存在"和"紧急就绪" | 剖宫产、创伤、NICU、急诊的卡片单独列出就绪信号：是否写明 24x7、麻醉、血库、手术室、ICU、NICU/SNCU 等。这些信号不改变证据档位，只在同档位、距离相近时作为次要排序依据 | Modeling | A |
+| 2. 合并记录不能排第一 | 被标记为疑似合并的机构，只要同一距离圈里有同档位的干净选项，就不能排在第一 | Modeling | A |
+| 3. 可达性缺口分析（规划者视图） | 对每个地区、每项服务，计算到最近 Strong/Moderate 机构的距离，再叠加 NFHS 需求指标（剖宫产率、住院分娩率、血糖等），找出"需求高、可达性差"的地区，并写成政策建议 | Exploration + Impact | B |
+
+第 3 项的边界：
+- NFHS 只用于地区层面的分析，**不参与单个病人的排序**。地区需求高，不能说明某家医院更好。
+- 数据集里 88% 是私立机构、公立只有 5%，所以"数据里没有可靠机构"不等于"现实中没有"。政策建议要分两类写：一是数据核实（补登公立设施），二是转诊和设施建设。
+- WHO 的参考是：人口剖宫产率低于 5% 通常说明可及性不足。这条可以作为孕产场景下的需求信号。
+
+**这一轮不做**：LLM Agent、道路导航 API、实时可用性、重写排序架构。
+
+### 迭代分工与时间（EST）
+
+| 时段 | A 引擎 | B 平台（本 tab） | 你 |
+| --- | --- | --- | --- |
+| 18:15–20:30 | 就绪信号；合并记录不排第一；卡片加 `lat`/`lon`；把人工核对结果写进 `docs/evaluation.md`；重跑评估 | `carematch/planner.py` + 可达性缺口分析 + `docs/impact.md`（政策建议） | 问主办方：视频时长、提交表单 |
+| 20:30–22:30 | 根据评估修 bug | 单文件 notebook 生成脚本 `scripts/build_notebook.py` → `CareMatch.ipynb`，包含：问题、数据探索、方法、演示、评估、可达性缺口与政策、局限 | 吃饭、休息 |
+| 22:30–00:30 | 冻结引擎 | App 迭代：显示服务范围说明和行动建议、就绪信号、地图、"地区缺口"页、方法页；重新部署；README | 看 App，提 UI 意见 |
+| 00:30 | 冻结 | 推送 | 睡觉 |
+| 07:30–10:30 | — | 在 Databricks 上跑最终 notebook 并导出；重新部署 App | 录视频（3–5 分钟） |
+| 10:30–11:30 | — | 提交前检查 | 提交 |
+
+时间不够时，B 按这个顺序砍：方法页 → 地图 → App 里的"地区缺口"页（只保留在 notebook 和 `docs/impact.md` 里）。**单文件 notebook 和 README 不能砍。**
+
 ## 1. 交付什么，做到什么程度算完成
 
 **主办方确认的提交物（11/21 16:45）：** ① 项目代码打包成**单个 .ipynb 文件**；② **公开的** GitHub 仓库链接；③ **视频讲解**。全部在周日中午前提交。
@@ -118,12 +157,15 @@
 | --- | --- | --- |
 | 0:00–0:20 | **问题**：机构"说有"不等于"真有"。举真实例子：一家政府医院写着 "Caesarean section facility not available on-site; referrals to LNJP"，系统把它排除了 | — |
 | 0:20–1:00 | **标准情况**：比哈尔邦首府找透析，3 家 Strong，都在 1 km 内；打开一张卡片，展示引用原文、出处字段、电话和"打电话该问什么" | `Dialysis` + `Patna` |
-| 1:00–1:35 | **取舍**：附近只有 Moderate，51 km 外有一家 Strong。系统两个都给，并说明为什么 | `MRI` + `Darbhanga`：25 km 内 2 家 Moderate，另附 Muzaffarpur 一家 Strong（51 km） |
-| 1:35–2:05 | **诚实的远距离回答**：烧伤在全国只有 38 家 Strong。从 Gaya 出发，最近的可靠选项在 Patna，约 92 km，系统直接说明 | `Burn care` + `Gaya` |
-| 2:05–2:25 | **偏远地区**：从 Nagaland 的 Kohima 出发找创伤救治，唯一的可靠选项在 Imphal，直线 99 km，而且跨了邦。提示这是直线距离，山路实际会远很多 | `Trauma` + `Kohima` |
+| 1:00–1:35 | **取舍**：附近只有 Moderate，51 km 外有一家 Strong。系统两个都给，并说明为什么 | `MRI scan` + `Darbhanga`：25 km 内 2 家 Moderate，另附 Muzaffarpur 一家 Strong（51 km） |
+| 1:35–2:05 | **诚实的远距离回答**：从 Gaya 出发，最近的可靠选项在 Patna，约 92 km，系统直接说明 | `Burn care` + `Gaya` |
+| 2:05–2:25 | **偏远地区**：从 Nagaland 的 Kohima 出发找创伤救治，最近的在 Imphal，直线 99 km，而且跨了邦；另外两家在 156 km 和 167 km。提示这是直线距离，山路实际会远很多 | `Trauma care` + `Kohima` |
 | 2:25–3:00 | **HOW**：Method 页（证据分档、距离圈、校准对照表）+ 评估数字（引用保真度 100%、top-1 准确率等） | — |
 
-备选查询：`C-section` + `Muzaffarpur`（附近 1 家 Moderate，Patna 61 km 外有一家 Strong）；PIN 码 `800001` 找 NICU（展示 PIN 输入）。
+备选查询（服务名按 App 下拉框的写法）：
+- `C-section (caesarean delivery)` + `Muzaffarpur`：附近 1 家 Moderate，Patna 61 km 外有一家 Strong。
+- `NICU (newborn intensive care)` + PIN `800001`：展示 PIN 码输入。
+- `Burn care` + `Port Blair`：300 km 内没有可靠选项，最近的在 1,217 km 外，展示诚实拒答。
 
 ## 9. 提交前检查清单
 
