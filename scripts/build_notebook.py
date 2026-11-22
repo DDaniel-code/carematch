@@ -36,7 +36,7 @@ MODULES = [
     ('price', 'Service-specific prices, bounds, conditions and exact source text.'),
     ('decision', 'Patient-selected preferences and their documented evidence.'),
     ('needs', 'Describe the situation: plain words (English, romanized Hindi with unreviewed spellings) to a suggested service, '
-              'urgency and a 108 / 102 danger-sign prompt. Only prefills the form; never a diagnosis and never searches by itself.'),
+              'urgency and a 108 / 102 danger-sign prompt. Suggests a service; travel preferences stay under user control.'),
     ('review', 'Eight automatic quality checks run on every answer, including citation fidelity: every quote must appear word for word in the '
                'named column of the facility record.'),
     ('recommend', 'The ranking: only Strong or Moderate evidence is recommended; take the nearest distance band (25/75/150/300 km) that has any; '
@@ -121,17 +121,24 @@ The same engine is deployed as a Databricks App (Streamlit) for health workers; 
 SETUP = r'''import csv, json, math, os, re, statistics, sys, time
 from collections import Counter
 from types import ModuleType
+from pathlib import Path
+from tempfile import TemporaryDirectory
 
 # Use a private package so importing these modules cannot shadow an installed CareMatch.
 package = ModuleType('_carematch_submission')
-package.__path__ = []
+# Databricks rereads loaded module files after each cell. Keep the exact embedded source
+# on the driver for as long as this notebook is running, independent of the workspace path.
+embedded_directory = TemporaryDirectory(prefix='carematch_notebook_')
+package.__path__ = [embedded_directory.name]
 sys.modules[package.__name__] = package
 
 def load_embedded(name, source):
     fullname = package.__name__ + '.' + name
     module = ModuleType(fullname)
     module.__package__ = package.__name__
-    module.__file__ = os.path.join(os.getcwd(), 'carematch', name + '.py')
+    path = Path(embedded_directory.name) / (name + '.py')
+    path.write_text(source, encoding='utf-8')
+    module.__file__ = str(path)
     sys.modules[fullname] = module
     setattr(package, name, module)
     exec(compile(source, module.__file__, 'exec'), module.__dict__)
@@ -171,6 +178,7 @@ if ON_DATABRICKS:
     facility_rows, pincode_rows, load_info = load(spark=spark)
     nfhs_rows = load_nfhs(spark=spark)
 else:
+    os.environ.setdefault('CAREMATCH_DATA_DIR', os.path.abspath('data'))
     facility_rows, pincode_rows, load_info = load(order=['local'])
     nfhs_rows = load_nfhs()
 index = CareIndex(facility_rows, pincode_rows)
@@ -218,7 +226,7 @@ dup_rows = sum(c for c in groups.values() if c > 1)
 mixed = sum(1 for m in index.mixing if m)
 print(f'Duplicate listings: {dup_rows} rows in {dup_groups} groups (same name and same PIN or within 2 km); shown once, sources kept.')
 print(f'Records that look merged with another facility: {mixed:,} of {len(facility_rows):,} ({mixed / len(facility_rows):.0%}).')
-example = next((facility_rows[i].get('name'), m) for i, m in enumerate(index.mixing) if m)
+example = next((index.rows[i].get('name'), m) for i, m in enumerate(index.mixing) if m)
 print('Example:', example[0], '->', example[1][0] if isinstance(example[1], list) else example[1])
 '''
 
@@ -433,7 +441,7 @@ Three short demonstrations built on the same engine. None of them changes what a
 
 PART7_NEEDS = """**Describe the situation.** A health worker can type what is happening instead of picking a service. The lexicon
 suggests a service and urgency, quotes the words it matched, and puts "call 108 / 102" first for danger signs. In the
-app it only prefills the form; the user checks it and searches. Hindi entries are romanized with unreviewed spellings.
+app it suggests a service for the user to confirm. The user selects any travel preference. Hindi entries are romanized with unreviewed spellings.
 """
 
 NEEDS_DEMO = '''from _carematch_submission.needs import interpret_need

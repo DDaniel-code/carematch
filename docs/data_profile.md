@@ -95,6 +95,10 @@ Legacy names Bombay / Madras / Calcutta do not appear.
 - `organization_type` = `facility` for 10,000 rows (uninformative).
 - `facilityTypeId`: hospital 5,637 · clinic 3,782 · dentist 490 · empty 67 · null 59 · doctor 21 · farmacy 10 · pharmacy 2, plus
   1-count junk values (URLs, coordinates, hashes) from column shifts.
+- 3 rows are column-shifted outright: prose in `unique_id` and a JSON null, a GeoJSON point or a number in `specialties`.
+  `CareIndex` sets them aside before anything is located or assessed (`textutil.audit_source_rows`: `specialties` must be
+  empty or a JSON list of strings) and reports the count as `index.data_quality` (10,088 input, 10,085 accepted,
+  3 quarantined). None of the three had evidence for any of the nine services.
 - 106 facilities typed clinic/dentist/doctor or capacity < 10 claim cardiac surgery, NICU or dialysis. Some are mislabeled hospitals
   (a "clinic" with 304 beds), others diagnostics centres. Type alone cannot gate; combine with evidence.
 

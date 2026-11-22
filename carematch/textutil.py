@@ -36,6 +36,34 @@ def stable_id(value, length=16):
     return hashlib.sha256(payload.encode()).hexdigest()[:length]
 
 
+def audit_source_rows(rows):
+    """Split facility rows into (accepted, quarantined). Nothing is repaired and the source is not changed.
+
+    A few source rows are column-shifted: a description fragment sits in `unique_id` and a number, a JSON null or a
+    GeoJSON point sits in `specialties`. `specialties` is an array<string> stored as JSON text, so a row whose
+    `specialties` is neither empty (SQL NULL) nor a JSON list of strings is such a row. It is set aside and counted
+    instead of being indexed as a facility. Same rule as audit_source_rows in Sa1kyo121/carematch-india, so both
+    pipelines quarantine the same rows.
+    """
+    accepted, quarantined = [], []
+    for row in rows:
+        raw = row.get('specialties')
+        if raw is None or (isinstance(raw, str) and not raw.strip()):
+            valid = True
+        else:
+            try:
+                parsed = raw if isinstance(raw, (list, tuple)) else json.loads(raw)
+                valid = isinstance(parsed, (list, tuple)) and all(x is None or isinstance(x, str) for x in parsed)
+            except (ValueError, TypeError):
+                valid = False
+        if valid:
+            accepted.append(row)
+        else:
+            quarantined.append({'source_record_id': 'record-' + stable_id(row, 24), 'unique_id_raw': row.get('unique_id'),
+                                'reason': 'specialties_not_json_string_array'})
+    return accepted, quarantined
+
+
 def fragments(value):
     """Return the string items of a JSON-array-as-string field; never JSON object keys.
 

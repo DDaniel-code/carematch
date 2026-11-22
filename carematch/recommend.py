@@ -11,6 +11,7 @@ Every result also lists runner-ups with the reason each was not chosen, and carr
 import csv
 import re
 import sys
+from threading import Lock
 
 from .decision import assumptions as decision_assumptions
 from .decision import cost_info, drive_minutes, normalize_preferences
@@ -20,7 +21,7 @@ from .price import comparable as price_comparable
 from .price import comparison_key, price_evidence, surely_cheaper
 from .geo import CITY_ALIASES, Gazetteer, city_key, facility_location
 from .services import SERVICES, resolve_service
-from .textutil import fragments, haversine_km, normalize, source_urls, text
+from .textutil import audit_source_rows, fragments, haversine_km, normalize, source_urls, text
 
 CONTRACT_VERSION = '1.1'
 BANDS_KM = (25, 75, 150, 300)
@@ -78,6 +79,11 @@ class CareIndex:
     """Facilities + gazetteer, with per-service assessments computed once and cached."""
 
     def __init__(self, facility_rows, pincode_rows):
+        # Column-shifted source rows are set aside before anything is located or assessed (see audit_source_rows).
+        total = len(facility_rows)
+        facility_rows, self.quarantine = audit_source_rows(facility_rows)
+        self.data_quality = {'input_rows': total, 'accepted_rows': len(facility_rows),
+                             'quarantined_rows': len(self.quarantine)}
         self.rows = facility_rows
         self.gaz = Gazetteer(pincode_rows, facility_rows)
         self.locations = [facility_location(r, self.gaz) for r in facility_rows]
@@ -91,6 +97,7 @@ class CareIndex:
         self.mixing = [record_mixing(r, self.city_regex, city_key) for r in facility_rows]
         self.dup_group = self._duplicate_groups()
         self._assessed = {}
+        self._service_locks = {service: Lock() for service in SERVICES}
 
     def _duplicate_groups(self):
         """Rows that are the same facility: same normalized name and (same PIN or positions within DEDUP_KM)."""
@@ -128,7 +135,12 @@ class CareIndex:
         return cls(load_csv(facilities_path), load_csv(pincodes_path))
 
     def assessments(self, service):
-        if service not in self._assessed:
+        if service in self._assessed:
+            return self._assessed[service]
+        # Visitors share one index. Publish a complete assessment only after the first request finishes.
+        with self._service_locks[service]:
+            if service in self._assessed:
+                return self._assessed[service]
             out = []
             for r in self.rows:
                 a = assess(r, service)
@@ -138,6 +150,20 @@ class CareIndex:
                         a['flags'] = sorted(set(a['flags']) | {'possible_merged_record'})
                         a['merge_reasons'] = merged
                 out.append(a)
+            # Another listing of the same facility may say the service is NOT available. That listing has no tier of
+            # its own and is never shown, so its statement would be lost: carry it over, keep its source record, and
+            # cap the tier exactly as a contradiction inside one record does.
+            negative = [[e for e in a['evidence'] if e['kind'] == 'negative'] for a in out]
+            for i, a in enumerate(out):
+                if a['tier'] not in ('strong', 'moderate'):
+                    continue
+                borrowed = [dict(e, source_facility_id=self.rows[j].get('unique_id'))
+                            for j in self.duplicates_of(i) for e in negative[j]]
+                if borrowed:
+                    a['evidence'] = a['evidence'] + borrowed
+                    a['tier'] = 'moderate'
+                    a['flags'] = sorted(set(a['flags']) | {'contradictory_claims'})
+                    a['reasons'] = a['reasons'] + ['another listing of this facility says the service is not available']
             self._assessed[service] = out
         return self._assessed[service]
 
@@ -150,6 +176,11 @@ def _card(index, i, a, dist):
     urls = source_urls(row.get('source_urls'))
     urls = sorted(urls, key=lambda u: (any(d in u for d in AGGREGATORS), len(u)))
     quotes = [e for e in a['evidence'] if e['kind'] in ('direct', 'listed')][:3] or a['evidence'][:2]
+    # A statement that the service is not available is quoted too (after the supporting quotes, never instead of them).
+    supporting = [e for e in quotes if e['kind'] != 'negative']
+    negatives = [e for e in a['evidence'] if e['kind'] == 'negative']
+    if supporting and negatives:
+        quotes = supporting[:2] + negatives[:1]
     dups = index.duplicates_of(i)
     mixing = index.mixing[i]
     flags = set(a['flags']) | set(f for f in loc['flags'] if f in FLAG_TEXT)
@@ -174,11 +205,13 @@ def _card(index, i, a, dist):
         'distance_basis': loc['basis'], 'location_confidence': loc['confidence'],
         'tier': a['tier'], 'tier_reasons': a['reasons'],
         'evidence': [{'evidence_id': e['evidence_id'], 'field': e['field'], 'quote': e['text'],
-                      'verbatim': e.get('raw', e['text']), 'kind': e['kind']} for e in quotes],
+                      'verbatim': e.get('raw', e['text']), 'kind': e['kind'],
+                      'source_facility_id': e.get('source_facility_id', row.get('unique_id'))} for e in quotes],
         'all_evidence_count': len(a['evidence']),
         'n_claims': len({normalize(e['text']) for e in a['evidence'] if e['kind'] in ('direct', 'listed')}),
         'flags': flags, 'uncertainties': uncertainties,
         'source_urls': urls[:3],
+        'duplicate_group': index.dup_group[i],
         'ask_when_calling': SERVICES[a['service']]['ask'],
         **({'merged_ids': [index.rows[j].get('unique_id') for j in dups]} if dups else {}),
         **dict(zip(('price_info', 'price_context'), price_evidence(row, a['service']))),
@@ -186,13 +219,16 @@ def _card(index, i, a, dist):
 
 
 def _dedupe(cards):
-    """Merge listings with the same normalized name within DEDUP_KM (or same name and no distance)."""
+    """Merge listings of the same facility: the same duplicate group (same normalized name and the same PIN or positions
+    within DEDUP_KM, see CareIndex._duplicate_groups) or the same record id.
+
+    Distances from the patient are never compared: two same-name branches equally far away on opposite sides of the
+    patient are different facilities, however close their two distances are."""
     kept = []
     for c in cards:
-        dup = next((k for k in kept if c['facility_id'] in k.get('merged_ids', [])
-                    or (_name_key(k['name']) == _name_key(c['name'])
-                        and (k['distance_km'] is None or c['distance_km'] is None
-                             or abs(k['distance_km'] - c['distance_km']) <= DEDUP_KM))), None)
+        dup = next((k for k in kept if k['duplicate_group'] == c['duplicate_group']
+                    or (c['facility_id'] and (c['facility_id'] == k['facility_id']
+                                              or c['facility_id'] in k.get('merged_ids', [])))), None)
         if dup:
             if c['facility_id'] not in dup.setdefault('merged_ids', []):
                 dup['merged_ids'].append(c['facility_id'])
@@ -562,7 +598,10 @@ def recommend(index, service_text, location_text, k=MAX_RESULTS, bands=BANDS_KM,
         scored.append((TIERS.index(a['tier']), dist, i, a))
 
     eligible = [s for s in scored if s[0] <= 1]
-    order = lambda s: (s[0], round(s[1], 1), -len(s[3]['evidence']), text(index.rows[s[2]].get('unique_id')))
+    # Amount of evidence is the last tie-break; a "not available" statement carried over from another listing is not
+    # counted, so a contradiction can never move a facility up.
+    own = lambda a: sum(1 for e in a['evidence'] if 'source_facility_id' not in e)
+    order = lambda s: (s[0], round(s[1], 1), -own(s[3]), text(index.rows[s[2]].get('unique_id')))
     counts = {b: {t: sum(1 for s in scored if s[1] <= b and TIERS[s[0]] == t) for t in ('strong', 'moderate', 'weak')}
               for b in bands}
 
@@ -672,6 +711,7 @@ def recommend(index, service_text, location_text, k=MAX_RESULTS, bands=BANDS_KM,
 
     result = {
         'contract_version': CONTRACT_VERSION,
+        'data_quality': dict(index.data_quality),
         'service': service, 'service_label': SERVICES[service]['label'], 'service_scope': SERVICES[service]['scope'],
         'origin': origin, 'band_km': chosen_band, 'action_advice': advice, 'results': results, 'runner_ups': runner_ups,
         'farther_stronger': extra, 'nearest_beyond': beyond, 'weak_nearby': weak_nearby,

@@ -55,6 +55,12 @@ class NeedLexiconTests(unittest.TestCase):
         self.assertIn('trauma', x['also_possible'])
         self.assertTrue(x['red_flag'])
 
+    def test_past_events_denials_and_nonclinical_delivery(self):
+        self.assertFalse(interpret_need('patient behosh nahi hai')['red_flag'])
+        self.assertFalse(interpret_need('heart attack last year, now advised bypass')['red_flag'])
+        self.assertEqual(interpret_need('medicine delivery late, patient bleeding a lot')['service'], 'emergency')
+        self.assertFalse(interpret_need('the appointment fits my schedule')['red_flag'])
+
     def test_specific_condition_beats_imaging_word(self):
         x = interpret_need('head injury needs CT')
         self.assertEqual((x['service'], x['urgency']), ('trauma', 'time_critical'))
@@ -63,6 +69,30 @@ class NeedLexiconTests(unittest.TestCase):
 
     def test_condition_notes(self):
         self.assertTrue(any('cath lab' in n for n in interpret_need('suspected heart attack')['notes']))
+
+    def test_missed_dialysis_with_breathlessness_is_an_emergency(self):
+        for text in ('missed dialysis yesterday and now very breathless', 'dialysis patient confused and no urine'):
+            x = interpret_need(text)
+            self.assertEqual((x['service'], x['urgency'], x['red_flag']), ('emergency', 'time_critical', True), text)
+            self.assertIn('dialysis', x['also_possible'])
+            self.assertIn('108', x['call_now'])
+        routine = interpret_need('kidney failure patient needs dialysis three times a week')
+        self.assertEqual((routine['service'], routine['urgency'], routine['red_flag']), ('dialysis', 'can_travel', False))
+        calm = interpret_need('dialysis done, no breathlessness')
+        self.assertFalse(calm['red_flag'])
+
+    def test_generic_danger_signs_are_never_no_match(self):
+        for text in ('patient unconscious', 'child having fits', 'bleeding heavily from a deep cut, will not stop',
+                     'man not breathing'):
+            x = interpret_need(text)
+            self.assertEqual((x['status'], x['service'], x['red_flag']), ('matched', 'emergency', True), text)
+            self.assertIn('108', x['call_now'])
+
+    def test_specific_red_flag_beats_generic_sign(self):
+        self.assertEqual(interpret_need('newborn baby not breathing properly')['service'], 'nicu')
+        self.assertEqual(interpret_need('heavy bleeding after delivery')['status'], 'matched')
+        self.assertEqual(interpret_need('pregnant lady having fits')['service'], 'c_section')
+        self.assertFalse(interpret_need('she is breathing, not unconscious')['red_flag'])
 
     def test_eval_set(self):
         with open(os.path.join(ROOT, 'eval', 'needs_queries.csv'), encoding='utf-8') as fh:

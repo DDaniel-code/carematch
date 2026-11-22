@@ -17,7 +17,7 @@ x = interpret_need("delivery ke baad khoon bahut beh raha hai")
 | `status` | `'matched'` · `'ambiguous'` · `'no_match'` | `no_match`: keep the Medical service select empty, show `understood_as`. `ambiguous`: prefill but require the user to confirm. |
 | `service` | service key or `None` | prefill the **Medical service** select (`SERVICES[key]['label']`) |
 | `service_label` | str | label for that service |
-| `urgency` | `'time_critical'` · `'default'` · `'can_travel'` · `None` | prefill the urgency preference (default = no preference) |
+| `urgency` | `'time_critical'` · `'default'` · `'can_travel'` · `None` | lexicon label for evaluation; the worker selects the travel preference |
 | `red_flag` | bool | when true, show `call_now` **first**, above everything else |
 | `call_now` | str or `None` | "108 (ambulance); 102 for pregnant women and newborns in most states" |
 | `matched` | list of `{condition, condition_id, phrase, service}` | `phrase` is a verbatim substring of the user's text: show "From your words '…'" |
@@ -28,7 +28,7 @@ x = interpret_need("delivery ke baad khoon bahut beh raha hai")
 | `input` | str | cleaned input |
 
 Suggested flow: optional text box "Describe the situation" above the Medical service select → on change, call
-`interpret_need`, prefill service + urgency, show `understood_as`, `call_now` (if any) and the disclaimer → the user can
+`interpret_need`, suggest a service, show the matched words, `call_now` (if any) and the disclaimer → the user can
 edit both before **Search for care**. Never search automatically on an `ambiguous` result.
 
 ## Lexicon (13 condition groups, English + romanized Hindi)

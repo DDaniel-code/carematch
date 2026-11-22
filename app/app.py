@@ -29,7 +29,6 @@ st.set_page_config(page_title='CareMatch · Find care', page_icon='🏥', layout
 URGENCY_OPTIONS = {'Default: evidence first, then distance': 'default',
                    'Time-critical: every minute on the road counts': 'time_critical',
                    'Can travel further for better-prepared care': 'can_travel'}
-URGENCY_LABEL = {v: k for k, v in URGENCY_OPTIONS.items()}
 COST_OPTIONS = {'Cost does not change the order': 'any',
                 'Prefer care documented as free, government-scheme or insured': 'low_cost'}
 SERVICE_LABELS = {spec['label']: key for key, spec in SERVICES.items()}
@@ -146,16 +145,12 @@ def website_link(raw):
 
 # ---- data ----------------------------------------------------------------------------------------------------
 
-@st.cache_resource(show_spinner='Loading 10,000 facilities and checking their evidence for 9 services. '
-                                'This happens once after the app starts (about a minute); searches are instant after that.')
+@st.cache_resource(show_spinner='Loading facility records and locations…')
 def get_index():
-    """Load and fully warm the index before the first search (a background warm-up thread starves Streamlit of the
-    GIL). The cache is shared by every visitor, so only the first visit after a deploy waits."""
+    """Share the facility index. Each service is assessed the first time a visitor requests it."""
     facilities, pincodes, info = datasource.load()
     started = time.perf_counter()
     index = CareIndex(facilities, pincodes)
-    for service in SERVICES:
-        index.assessments(service)
     info['index_seconds'] = round(time.perf_counter() - started, 1)
     return index, info
 
@@ -232,7 +227,7 @@ def price_html(card, sort_mode):
         if p.get('bound') == 'free':
             notes.append('a claim of free care: shown, but not ranked as a price; check who qualifies')
         elif unit == 'unspecified':
-            notes.append('unit not stated, so not compared with other quotes')
+            notes.append('unit not stated, so not compared')
         if p.get('conditions'):
             notes.append('conditions: ' + ', '.join(p['conditions']))
         if p.get('bound') in ('upper_bound', 'lower_bound'):
@@ -246,7 +241,8 @@ def price_html(card, sort_mode):
                + (f'<div class="cm-warn">{h("; ".join(notes))}</div>' if notes else '') + '</div>')
         if p.get('quote'):
             out += (f'<div class="cm-quote">“{h(p["quote"])}”<br><small>— {h(FIELD_TEXT.get(p.get("field"), p.get("field") or "record"))}'
-                    ' field · a web quote; confirm the current charge by phone</small></div>')
+                    + (' field</small></div>' if sort_mode == 'price'      # the page caption already says this once
+                       else ' field · a web quote; confirm the current charge by phone</small></div>'))
     for ctx in card.get('price_context') or []:
         amounts = ', '.join(f'₹{a:,.0f}' for a in ctx.get('amounts_inr', [])[:3])
         kind = {'insurer_coverage': 'an insurance or scheme limit', 'capital_or_equipment': 'a building or equipment cost'}.get(
@@ -288,15 +284,13 @@ def _submit():
 
 
 def _interpret():
-    """Read the description and prefill service and urgency. Only a clear match changes the form; an ambiguous one
+    """Read the description and suggest a service. Travel preferences belong to the user. Only a clear match changes the form; an ambiguous one
     only offers switches, and no match leaves the form as it was."""
     text = st.session_state.get('need_text') or ''
     x = interpret_need(text) if interpret_need and text.strip() else None
     st.session_state.need = x
     if x and x.get('status') == 'matched' and x.get('service') in SERVICES:
         st.session_state.service = SERVICES[x['service']]['label']
-        if x.get('urgency') in URGENCY_LABEL:
-            st.session_state.urgency = URGENCY_LABEL[x['urgency']]
 
 
 def _use_service(key):
@@ -311,10 +305,13 @@ def render_need():
     if x.get('red_flag'):
         st.error(f"**Danger signs: call {x.get('call_now') or '108'} now.** Do not wait for this search; use it while "
                  'help is on the way.', icon='🚑')
-    if x.get('understood_as'):
-        st.markdown(esc(x['understood_as']))
+    if x.get('matched'):
+        matches = list(dict.fromkeys(m['phrase'] for m in x['matched']))
+        st.caption('Words matched: ' + ', '.join(esc(phrase) for phrase in matches))
+    elif x.get('understood_as'):
+        st.caption(esc(x['understood_as']))
     if x.get('status') == 'matched':
-        st.caption('Service and urgency are filled in below. Check them, add the place, then press **Find care**.')
+        st.markdown(f"Suggested service: **{esc(SERVICES[x['service']]['label'])}**. Confirm the service and starting place below.")
     if x.get('status') == 'ambiguous':
         st.warning('More than one service could fit. Choose one below or in the form, then press Find care.')
     switches = ([x['service']] if x.get('status') == 'ambiguous' and x.get('service') else []) + list(x.get('also_possible') or [])
@@ -508,7 +505,7 @@ def status_line(r, sort_mode):
              'price': 'ordered by documented price'}[sort_mode]
     pc = (r.get('sort') or {}).get('price_comparison') or {}
     if sort_mode == 'price' and pc.get('ranked_by') == 'distance':
-        order = 'ordered by distance: too few comparable prices to rank'
+        order = 'ordered by distance (prices could not be ranked: reason below)'
     if pc.get('safety_pinned'):
         order = 'urgent-care rule keeps the nearest eligible branch without a conflicting claim first'
     return f'<div class="cm-status" role="status"><b>{h(what)}</b>' + (f' · {order}' if n else '') + f'{h(qc)}</div>'
@@ -529,6 +526,27 @@ def comparison(index, r, sort_mode):
     return result
 
 
+TIER_RANK = {'strong': 3, 'moderate': 2, 'weak': 1}
+
+
+def differs(base, o):
+    """What actually changes against the best-evidence choice: evidence strength traded for distance, or nothing."""
+    if (o.get('facility_id') or o.get('name')) == (base.get('facility_id') or base.get('name')):
+        return 'Same facility as Best evidence.'
+    parts = []
+    bt, ot = TIER_RANK.get(base.get('tier'), 0), TIER_RANK.get(o.get('tier'), 0)
+    if ot < bt:
+        parts.append(f"weaker evidence ({(o.get('tier') or 'none').title()} instead of {(base.get('tier') or 'none').title()})")
+    elif ot > bt:
+        parts.append(f"stronger evidence ({(o.get('tier') or 'none').title()})")
+    else:
+        parts.append(f"same evidence tier ({(o.get('tier') or 'none').title()})")
+    bd, od = base.get('distance_km'), o.get('distance_km')
+    if bd is not None and od is not None and abs(bd - od) >= 0.1:
+        parts.append(f"{abs(bd - od):.1f} km {'closer' if od < bd else 'farther'}")
+    return 'Differs from Best evidence: ' + ', '.join(parts) + '.'
+
+
 def render_comparison(index, r, sort_mode):
     comp = comparison(index, r, sort_mode)
     if not comp:
@@ -541,7 +559,11 @@ def render_comparison(index, r, sort_mode):
         st.markdown(f"**Compare orders:** {esc(comp['summary'])}")
     if not any(o.get('name') for o in options):
         return                       # no results: the summary alone, plain
-    with st.expander(f'Best evidence, nearest and listed-price orders side by side ({len(options)})'):
+    base = next((o for o in options if o.get('mode') == 'default' and o.get('name')), None)
+    named = {o.get('facility_id') or o.get('name') for o in options if o.get('name')}
+    title = ('Best evidence, nearest and listed-price orders side by side'
+             + (': all pick the same facility' if len(named) == 1 and all(o.get('name') for o in options) else f' ({len(options)})'))
+    with st.expander(title):
         for o in options:
             if not o.get('name'):
                 st.caption(f"{esc(o['label'])} · No ranked facility. {esc(o.get('reason') or '')}")
@@ -550,6 +572,8 @@ def render_comparison(index, r, sort_mode):
             tier = TIER_CHIP.get(o.get('tier'), (None, o.get('tier') or 'evidence not stated'))[1]
             st.markdown(f"**{esc(o.get('label') or o.get('mode'))}:** {esc(o.get('name') or 'no option')} · {esc(dist)} · "
                         f"{esc(tier)}")
+            if base and o is not base:
+                st.markdown(f"<div class='cm-meta'><b>{h(differs(base, o))}</b></div>", unsafe_allow_html=True)
             cit = o.get('citation')
             if cit and cit.get('quote'):
                 st.markdown(f'<div class="cm-quote">“{h(cit["quote"])}”<br><small>— '
@@ -557,6 +581,8 @@ def render_comparison(index, r, sort_mode):
                             unsafe_allow_html=True)
             elif o.get('name'):
                 st.caption('No supporting quote returned for this option.')
+            if o.get('mode') == 'price' and o.get('price_basis') == 'distance':
+                st.caption('Prices could not be ranked here, so this order fell back to distance.')
 
 
 def render_result(index, r, sort_mode, service):
@@ -580,18 +606,28 @@ def render_result(index, r, sort_mode, service):
     elif r.get('action_advice'):
         st.info(f"**Next step:** {esc(r['action_advice'])}", icon='📞')
     render_comparison(index, r, sort_mode)
+    # One safety box: the app's emergency rule for price order plus the engine's own note, never two stacked warnings.
+    safety = []
     if sort_mode == 'price' and service in TIME_CRITICAL:
-        st.warning('For an emergency, go to the nearest facility that can treat the patient. Sorting by price is meant '
-                   'for care that can be planned.', icon='⚠️')
-    if sort.get('safety_note'):
-        st.warning(sort['safety_note'], icon='⚠️')
+        safety.append('For an emergency, go to the nearest facility that can treat the patient. Sorting by price is meant '
+                      'for care that can be planned.')
+    if sort.get('safety_note') and sort['safety_note'] not in safety:
+        safety.append(sort['safety_note'])
+    if safety:
+        st.warning(' '.join(safety), icon='⚠️')
     if sort.get('stronger_option_nearby'):
         s = sort['stronger_option_nearby']
         st.caption(f"Also within reach: **{esc(s['name'])}** ({s['distance_km']} km) has Strong evidence. {esc(s.get('note', ''))}")
     if sort_mode == 'price':
         pc = sort.get('price_comparison') or {}
-        st.caption((esc(pc['note']) + ' ' if pc.get('note') else '')
-                   + 'Prices are quotes found on web pages: they may be out of date, for a package, or only for some patients. '
+        if pc.get('ranked_by') == 'distance':
+            n = pc.get('comparable_quotes') or 0
+            reason = pc.get('note') or (f"only {n} quote{'s' if n != 1 else ''} with the same unit within "
+                                        f"{pc.get('budget_km', 'the search')} km, too few to rank by price")
+            st.info(f"**Why this is ordered by distance:** {esc(reason)}", icon='ℹ️')
+        elif pc.get('note'):
+            st.caption(esc(pc['note']))
+        st.caption('Prices are web quotes (may be out of date, a package, or only for some patients); confirm by phone. '
                    'Only quotes with the same unit are compared; an unknown price is not assumed high or low.')
     if (r.get('preferences') or {}).get('applied') and r.get('tradeoff_note'):
         st.caption(f"Trade-off: {esc(r['tradeoff_note'])}")
@@ -671,13 +707,14 @@ except Exception as exc:  # a data failure must never look like "no hospitals fo
     st.stop()
 
 if interpret_need:
-    d1, d2 = st.columns([3, 1], vertical_alignment='bottom') if 'vertical_alignment' in inspect.signature(st.columns).parameters \
-        else st.columns([3, 1])
-    d1.text_input('Describe the situation (optional)', key='need_text', on_change=_interpret,
-                  placeholder='e.g. "bleeding after delivery", "road accident, head injury", "bachcha saans nahi le raha"',
-                  help='Plain words are enough. Understands common English and romanized Hindi phrases (Hindi spellings '
-                       'unreviewed). It only suggests a service and urgency; you can change both.')
-    d2.button('Suggest a service', on_click=_interpret, use_container_width=True)
+    with st.expander('Help me choose a service'):
+        d1, d2 = st.columns([3, 1], vertical_alignment='bottom') if 'vertical_alignment' in inspect.signature(st.columns).parameters \
+            else st.columns([3, 1])
+        d1.text_input('Describe the situation (optional)', key='need_text',
+                      placeholder='e.g. "bleeding after delivery", "road accident, head injury", "bachcha saans nahi le raha"',
+                      help='Plain words are enough. Understands common English and romanized Hindi phrases (Hindi spellings '
+                           'unreviewed). You choose the travel preference in the search form.')
+        d2.button('Suggest a service', on_click=_interpret, use_container_width=True)
     render_need()
 
 with st.form('search'):

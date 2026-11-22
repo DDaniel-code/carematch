@@ -11,7 +11,8 @@ def _card_text(c, header):
     lines.append(f"   {c['address'] or c['city']}{', PIN ' + c['pin'] if c['pin'] else ''}")
     lines.append(f"   Why: {'; '.join(c['tier_reasons'])}")
     for e in c['evidence']:
-        lines.append(f"     “{e['quote'][:160]}”  [{e['field']}]")
+        lines.append(f"     “{e['quote'][:160]}”  [{e['field']}]"
+                     + ('  <- says the service is NOT available' if e.get('kind') == 'negative' else ''))
     if c.get('why_ranked'):
         lines.append(f"   Order: {c['why_ranked']}")
     for u in c['uncertainties']:

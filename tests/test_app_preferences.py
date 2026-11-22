@@ -152,8 +152,20 @@ class FindCareOutcomes(unittest.TestCase):
         self.assertIn('Dashmesh Hospital', joined)
         self.assertIn('Price comparison falls back to distance', joined)
         self.assertTrue(any('side by side' in e.label for e in at.expander))
+        self.assertIn('Differs from Best evidence: weaker evidence (Moderate instead of Strong), 1.6 km closer', joined)
         at.radio(key='sort').set_value('Nearest').run()
         self.assertIn('Moolchand', card_titles(at)[0])
+        at.radio(key='sort').set_value('Compare listed prices').run()
+        self.assertIn('Why this is ordered by distance:', ' '.join(text(at)), 'the price fallback gives its reason')
+        self.assertIn('prices could not be ranked', status(at))
+
+    def test_description_does_not_override_the_users_travel_preference(self):
+        at = self.search('Dialysis', 'Delhi')
+        original = at.radio(key='urgency').value
+        at.text_input(key='need_text').set_value('kidney failure patient needs dialysis')
+        next(b for b in at.button if b.label == 'Suggest a service').click().run()
+        self.assertEqual(at.radio(key='urgency').value, original)
+        self.assertTrue(any('Suggested service' in m.value for m in at.markdown))
 
     def test_comparison_with_no_options_is_plain(self):
         at = self.search('Burn care', 'Port Blair')

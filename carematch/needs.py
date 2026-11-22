@@ -74,6 +74,13 @@ CONDITIONS = [
      'patterns': [r'\bsnake ?bite\b', r'\bbitten by (a )?snake', r'\bpoison(ing|ed)?\b', r'\bswallowed (pesticide|poison|kerosene|acid)',
                   r'\bpesticide\b', r'\b(saanp|sanp|saap) (ne )?(kaat|kat)', r'\b(zeher|zehar|zahar)\b'],
      'note': 'Ask whether anti-snake venom is available when you call.'},
+    # Must come before kidney_failure: a dialysis patient who is breathless / confused / not passing urine after a
+    # missed session is an emergency, not a "can travel further" dialysis search.
+    {'id': 'dialysis_emergency', 'label': 'dialysis patient with breathlessness, confusion or no urine',
+     'service': 'emergency', 'also': ['dialysis'], 'urgency': 'time_critical', 'red_flag': True,
+     'patterns': [(r'\b(dialysis|kidney failure|renal failure|ckd)\b',
+                   r'\b(breathless|short(ness)? of breath|can.?t breathe|difficulty breathing|saans (phool|nahi|lene)'
+                   r'|confus|drowsy|no urine|not passing urine|urine (band|nahi))')]},
     {'id': 'kidney_failure', 'label': 'kidney failure / needs dialysis', 'service': 'dialysis', 'also': [],
      'urgency': 'can_travel', 'red_flag': False,
      'patterns': [r'\b(kidney|renal) failure\b', r'\bdialysis\b', r'\b(creatinine|urea) (is )?(high|raised|very high)',
@@ -83,6 +90,15 @@ CONDITIONS = [
      'urgency': 'default', 'red_flag': False,
      'patterns': [r'\b(bypass|cabg|valve replacement|valve surgery|open heart|heart surgery|angioplasty)\b',
                   r'\bbypass (karwana|karana)\b']},
+    # Life-threatening signs that fit no specific group above. Yields to any specific red-flag group (so "newborn not
+    # breathing" stays NICU and "heavy bleeding after delivery" stays obstetric); otherwise searches emergency care.
+    {'id': 'general_emergency', 'label': 'life-threatening sign (unconscious, not breathing, fits, uncontrolled bleeding)',
+     'service': 'emergency', 'also': [], 'urgency': 'time_critical', 'red_flag': True,
+     'patterns': [r'\bunconscious\b', r'\bbehosh\b', r'\bnot breathing\b', r'\b(seizures?|convulsions?|(?:having|had|has) (?:a fit|fits))\b',
+                  r'\bheavy bleeding\b', r'\bbleeding (heavily|a lot|profusely)\b',
+                  r'\b(can.?t|cannot|won.?t|will not|does not|doesn.?t) stop bleeding\b',
+                  r'\bbleeding (that )?(will not|won.?t) stop\b', r'\bcan.?t breathe\b',
+                  r'\b(severe|very) (breathless|short(ness)? of breath)']},
     {'id': 'imaging_mri', 'label': 'MRI scan advised', 'service': 'mri', 'also': [], 'urgency': 'default', 'red_flag': False,
      'patterns': [r'\bmri\b', r'\bmagnetic resonance\b']},
     {'id': 'imaging_ct', 'label': 'CT scan advised', 'service': 'ct_scan', 'also': [], 'urgency': 'default', 'red_flag': False,
@@ -105,6 +121,11 @@ def _clean(text):
     return ' '.join((text or '').replace('’', "'").split())
 
 
+NON_CLINICAL_DELIVERY = re.compile(r'\b(?:medicine|medication|parcel|package|food|courier) delivery\b', re.I)
+PAST_EVENT = re.compile(r'^\s+(?:last year|last month|(?:\d+|one|two|three|several) (?:years?|months?) ago)\b', re.I)
+HINDI_DENIAL = re.compile(r'^\s+(?:nahi|nahin)\s+(?:hai|hain|hua|hui)\b', re.I)
+
+
 def _negated(text, start):
     prefix = text[:start][-40:]
     breaks = list(SCOPE_BREAK.finditer(prefix))
@@ -118,7 +139,9 @@ def _match(cond_alts, text):
     for alt in cond_alts:
         spans = []
         for rx in alt:
-            m = next((m for m in rx.finditer(text) if not _negated(text, m.start())), None)
+            m = next((m for m in rx.finditer(text) if not _negated(text, m.start())
+                      and not PAST_EVENT.match(text[m.end():])
+                      and not HINDI_DENIAL.match(text[m.end():])), None)
             if not m:
                 break
             spans.append(m)
@@ -137,8 +160,9 @@ def interpret_need(text):
         return {**base, 'status': 'no_match', 'service': None, 'urgency': None, 'matched': [], 'also_possible': [],
                 'red_flag': False, 'understood_as': 'Please describe the situation or choose a service.'}
     hits = []
+    searchable = NON_CLINICAL_DELIVERY.sub(lambda m: ' ' * len(m[0]), raw)
     for order, (cond, alts) in enumerate(_compiled):
-        span = _match(alts, raw)
+        span = _match(alts, searchable)
         if span:
             hits.append((cond, span, order))
     if not hits:
@@ -149,6 +173,8 @@ def interpret_need(text):
     specific = [h for h in hits if not h[0]['id'].startswith('imaging_')]
     if specific:
         hits = specific
+    if any(h[0]['red_flag'] and h[0]['id'] != 'general_emergency' for h in hits):
+        hits = [h for h in hits if h[0]['id'] != 'general_emergency']
     hits.sort(key=lambda h: (not h[0]['red_flag'], URGENCY_RANK[h[0]['urgency']], h[2]))
     top = hits[0][0]
     matched = [{'condition': c['label'], 'condition_id': c['id'], 'phrase': raw[s:e], 'service': c['service']}

@@ -26,10 +26,11 @@ def main():
                 if option['mode'] == 'price':
                     totals['price_' + (option['price_basis'] or 'no_rank')] += 1
                 if option['facility_id']:
-                    rows = [index.rows[i] for i in index.by_id[str(option['facility_id'])]]
                     assert option['citation'], (q['id'], option['facility_id'])
                     for cite in (option['citation'], option['price_citation']):
                         if cite:
+                            record_id = cite.get('facility_id', option['facility_id'])
+                            rows = [index.rows[i] for i in index.by_id[str(record_id)]]
                             assert any(cite['quote'] in str(row.get(cite['field'], '')) or
                                        any(cite['quote'] in s for s in fragments(row.get(cite['field'])))
                                        for row in rows), (q['id'], cite)

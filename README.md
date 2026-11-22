@@ -67,11 +67,11 @@ only suggests which facilities planners should phone to verify; it never changes
   **Best evidence** (the ranking above, with optional urgency and cost preferences), **Nearest** (straight-line, among
   credible branches whose location is certain), and **Compare listed prices** (within an extra distance you choose).
   Prices are shown exactly as quoted (exact, range, "up to", "from", free) with unit and conditions; quotes without a
-  unit or with conditions are not compared, insurer limits and equipment costs are labelled "not a patient price", and
+  unit or with mismatched eligibility or inclusions are kept out of the comparison, insurer limits and equipment costs are labelled "not a patient price", and
   a public operator is never described as free. Prices are rarely documented, so this order usually falls back to
   distance and says so. A side-by-side note shows when the three orders pick different facilities.
 - **Describe the situation** (optional): plain words such as "bleeding after delivery" or "road accident, head injury"
-  (common English and romanized Hindi phrases; Hindi spellings unreviewed) prefill the service and urgency. Danger
+  (common English and romanized Hindi phrases; Hindi spellings unreviewed) suggest the service. The user chooses any travel preference. Danger
   signs show "call 108 / 102" first. Nothing is searched until the user checks the form and presses Find care; an
   ambiguous description only offers switches, and it is never a diagnosis.
 - **Directions** open Google Maps (driving, driving that tries to avoid tolls, or walking) for reliably located
@@ -86,7 +86,7 @@ On a golden set of 38 queries (nine services; metros, tier-2 cities, rural PIN c
 | Check | Result |
 | --- | --- |
 | All quality checks pass (8 per answer on this set; up to 10 when prices or sort orders apply) | 38 / 38 queries |
-| Quotes found word for word in the source column | 248 / 248 |
+| Quotes found word for word in the source column | 249 / 249 |
 | Duplicate facility in a top 3 | 0 |
 | Honest "nothing credible within 300 km" | 2 (Port Blair) |
 | Median distance to the top recommendation | 1–3 km in cities, ~115 km in rural and remote places |
@@ -184,3 +184,5 @@ The dataset is not committed (`data/` is git-ignored).
 Parsing helpers in `carematch/textutil.py` are adapted from Charlie's search MVP
 (`Sa1kyo121/carematch-india`, branch `feature/search`). Data: Virtue Foundation facility dataset, India Post PIN
 directory and NFHS-5 district indicators, as provided for the challenge.
+
+[Recording guide with the Delhi and three-call scenarios](docs/video_demo.md)

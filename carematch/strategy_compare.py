@@ -23,7 +23,7 @@ def _first_option(mode, result):
     evidence = next(iter(card.get('evidence', [])), None)
     if evidence:
         option['citation'] = dict(field=evidence['field'], quote=evidence.get('verbatim') or evidence['quote'],
-                                  facility_id=card['facility_id'], source_urls=card.get('source_urls', []))
+                                  facility_id=evidence.get('source_facility_id') or card['facility_id'], source_urls=card.get('source_urls', []))
     if mode == 'price':
         option['reason'] = prices.get('note') or option['reason']
         price = card.get('price_info')

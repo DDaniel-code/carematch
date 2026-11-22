@@ -34,7 +34,7 @@ The app runs as its own service principal (shown on the app's page, named after 
 
 ## 4. Check it
 
-Open the app URL. The first visit after a deploy loads and checks all facilities (about a minute); later searches are instant.
+Open the app URL. The first visit loads the facility and location index. The first search for each service prepares shared evidence for that service. Subsequent searches reuse it.
 The sidebar says where the data came from:
 
 - `Source: warehouse · 10,088 facilities …`: reading Unity Catalog directly.

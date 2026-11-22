@@ -15,12 +15,12 @@ answer is "nothing credible within 300 km".
 | Metric | Result | Gate |
 | --- | --- | --- |
 | Quality review passed (8 checks per query, shown in the app) | 38 / 38 | all |
-| Citation fidelity: quotes found word for word in the named column of the facility record | 248 / 248 (100%) | 100% |
+| Citation fidelity: quotes found word for word in the named column of the facility record | 249 / 249 (100%) | 100% |
 | Duplicate facility in a top 3 | 0 | 0 |
 | Same input → identical output | yes (invariant test) | yes |
 | Answered within 300 km | 36; honest "nothing within 300 km" for 2 (Port Blair) | report |
 | Recommendations shown | 104 (89 Strong, 15 Moderate) | report |
-| Query latency, warm index | p50 13 ms, p95 78 ms | < 100 ms |
+| Earlier local warm-index benchmark, default engine call only | p50 13 ms, p95 78 ms | Excludes page rendering, strategy comparison, network time and concurrency |
 
 Median straight-line distance to the top recommendation by place type:
 

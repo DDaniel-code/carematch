@@ -12,7 +12,8 @@ from .textutil import fragments, normalize, text
 
 
 def _quote_in_record(index, card, ev):
-    for i in index.by_id.get(text(card['facility_id']), []):
+    # A quote carried over from another listing of the same facility is checked against that listing's record.
+    for i in index.by_id.get(text(ev.get('source_facility_id') or card['facility_id']), []):
         raw = index.rows[i].get(ev['field'])
         if ev['field'] == 'description':
             if ev['verbatim'] and ev['verbatim'] in text(raw):
@@ -38,9 +39,12 @@ def review(index, result):
     checks.append(_check('At most 3 recommendations, all with Strong or Moderate evidence',
                          len(results) <= 3 and not bad_tier, f'{len(results)} results; weak/none: {bad_tier}'))
 
-    keys = [re.sub(r'[^a-z0-9]+', ' ', normalize(c['name'])).strip() for c in results]
-    checks.append(_check('No facility listed twice', len(keys) == len(set(keys)),
-                         'duplicate names: ' + ', '.join(sorted({k for k in keys if keys.count(k) > 1}))))
+    # The same facility = the same duplicate group or record id. Two branches that only share a name are not duplicates.
+    names = [re.sub(r'[^a-z0-9]+', ' ', normalize(c['name'])).strip() for c in results]
+    groups = [c.get('duplicate_group', name) for c, name in zip(results, names)]
+    ids = [text(c['facility_id']) for c in results]
+    twice = sorted({c['name'] for c, g, i in zip(results, groups, ids) if groups.count(g) > 1 or ids.count(i) > 1})
+    checks.append(_check('No facility listed twice', not twice, 'listed twice: ' + ', '.join(twice)))
 
     missing = [(c['name'], e['field'], e['quote'][:60]) for c in every for e in c['evidence']
                if not _quote_in_record(index, c, e)]

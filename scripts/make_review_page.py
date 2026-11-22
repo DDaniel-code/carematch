@@ -27,7 +27,8 @@ def card_html(c):
            f"{html.escape(c.get('type') or '')} · {html.escape(c.get('city') or '')}, {html.escape(c.get('state') or '')}</p>",
            f"<p class=mute>Why this tier: {html.escape('; '.join(c['tier_reasons']))}</p>"]
     for e in c['evidence']:
-        out.append(f"<blockquote>“{html.escape(e['quote'])}” <span class=mute>— {e['field']}</span></blockquote>")
+        note = ' · says the service is not available' if e.get('kind') == 'negative' else ''
+        out.append(f"<blockquote>“{html.escape(e['quote'])}” <span class=mute>— {e['field']}{note}</span></blockquote>")
     for u in c['uncertainties']:
         out.append(f"<p class=warn>⚠ {html.escape(u)}</p>")
     return '\n'.join(out)
