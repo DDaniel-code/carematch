@@ -42,8 +42,6 @@ TIER_CHIP = {'strong': ('strong', 'Strong evidence'), 'moderate': ('moderate', '
 TIME_CRITICAL = {'c_section', 'trauma', 'emergency', 'nicu', 'burn'}
 SORTS = {'Best evidence': 'default', 'Nearest': 'nearest', 'Compare listed prices': 'price'}
 PRIMARY_RGB, EXTRA_RGB, ORIGIN_RGB = cm_style.INK_RGB, cm_style.MUTED_RGB, cm_style.CORAL_RGB
-KIND_TEXT = {'direct': 'direct statement', 'listed': 'listed item', 'indirect': 'indirect mention',
-             'negative': 'negative statement'}
 
 def esc(value):
     """Escape for Streamlit markdown ($ starts LaTeX, * and _ emphasis, ...)."""
@@ -311,11 +309,11 @@ def render_card(index, c, label, sort_mode, extra=False, nested=False):
             contact[0].caption('No phone number in the records.')
         if site:
             url, host, kind = site
-            label = (f'Website · {host}' if kind == 'website' else f'Listing page · {host}')
-            contact[1].link_button(label if len(label) <= 30 else label[:29] + '…', url, use_container_width=True,
-                                   help=('The website listed in the record, for contact details and opening hours. For a '
-                                         'hospital group it may be the main site: look for this branch.' if kind == 'website'
-                                         else 'A directory or social page from the record, not the facility\'s own site.'))
+            contact[1].link_button('Website' if kind == 'website' else 'Listing page', url, use_container_width=True,
+                                   help=((f'Opens {host}, the website listed in the record, for contact details and opening '
+                                          'hours. For a hospital group it may be the main site: look for this branch.')
+                                         if kind == 'website' else
+                                         f'Opens {host}, a directory or social page from the record, not the facility\'s own site.'))
         routes_help = f"Opens Google Maps directions to {c.get('name')} from your phone's own location"
         if loc and loc[2]:
             contact[2].link_button('Directions', directions_url(loc[0], loc[1], 'driving'), use_container_width=True,
@@ -340,12 +338,8 @@ def render_card(index, c, label, sort_mode, extra=False, nested=False):
                 st.caption('Evidence strength describes support in the dataset, not independent verification.')
             for e in c.get('evidence', []):
                 negative = e.get('kind') == 'negative'
-                trace = ' · '.join(esc(x) for x in (
-                    KIND_TEXT.get(e.get('kind'), e.get('kind')), e.get('evidence_id'),
-                    f"record {e.get('source_facility_id') or c.get('facility_id')}",
-                    e.get('verification_status') or 'unverified') if x)
                 st.markdown(('**Negative evidence: the service may be unavailable**  \n' if negative else '')
-                            + f"> “{esc(e['quote'])}”  \n> — *{FIELD_TEXT.get(e['field'], esc(e['field']))}* field  \n> {trace}")
+                            + f"> “{esc(e['quote'])}”  \n> — *{FIELD_TEXT.get(e['field'], esc(e['field']))}* field")
             if c.get('tier_reasons'):
                 st.markdown('**Why this tier:** ' + esc('; '.join(c['tier_reasons'])))
             if c.get('why_ranked'):
