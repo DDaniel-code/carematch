@@ -1,0 +1,11 @@
+# Restrained, accessible palette for the CareMatch app (all pages).
+[theme]
+base = "light"
+primaryColor = "#1a5f7a"
+backgroundColor = "#ffffff"
+secondaryBackgroundColor = "#f3f5f7"
+textColor = "#1f2933"
+font = "sans serif"
+
+[browser]
+gatherUsageStats = false
