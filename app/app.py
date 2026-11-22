@@ -293,7 +293,8 @@ def render_map(index, r):
         pdk.Layer('ScatterplotLayer', data=origin, get_position='[lon, lat]', get_radius='radius',
                   get_fill_color=[26, 95, 122, 28], get_line_color=[26, 95, 122, 140], stroked=True,
                   line_width_min_pixels=1, pickable=True),
-        pdk.Layer('ScatterplotLayer', data=pts, get_position='[lon, lat]', get_radius=13, radius_units='pixels',
+        # pydeck reads bare strings as expressions; a literal must be quoted ("'pixels'"), else the radius is 13 metres.
+        pdk.Layer('ScatterplotLayer', data=pts, get_position='[lon, lat]', get_radius=13, radius_units="'pixels'",
                   get_fill_color='color', get_line_color=[255, 255, 255], stroked=True, line_width_min_pixels=2,
                   pickable=True),
         pdk.Layer('TextLayer', data=pts, get_position='[lon, lat]', get_text='label', get_size=14,
