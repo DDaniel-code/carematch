@@ -1,0 +1,17 @@
+{
+  "phrases": 52,
+  "note": "phrases written by the team: measures lexicon coverage, not real-world accuracy",
+  "accuracy": {
+    "status": 1.0,
+    "service": 1.0,
+    "urgency": 1.0,
+    "red_flag": 1.0
+  },
+  "all_fields_correct": {
+    "en": "39/39",
+    "hi": "13/13"
+  },
+  "expected_no_match": 6,
+  "expected_ambiguous": 1,
+  "misses": []
+}

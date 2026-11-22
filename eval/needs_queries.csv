@@ -1,0 +1,53 @@
+id,text,expected_service,expected_urgency,expected_red_flag,expected_status,language
+n01,She has been in labour for 14 hours and the baby is not coming out,c_section,time_critical,True,matched,en
+n02,obstructed labour at home,c_section,time_critical,True,matched,en
+n03,prasav peeda bahut der se ho rahi hai,c_section,time_critical,True,matched,hi
+n04,bachcha atak gaya hai delivery mein,c_section,time_critical,True,matched,hi
+n05,heavy bleeding after delivery,c_section,time_critical,True,matched,en
+n06,PPH after home birth,c_section,time_critical,True,matched,en
+n07,delivery ke baad khoon bahut beh raha hai,c_section,time_critical,True,matched,hi
+n08,pregnant woman bleeding a lot,c_section,time_critical,True,matched,en
+n09,pregnant lady having fits,c_section,time_critical,True,matched,en
+n10,eclampsia suspected in 8th month,c_section,time_critical,True,matched,en
+n11,garbhavastha mein daure pad rahe hain,c_section,time_critical,True,matched,hi
+n12,newborn baby not breathing properly,nicu,time_critical,True,matched,en
+n13,premature baby born at 7 months,nicu,time_critical,True,matched,en
+n14,low birth weight baby needs care,nicu,time_critical,True,matched,en
+n15,navjaat bachcha saans nahi le raha,nicu,time_critical,True,matched,hi
+n16,bike accident on the highway,trauma,time_critical,True,matched,en
+n17,head injury after falling from roof,trauma,time_critical,True,matched,en
+n18,accident ho gaya sar par chot lagi hai,trauma,time_critical,True,matched,hi
+n19,hit by a truck,trauma,time_critical,True,matched,en
+n20,broken leg after a fall at home,trauma,default,False,matched,en
+n21,possible fracture of the wrist,trauma,default,False,matched,en
+n22,haddi toot gayi hai,trauma,default,False,matched,hi
+n23,child burned with hot oil,burn,time_critical,True,matched,en
+n24,kitchen fire burns on arms,burn,time_critical,True,matched,en
+n25,ladki aag se jal gayi,burn,time_critical,True,matched,hi
+n26,scalded with boiling water,burn,time_critical,True,matched,en
+n27,severe chest pain and sweating,emergency,time_critical,True,matched,en
+n28,suspected heart attack,emergency,time_critical,True,matched,en
+n29,seene mein dard ho raha hai,emergency,time_critical,True,matched,hi
+n30,face drooping and slurred speech,emergency,time_critical,True,matched,en
+n31,sudden weakness on one side of the body,emergency,time_critical,True,matched,en
+n32,lakwa maar gaya lagta hai,emergency,time_critical,True,matched,hi
+n33,snake bite in the field,emergency,time_critical,True,matched,en
+n34,swallowed pesticide,emergency,time_critical,True,matched,en
+n35,saanp ne kaat liya,emergency,time_critical,True,matched,hi
+n36,zeher kha liya,emergency,time_critical,True,matched,hi
+n37,kidney failure patient needs dialysis three times a week,dialysis,can_travel,False,matched,en
+n38,creatinine very high doctor said dialysis,dialysis,can_travel,False,matched,en
+n39,gurde kharab ho gaye hain,dialysis,can_travel,False,matched,hi
+n40,doctor advised bypass surgery,cardiac_surgery,default,False,matched,en
+n41,needs valve replacement,cardiac_surgery,default,False,matched,en
+n42,MRI for back pain,mri,default,False,matched,en
+n43,CT scan advised for headache,ct_scan,default,False,matched,en
+n44,head injury needs CT,trauma,time_critical,True,matched,en
+n45,no bleeding but labour for 20 hours,c_section,time_critical,True,matched,en
+n46,not a burn just a rash,,,False,no_match,en
+n47,fever and cough for three days,,,False,no_match,en
+n48,toothache,,,False,no_match,en
+n49,need a good hospital,,,False,no_match,en
+n50,road accident and the pregnant passenger is bleeding,c_section,time_critical,True,ambiguous,en
+n51,heartburn after dinner,,,False,no_match,en
+n52,sunburn on face,,,False,no_match,en
