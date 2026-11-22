@@ -7,9 +7,13 @@ import streamlit as st
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
+sys.path.insert(0, str(ROOT / 'app'))
+import cm_style
 from carematch.travel_scenario import arrival_share
 
 st.set_page_config(page_title='C-section travel scenarios', layout='wide')
+cm_style.apply()
+cm_style.bar('Planning view for NGO coordinators')
 st.title('Could the trip fit the time budget?')
 st.write('Explore travel to branches with documented C-section service from each PIN centre. '
          'Percentages are probabilities under the travel assumptions below. Reception, treatment and outcomes are unmeasured.')

@@ -8,9 +8,13 @@ import streamlit as st
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
+sys.path.insert(0, str(ROOT / 'app'))
+import cm_style
 from carematch.call_map import load_map
 
 st.set_page_config(page_title='C-section verification map', layout='wide')
+cm_style.apply()
+cm_style.bar('Planning view for NGO coordinators')
 st.title('Where should we call first?')
 st.write('Explore how many more PIN areas could have a documented C-section facility within 50 km if the selected branches confirm on-site service.')
 
@@ -91,7 +95,7 @@ if k and not first_failed and baseline_file.is_file():
                  f"{comparison['topk_by_individual_gain_new_pins']} unique PINs. Accounting for overlap yields {gain}.")
 
 labels = ['Outside documented coverage', 'Covered in current records', 'Additional if confirmed']
-colours = ['#a2a6ab', '#256a82', '#dc7214']
+colours = ['#b4abbf', '#7f68c0', '#db6332']
 frame['status'] = labels[0]
 frame.loc[frame.covered_now, 'status'] = labels[1]
 if need:

@@ -1,11 +1,17 @@
 """Browse held-out model leads and their underlying facility text."""
 import json
+import sys
 from pathlib import Path
 
 import pandas as pd
 import streamlit as st
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+import cm_style
+
 st.set_page_config(page_title='Service verification leads', layout='wide')
+cm_style.apply()
+cm_style.bar('Planning view for NGO coordinators')
 st.title('Which facilities merit a C-section verification call?')
 st.write('These records resemble facilities with documented C-section service. A coordinator can use the cited details to plan a call and verify the branch, service and current availability.')
 folder = Path(__file__).resolve().parents[2] / 'analysis'

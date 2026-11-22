@@ -12,8 +12,11 @@ import time
 from urllib.parse import quote, urlencode, urlsplit
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 import streamlit as st  # noqa: E402
+
+import cm_style  # noqa: E402
 
 from carematch import datasource  # noqa: E402
 from carematch.needs import interpret_need  # noqa: E402
@@ -38,54 +41,9 @@ TIER_CHIP = {'strong': ('strong', 'Strong evidence'), 'moderate': ('moderate', '
 # Services where minutes matter: price sorting is shown with a safety note.
 TIME_CRITICAL = {'c_section', 'trauma', 'emergency', 'nicu', 'burn'}
 SORTS = {'Best evidence': 'default', 'Nearest': 'nearest', 'Compare listed prices': 'price'}
-PRIMARY_RGB, EXTRA_RGB = [8, 127, 131], [95, 107, 118]
+PRIMARY_RGB, EXTRA_RGB, ORIGIN_RGB = cm_style.INK_RGB, cm_style.MUTED_RGB, cm_style.CORAL_RGB
 KIND_TEXT = {'direct': 'direct statement', 'listed': 'listed item', 'indirect': 'indirect mention',
              'negative': 'negative statement'}
-
-CSS = """
-<style>
-/* Page chrome (white/teal redesign). Presentation only: native controls, keyboard navigation and status messages stay intact. */
-.stApp{background:#f6fafb;color:#153b49}
-[data-testid="stMainBlockContainer"]{max-width:1380px;padding-top:4.5rem}
-.brand{color:#087f83;font-size:1.6rem;font-weight:800;letter-spacing:-.04em}
-.brand span{font-size:.68rem;letter-spacing:.18em;margin-left:.7rem}
-h1{color:#123f50;letter-spacing:-.035em}
-h2,h3,h4{color:#163f50}
-[data-testid="stForm"],[data-testid="stVerticalBlockBorderWrapper"]{background:#fff;border-radius:16px}
-[data-testid="stForm"]{padding:1.4rem;border:1px solid #c9dfe4}
-[data-testid="stBaseButton-primary"],[data-testid="stBaseButton-primaryFormSubmit"]{background:#087f83;border-color:#087f83;min-height:2.6rem}
-[data-testid="stBaseButton-primary"]:hover,[data-testid="stBaseButton-primaryFormSubmit"]:hover{background:#06666a;border-color:#06666a}
-blockquote{border-left:3px solid #79b7be;background:#f0f7f8;padding:.65rem 1rem}
-[data-testid="stCaptionContainer"]{color:#4f6570}
-[data-testid="stMarkdownContainer"]{overflow-wrap:anywhere}
-@media (max-width:760px){
-  [data-testid="stMainBlockContainer"]{padding:4.5rem 1rem 1.5rem}
-  [data-testid="stHorizontalBlock"]{flex-direction:column;gap:1rem}
-  [data-testid="stColumn"]{width:100% !important;flex:1 1 100% !important;min-width:0 !important}
-  h1{font-size:2rem !important}
-}
-/* Result components */
-.cm-status{font-size:.95rem;color:#153b49;margin:.1rem 0 .4rem}
-.cm-title{display:flex;align-items:center;gap:.55rem;font-size:1.08rem !important;font-weight:650;margin:.1rem 0 .3rem;line-height:1.3;padding:0}
-/* Newer Streamlit wraps heading content in one span; keep the pin and the name spaced inside it too. */
-.cm-title>span:first-child{display:inline-flex;align-items:center;gap:.55rem}
-.cm-pin{display:inline-flex;align-items:center;justify-content:center;min-width:1.65rem;height:1.65rem;border-radius:50%;
-        background:#087f83;color:#fff;font-weight:700;font-size:.85rem;flex:none}
-.cm-pin.extra{background:#5f6b76}
-.cm-meta{color:#4f6570;font-size:.88rem;margin:.1rem 0}
-.cm-chip{display:inline-block;border:1px solid #c9dfe4;border-radius:999px;padding:.05rem .55rem;font-size:.8rem;
-         margin:0 .3rem .2rem 0;color:#153b49;background:#f0f7f8;white-space:nowrap}
-.cm-chip.strong{border-color:#2f855a;color:#22543d;background:#f0fff4}
-.cm-chip.moderate{border-color:#b7791f;color:#744210;background:#fffaf0}
-.cm-chip.weak{border-color:#9aa5b1;color:#3e4c59}
-.cm-quote{border-left:3px solid #79b7be;background:#f0f7f8;border-radius:0 8px 8px 0;padding:.4rem .7rem;color:#153b49;
-          margin:.35rem 0;font-size:.92rem}
-.cm-quote small{color:#4f6570}
-.cm-price{font-size:.9rem;margin:.25rem 0;color:#153b49}
-.cm-warn{font-size:.86rem;color:#7b341e;margin:.15rem 0}
-</style>
-"""
-
 
 def esc(value):
     """Escape for Streamlit markdown ($ starts LaTeX, * and _ emphasis, ...)."""
@@ -346,9 +304,9 @@ def render_card(index, c, label, sort_mode, extra=False, nested=False):
         loc = located(index, c)
         phone = c.get('phone')
         site = website_link(c.get('website'))
-        contact = st.columns([1.05, 1.25, .8])
+        contact = st.columns([1.75, 1.1, 1.0])
         if phone:
-            contact[0].link_button(f'Call {phone}', f"tel:{phone.replace(' ', '')}", use_container_width=True)
+            contact[0].link_button(f'Call {phone}', f"tel:{phone.replace(' ', '')}", type='primary', use_container_width=True)
         else:
             contact[0].caption('No phone number in the records.')
         if site:
@@ -453,7 +411,7 @@ def render_map(index, r):
                'name': f"Search centre: {o['label']}", 'detail': f"approximate, ±{o.get('precision_km')} km"}]
     layers = [
         pdk.Layer('ScatterplotLayer', data=origin, get_position='[lon, lat]', get_radius='radius',
-                  get_fill_color=PRIMARY_RGB + [28], get_line_color=PRIMARY_RGB + [140], stroked=True,
+                  get_fill_color=ORIGIN_RGB + [36], get_line_color=ORIGIN_RGB + [190], stroked=True,
                   line_width_min_pixels=1, pickable=True),
         # pydeck reads bare strings as expressions; a literal must be quoted ("'pixels'"), else the radius is 13 metres.
         pdk.Layer('ScatterplotLayer', data=pts, get_position='[lon, lat]', get_radius=13, radius_units="'pixels'",
@@ -651,7 +609,7 @@ def render_result(index, r, sort_mode, service):
     with right:
         if map_points(index, r):
             with st.container(border=True):
-                st.markdown('### Around your search')
+                st.markdown('<h3 class="cm-panel">Around your search</h3>', unsafe_allow_html=True)
                 render_map(index, r)
         if r.get('service_scope'):
             st.markdown(f"**What the records can show.** {esc(r['service_scope'])}")
@@ -682,16 +640,15 @@ def render_result(index, r, sort_mode, service):
 
 # ---- page ----------------------------------------------------------------------------------------------------
 
-st.markdown(CSS, unsafe_allow_html=True)
-st.markdown('<div class="brand">✚ carematch<span> INDIA</span></div>', unsafe_allow_html=True)
+cm_style.apply()
 if st.session_state.get('query'):
     # After the first search the introduction steps aside, so the answer starts on the first screen.
-    st.caption('Find a healthcare facility. See the evidence. Know what to confirm. Always call before travelling.')
+    cm_style.bar('See the evidence. Know what to confirm. Always call before travelling.')
 else:
-    st.title('Care you can understand.')
-    st.markdown('Find a healthcare facility. See the evidence. Know what to confirm.')
-    st.caption('For health workers and families in India: one service, one place, up to three facilities, and the evidence '
-               'behind each one. Always call before travelling.')
+    cm_style.hero('Care you can understand.',
+                  'Find a healthcare facility in India, read the sentence in its record that supports the suggestion, '
+                  'and know what to confirm before anyone travels.',
+                  ('Choose a service', 'Say where the patient is', 'Read the evidence, then call'))
 
 try:
     index, info = get_index()
