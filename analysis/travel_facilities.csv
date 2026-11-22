@@ -1,0 +1,350 @@
+facility_id,name,tier,field,quote
+2ac0d1c7-d1b9-400d-ba33-6e125f525935,Akash Hospital,strong,procedure,Caesarean delivery
+601a4f38-97e7-40ff-97e1-2e72477468fb,"Dr Rupam Arora Clinic, Krishna Nagar",moderate,procedure,Caesarean Section
+8032fc36-e23e-4bd8-91fa-efb3b628c105,Sankhwar Hospital,strong,procedure,Performs cesarean delivery
+38d1d343-dd40-41bf-9329-19ebb8814437,Aashlok Hospital,moderate,procedure,Caesarean Section
+9c3cb801-c110-4ca7-ae34-4b1b5be4af66,Neonest Hospital,strong,procedure,Performs cesarean sections
+00fadd88-df09-4a1e-a3ad-95c5a431b2d1,Synergy Clinics,moderate,procedure,Cesarean section
+d1d0c662-85c9-4782-8086-69c04e1a31f2,Orchid Hospital,strong,procedure,Caesarean delivery
+83156026-793b-47a2-9cd1-14ce24bf4a60,PSRI Hospital,moderate,procedure,Normal deliveries and caesarean sections
+e0893a32-13ef-4fb0-a8bb-0c2bc02a2393,Ansari Hospital,moderate,procedure,Cesarean section and hysterectomy (removal of uterus) are performed in Gynecology
+d32b615a-4bce-4cd3-9616-1c7581f879df,Meenakshi Hospital,moderate,procedure,Obstetrics: Cesarean Section
+eae09acc-7c6e-43eb-b15f-e6d7fe3e4c89,Shree Aggarsain International Hospital,moderate,procedure,Caesarean Section
+aee90e94-5d26-4247-a0c5-7db96b6839ad,Mayom Hospital,strong,procedure,C-section
+bed60b77-6516-4618-8447-053a4ba73ba1,Nivaran Multispeciality Hospital,moderate,procedure,Cesarean Delivery
+37fcd8ff-0d63-4129-9c09-0d4bdb8afa53,SRC Medical and Maternity Centre,moderate,procedure,Performs Caesarean section
+a4a9a637-1717-49f9-808e-3b4d80b34826,Uma Sanjeevani Health Centre,moderate,procedure,Caesarean Section
+bb95dc25-9a95-4bef-bc9e-c0e9a535c727,Kalyani Hospital,strong,procedure,Cesarean delivery
+4f1a8380-adab-4682-8475-5be00c9e48b1,Mother and Child Care Clinic,moderate,procedure,Caesarean Section
+58d82919-60f7-4a74-a45f-0246f13d1b49,"Samriddhi Hospital and Fertility Center - Plot No. 5, Mata Amritanandamayi Marg, opposite Indian Oil Petrol Pump, Sector 88, Faridabad, Haryana - 121002",strong,procedure,Caesarean Delivery
+49a3e0fa-424c-4d7f-8df6-43185eeee389,Siddhi Vinayak Poly Clinic,moderate,procedure,Cesarean Delivery
+1b9a9d2b-0456-44e9-a171-c6535396d692,Aar Pee Hospital,strong,procedure,Caesarean delivery
+99c39735-3ece-43a8-b44e-ffff7d87764a,LYF Hospital - Gaur City - 1,moderate,procedure,Cesarean Section Delivery
+2bc42a76-06f4-412e-99d6-eed32cf08aa0,Aarvy Healthcare Super Speciality Hospital,strong,procedure,Performs Caesarean Section
+445fae90-87b1-44a3-8eb4-48ebc6829e18,Sethi Hospital,moderate,procedure,Cesarean Delivery
+024eec30-208e-43b3-81dd-044c17e9c01d,The Gynae Clinic,moderate,procedure,Provides Vaginal Birth After Caesarean (VBAC)
+4efd3d6e-54ab-4dfa-8f60-6688f8183ebc,Lall Hospitals,moderate,procedure,Caesarean section performed; may be done with spinal block or general anaesthesia; involves incisions in the lower abdomen and uterus to deliver the baby
+cdcc342f-b707-4a15-9f5a-a869354d0a9e,Lall Nursing And Maternity Home,moderate,procedure,Cesarean delivery
+3de583b1-b061-4167-98c2-a687bab8cc30,Lalita Memorial Hospital,strong,procedure,Caesarean Section
+94969e8e-bc23-4cfa-a4dc-a0c598d9b71c,"Shri Komal Hospital and Dr Saxena Nursing Home, Kanmajra, Rewari",moderate,procedure,Caesarean Section
+3f158bca-9853-4986-8041-d8a14e5cb0ad,Swastik Maternity & Medical Centre – Gurgaon,moderate,procedure,Cesarean delivery is performed
+c710d0a6-a688-4613-a8a5-3bc155f9ceb8,Cloudnine Golf Course Road - Gurgaon,moderate,procedure,Complicated cesarean sections
+543e96c8-9cdc-4a52-9522-20ac534fa5cd,Wellstar Clinic & Diagnostics,moderate,procedure,Caesarean delivery
+a06d166a-10a6-4ab5-9aee-3fa628d76400,Kishan Singh Hospital Medical Reaserch Centre,strong,procedure,Cesarean delivery
+0f0f3145-1759-4168-b261-bdcef9cb78aa,Ganga Sahai Multispeciality Hospital,moderate,procedure,Cesarean delivery is performed at Ganga Sahai Hospital
+acde9be7-1859-4c30-a5aa-71f18a4f590e,"Civil Hospital, Panipat",strong,procedure,Caesarean Section
+9df208a6-3994-48de-a477-4b0b1383aff6,Gupta Nursing Home & Laparoscopy Center,moderate,procedure,Offers normal and caesarean delivery
+d6da16ff-958d-4759-bc22-63e0185ccdaf,"Gopi Krishna Hospital, Sadar Bazar",moderate,procedure,Caesarean Section (C Section)
+df4678a7-1148-4f7a-bc15-1d5b2356b214,Pardeep Kansal Multi Speciality Hospital,moderate,procedure,Caesarean section
+c2cc824f-0c27-44ac-b66f-1ea1c0d0f1ef,Anand Nursing Home,strong,procedure,Caesarean delivery
+8306f89c-e2bd-402d-8797-42bd7e71f5b4,Sparsh Hospital & IVF Centre,strong,procedure,Cesarean birth (Caesarean section)
+cb8336f2-ccf8-4688-82eb-82ec3b2569be,Talwar Hospital and IVF Centre,moderate,procedure,Performs caesarean section surgeries
+d2833710-0cdf-4208-b273-6149a2cf64ec,Shriram Trauma & Super Speciality Hospital,strong,procedure,Cesarean delivery
+ade57c01-bebc-4bf7-9093-b5aeb530fec4,D.N. Hospital,moderate,procedure,Gynaecology services including normal deliveries and cesarean deliveries
+f4c0eda4-1a23-4316-b3de-e42b25212081,Apex Hospital and Trauma Centre,moderate,procedure,Gynaecology consultations with normal delivery and Caesarean delivery
+33702f94-4a9b-4c41-98c9-a3b297e561df,Guru Nanak Hospital & Divine India IVF Centre,moderate,procedure,Caesarean Section
+e4620a1d-0e42-4156-843d-95f2beb5a3dd,Sohana Hospital,strong,procedure,Caesarean section
+99617cec-7084-4053-b1e0-256fd18f84f0,Healing Touch Super Speciality Hospital,moderate,procedure,Cesarean Delivery
+4c6e0f30-2dc5-4aa9-8663-d18c7b3e337f,Siddharth Hospital Ad,moderate,procedure,Performs cesarean section (C-section) deliveries
+ebcba078-03f3-439e-b7ad-8ac2e6ff4a27,"Chhuttani Medical Centre, Chandigarh",moderate,procedure,Cesarean Delivery
+e7fdb2a6-f74f-49bc-b9d8-9e9e49ef8521,Pande Multispeciality Hospital,moderate,procedure,Caesarean Delivery
+ad126438-6e34-43e7-a627-1432ccc65d36,Vyas Hospital,moderate,procedure,Caesarean section delivery
+a8366948-ee37-4b9c-8b54-cda0cad4a3b1,GHAI Hospital,strong,procedure,Normal Delivery & Caesarean Section
+a3091766-8703-4a97-a032-dce859226266,Pancham Hospital,moderate,procedure,Caesarean section and painless delivery
+1b093c98-8d1c-4715-a67b-4441e0d7e7ce,Orison Super Speciality Hospital Infertility & Trauma Centre,moderate,procedure,Caesarean section (LSCS) and in-room normal vaginal deliveries
+0f50a26e-324a-4fc2-a071-431eaf89d078,SNS.Pahwa (C) Hospital Ludhiana,moderate,procedure,Performs Caesarean section (C-section)
+017a80f7-93b3-4554-a141-c6f2345b7164,Christian Medical College Ludhiana,moderate,procedure,Stitchless cesarean sections
+76eb1529-9e07-4ef8-abb9-c5524042146e,IVF Centre in Moga,moderate,procedure,C-Section
+20b34829-cc01-4eec-974b-80166d27c50b,Apollo Cradle & Childrens Hospital,strong,procedure,C-Section
+2c228858-31a4-4f39-9fa9-83de16c3a469,Frances Newton Hospital Ad,moderate,procedure,Performs cesarean delivery
+2fe6d0eb-1679-4318-86dc-66c9fd5670d0,Pasricha Medicare Centre,moderate,procedure,"Performs high-risk cesarean sections for obstructed labor, previous multiple cesareans with adhesions, placenta previa, and uterine rupture"
+7bdc52c3-fb3b-4949-a2e6-29d6319cf19f,"Beri Maternity Hospital, Putligarh, Amritsar",moderate,procedure,Cesarean Delivery
+e47929b1-a070-4278-9958-fd8290d0e8ba,Dr Karam Singh Memorial Multispeciality Hospital,moderate,procedure,Caesarean Section
+d7b9aaf1-fb11-4a90-96be-78db26d7101f,Doaba Hospital,moderate,procedure,Caesarean section (C-section) delivery
+4128f1b8-a352-4eb8-aa19-5907d7cac45d,"Healing Touch Gastrosurgery & Gynaecology Hospital 1 B Golden Avenue Phase 2 Jalandhar City, Jalandhar",moderate,procedure,Performs caesarean delivery and normal delivery in Gynaecology & Obstetrics
+aa63a318-1d1c-4e3c-97cb-d9b5d7efa060,Mannat IVF centre & Super Speciality Hospital,moderate,procedure,"High-risk obstetric care is provided, including delivery and cesarean sections, with options for painless delivery and family planning and sterilization"
+f210b894-f29b-49b3-aa9f-6d6b87acec7e,New Shyam Narayan Hospital,moderate,procedure,Caesarean section
+e48a8f48-d155-4bf6-9584-0a487401f89a,Life Line Care Hospital & Dialysis Centre,strong,procedure,Cesarean delivery
+27a8bb0c-db7f-453e-bfda-6567043654b7,Hari Ram Kohli Memorial Hospital,moderate,procedure,Caesarean Section
+b1b8f085-52bc-4ca1-9b71-30c9ca0ee328,Amal Hospital,moderate,procedure,C-sections and natural deliveries performed by the Gynecology and Obstetrics department
+ac53696e-90bb-46ac-a9aa-75cd137fb43e,John Bishop Memorial Hospital,moderate,procedure,Performs cesarean sections
+5e27f661-f4d1-4960-a0c1-0ddfb7228a6b,Poddar Nursing Home,moderate,procedure,Caesarean Section (C Section)
+2535f5e0-3b40-4a5e-802e-81f3168df7ec,Shanti Gopal Hospital,moderate,capability,Provides pregnancy care and delivery services including normal delivery and cesarean delivery
+6ff9941f-3b89-4e14-b2b4-9fe1e2aa417d,Trulife Family Health Clinic,moderate,procedure,Caesarean Delivery
+a00b6ebd-4023-44ba-901e-9080402ca99b,Prayag Hospital & Research Centre,moderate,procedure,Cesarean Delivery
+24aa55f5-5346-415b-9fe3-e7a7bdef6d40,Sneh Mother Child and Infertility Clinic,moderate,procedure,Caesarean section
+e7934891-4d67-4225-902f-b4dedd6ad768,Dr. Smiti Women's Clinic,moderate,procedure,Performs cesarean sections
+756809c7-6aa2-4a7a-8019-5e16d03c39df,"Matra Chhaya Clinic And Nursing Home, Ramghat Road",moderate,procedure,Cesarean Delivery
+39a3c23b-3698-4b55-ab14-53b3ec23fa63,Ram Tej Hospital,strong,procedure,Labor room births including vaginal deliveries and cesarean sections
+12fe95f9-0e07-4fbf-8320-8bbfb9d20315,"GANDHI EYE HOSPITAL, ALIGARH",moderate,procedure,Provides cesarean (C-section) delivery services
+72b1bbcd-4cc4-403f-9df8-6a44ac724885,Satish Nursing Home,moderate,procedure,Cesarean section delivery
+5eb1fe37-0de1-402c-b8ee-cc7dd6db6ea1,Surman Hospital,strong,procedure,Cesarean delivery (C-Section)
+96ce8fa8-2d29-4657-9cda-cf79d10a9d9e,Dr. Kamlesh Tandon Hospital,moderate,procedure,Caesarean Section
+120ace0f-93b9-4773-89f6-e9b4dffbad8c,Om Medical Complex Khandari Agra,moderate,procedure,Caesarean Section (C Section)
+b43315f5-dffd-4628-af31-75c869a60a48,"Shivani Hospital and IVF, Shastri Nagar, Kanpur",strong,procedure,Performs Caesarean section
+43d0e338-a916-4791-8823-50c671a22ebf,Wellsun Medicity Hospital,moderate,procedure,Provides Caesarean section deliveries (C-section) in the Mother and Child Care department
+f4e59208-5411-4232-bf6c-11493a8ee88b,Sanjeevani Hospital,moderate,procedure,Operation Delivery (LSCS)
+d93e5058-3819-47e3-aaae-49e6d9cfbafb,BNK Hospital,strong,procedure,Lower Segment Caesarean Section (LSCS)
+668afa66-7048-4956-8c16-399ff93ec883,Priti Hospital,moderate,procedure,Cesarean deliveries (labor and delivery with C-sections)
+14510729-4176-4647-a353-fc6e5a119196,Phoenix Hospital,strong,procedure,Cesarean delivery
+8b6bc0ff-ee35-4cff-a7f2-1a167888524e,"Bundelkhand Fertility Center, Jhansi",moderate,procedure,Extraperitoneal Caesarean section
+2938dee6-a69f-49e6-b6fb-9b3585da183f,Peace Point Hospital,moderate,procedure,Performs Caesarean section (C-section) surgery
+5abe5063-f066-4028-9a98-43f1f3e00078,Tejas Hospital,strong,procedure,Deliveries by caesarean section
+8b5d6123-2e89-4d88-9fb2-b92a652c60d6,Mittal Eye Hospital Betiahata Gorakhpur,moderate,procedure,"Performs deliveries, including cesarean sections"
+4d02a4c1-e1fd-4fbe-94df-150b20d2f368,Sanjeevan Sparsh Hospital,moderate,procedure,Normal and cesarean deliveries are offered
+531e6b63-6c19-4250-9b29-db5187429fa3,Medizone Hospitals,strong,procedure,Cesarean delivery
+22cc2cb0-805f-428e-992e-655e12431a09,J N Hospital,moderate,procedure,Caesarean section offered
+adfecbb0-816b-432f-b063-67ad8c6b0203,Aiman Nursing Home,strong,procedure,Caesarean section
+5c9f7e5b-618b-4859-b7a2-f1735b52eec2,Pawar'S Clinic,moderate,procedure,Delivery by cesarean section (LSCS)
+c80ad4c1-cdaa-4254-a07b-7cc0364d7c5d,Krishna Medical Centre,strong,procedure,Caesarean section (C-section)
+2935d335-3473-481d-bfce-f856a75268e1,Elite Hospital,strong,procedure,Cesarean delivery is provided
+d4d2acd5-28e3-4991-82ed-68d46ad1f1ff,Agarwal Clinic and Nursing Home,moderate,procedure,Cesarean delivery
+724acb61-bdd6-45b0-bdf9-adbd59347795,"Vardhman Hospital, Muzaffarnagar",moderate,procedure,Cesarean (C-Section) Delivery
+66264f61-3e21-4db3-9d05-e5aa99a7f33b,Rewati Nursing Home,moderate,procedure,"Obstetric care including prenatal, intrapartum, and postpartum care; management of high-risk pregnancies; emergency obstetric care; and Doppler blood flow studies and advanced ultrasound techniques"
+37831f8b-ebbe-4dce-99ff-16d09921820d,Purvanchal Metrocity Hospital,moderate,procedure,Cesarean delivery
+7ae333aa-d8a3-46d7-9a10-854c132f0f12,"Dr Kusum Sharma Multi Speciality Hospital, Gopalgarh, Bharatpur",strong,procedure,Performs Caesarean Section
+994003f4-9f32-4edf-b17a-0407dcdbd6c5,"Sarkar Multi-Speciality Hospital & IVF Centre, Agra",moderate,procedure,C-section
+267d9a6e-a1de-4c30-bd79-4d64b21d5bb1,Jindal Super Speciality Hospital,moderate,procedure,Caesarean Section
+24e5f7f9-10a2-49fc-9b6f-e3b0ce79e86d,Lbs Hospital,strong,procedure,Caesarean Delivery
+806c465b-4328-47ad-84f3-530d47cee0c7,Bhagyoday Tirth Chikitsalay,moderate,procedure,Cesarean delivery
+e1f35444-4d62-4730-b616-5cca44814439,Mittal Hospital & Research Centre,strong,procedure,Caesarean delivery (including high-risk cases)
+a618961b-bffb-4781-a298-24f40c83cee8,Surya Hospitals Jaipur,strong,procedure,C-Section
+2a4f2404-c9c3-4878-bd3a-a344d83fc3f3,Bani Park Hospital,moderate,procedure,Performs cesarean delivery
+8de46ac7-edde-480b-96a9-fb39f8c3c8d9,Shekhawati Hospital & Research Centre,strong,procedure,Cesarean Delivery
+38ed9af6-4dc5-4e81-9459-d08f6138b84c,Rao Hospital,moderate,procedure,Normal and cesarean deliveries
+b573b0e9-aebf-4deb-aeac-b204e05f7414,Cocoon Hospital,moderate,procedure,Provides vaginal birth after cesarean (VBAC) services as a supported option
+1f464921-0ab6-41c9-bac6-807c40585731,Diva Hospital & IVF Center,strong,procedure,Cesarean delivery
+e7cf3511-c4e1-41b0-9a86-b11a6bdfd0e7,Cradle Children Hospital,strong,procedure,C-Section
+82f1d1c5-f695-4c81-bc4d-094f1e35f2ec,Rajat Maternity & General Hospital,moderate,procedure,Cesarean Delivery
+3a2d6e6f-e10d-4a7f-9be0-40231b76190e,Asopa Hospital,moderate,procedure,Caesarean section
+ea87bf57-7560-41f9-8b03-7a7d33576338,"Marble City Hospital, Kishangarh, Ajmer",moderate,procedure,Caesarean Section
+e76ffec7-c8e5-45b7-bc51-e7a82b6d4e70,Aagman Women’s Hospital,strong,procedure,Performs cesarean (C-section) deliveries
+f592e0c7-9d87-4449-98e4-f103abe4f5ac,Nahar Hospital,moderate,procedure,Elective and emergency caesarean sections are performed
+87bd1460-4877-4635-b4c9-68e9401afd26,Pareva Women's Hospital,strong,procedure,Performs lower segment cesarean section (LSCS)
+93831102-95d4-47a6-812c-1349d0e8e2f4,Rama Krishna Multispeciality Hospital,moderate,procedure,Performs Cesarean Delivery
+46034119-2b71-48b0-a926-eeaa0b71233e,Gokuldas Hospital,strong,procedure,Caesarean Section (C Section)
+0ecdab93-471a-4c88-8d23-7f009b9306e0,Pushpa Mission Hospital,moderate,procedure,Performs cesarean delivery
+40ea84cf-9188-4914-9cca-8fc0f9911104,Deep Maternity and Nursing Home - Naroda,moderate,procedure,Caesarean section (C-section)
+4ee1bf0e-8cbf-407f-aed7-a86a708cd741,MAA Women's Hospital & IVF Center,strong,procedure,Normal Delivery and Cesarean Section
+57ce5502-fc53-44cf-8210-616a629ef9ca,Shubham Hospital & IVF Center,strong,procedure,Normal delivery (vaginal delivery) and cesarean section (C-section) procedures
+6a46bfc2-421f-44b5-be16-82aae258acca,Gita Bhawan Hospital,strong,procedure,Caesarean deliveries are performed
+c2d0e606-ed32-440d-85d3-3e86e7adedc6,Usha Nursing Home,moderate,procedure,Cesarean delivery
+fa4ff91a-d31d-465f-b45c-10d738f25cab,Jupiter Hospital,moderate,procedure,Provides obstetric services including vaginal deliveries and cesarean sections.
+52b3d906-b4b1-4c68-b8b8-80b2de885788,Mathur Hospital & Research Centre,moderate,procedure,Performs LSCS (lower segment cesarean section)
+26a27936-c005-4dba-bec6-53c4abfc6182,Sugni Devi Jesraj Baid Hospital and Research Center,moderate,procedure,Caesarean Section
+805f2cf5-99f5-49c3-9163-800ee25d8762,Golden City Hospital & Fertility Centre,strong,procedure,Performs cesarean sections
+83bb8b54-e6d5-4517-95ba-ec138fcd948a,Sanidhya Eye Hospital,strong,procedure,"A full-term lower segment cesarean section (LSCS) was performed at Sandhya Hospital, resulting in a healthy female baby weighing 2.6 kg."
+d70319e9-7f81-4339-8760-768a68afaf34,Jagruti Maternity Hospital Dr Rajesh Gondalia,moderate,procedure,"Facilities for normal delivery, vacuum delivery, cesarean section, and complicated deliveries with anesthesiologists and pediatricians present at delivery"
+9f07b577-3c07-4086-8e10-8f3e8f8f031d,Harsh Hospital & Maternity Home,strong,procedure,Cesarean section
+96782505-2fa7-48ee-8475-73563b07f413,SGVP Holistic Hospital,strong,procedure,Cesarean deliveries (C-section)
+fe0d401f-ed25-436b-a565-4a64fb56d471,Sangini Advance Women's Care,moderate,procedure,C-Section
+7cd645ec-676e-4830-974a-6c3256d3434d,Aadhya Women’s and Surgical Hospital,moderate,procedure,Caesarean section delivery
+b32be595-3d20-496f-a581-815074e2de27,Sanskriti Prasutigruh And Surgical Hospital,strong,procedure,Cesarean delivery
+74db5edf-43c8-4c9a-851f-a68a1bc1e5cf,Anjani Maternity Home,moderate,procedure,Cesarean delivery
+96ef5b53-3ab8-414c-be5b-14f189ca72c0,Queen WomenS Hospital,moderate,procedure,Performs sutureless Caesarean Section (LSCS).
+cba994e0-0c4b-4521-b343-f5db61f6bc0c,Brinda Women's Hospital,moderate,procedure,Cesarean section delivery
+d6cd7db3-2094-4903-80f0-2367fd7d0af0,Motherhood Women’s & Child Care Hospital,moderate,procedure,Performs cesarean delivery
+ca4eb1ea-d5d3-4f55-817b-d2c3fb61dabe,Chhaya Women's Hospital,moderate,procedure,Cesarean delivery
+a16bc489-34c0-4bcb-84a4-c487d76dd519,Saavi Women s Hospital,moderate,procedure,"Delivery including normal vaginal delivery, assisted vaginal delivery with vacuum or forceps, and cesarean section"
+3ab5e575-d140-4caf-aecd-2d05306c0699,Shubham Women's Hospital,moderate,procedure,Caesarean Section (C-Section)
+dde0bbd4-ab5a-4925-9027-5718ea794b96,Atman Uro-Gynaec Hospital,strong,procedure,Caesarean section delivery
+914cb264-56d9-4ab7-bfa6-a7a48c822642,Sparsh Women's Hospital,strong,procedure,Cesarean delivery
+cb163bdf-5015-46b4-b8e4-b83af28b30ce,Prapti Women's Hospital,moderate,procedure,Performs cesarean delivery
+6132cee5-de8b-4734-a693-f143b778962c,Bagul Nursing Home & Dr. Bagul’s Hope IVF Center,strong,procedure,Delivery by cesarean section
+6ab47d4a-76da-4bc0-a02d-de28fbb48dd3,Matritva Women's Hospital,moderate,procedure,Performs cesarean sections
+2ca2244c-2e89-42eb-98cc-2557214676e9,Bhaktivedanta Hospital & Research Institute,strong,procedure,Caesarean Section
+dafed6f6-c856-47d3-a6e4-06ea20cfed3e,Aryan Hospital & Medical Centre,strong,procedure,Performs Caesarean section deliveries
+f9b26e8a-69eb-4db0-b20f-0490c19a0869,Suraj Clinic,moderate,procedure,Performs caesarean sections
+d4737fdd-c479-4c31-9d34-fc19fd7d7e58,Dr. Sumitrabai Wagh Maternity Hospital,strong,procedure,Caesarean Section
+863a9801-8b0d-4ce0-b0e8-a7ab2d71d371,Medansh Multispeciality Hospital,moderate,procedure,Cesarean delivery
+8002c213-ef9f-42ec-bf62-532d95b94932,Mangala Hospital,moderate,procedure,Cesarean section
+14f54bc7-d489-40ea-a888-b46300c18fb9,Sarla Hospital,strong,procedure,Caesarean Section
+af99e7c6-44b0-44db-88b4-d78424f0651d,Doctor A Kapoor's Diabetes Control Clinic at Lifeline Medicare Hospital,moderate,procedure,Cesarean section (Caesarean delivery) performed
+3b72d632-462e-4d37-b1a6-20ef16dae2d8,"K K Speciality Clinic And Hospital, Mumbai",strong,procedure,Cesarean Section
+d27e57e1-f764-41ec-9e1b-99628b7b08a0,Aakanksha Maternity and Nursing Home,moderate,procedure,Performs caesarean delivery
+91057385-778c-49fc-b5c8-fec7ca4f760c,Ruddhi Maternity & Nursing Hospital,moderate,procedure,Performs caesarean sections (C-sections).
+6b01c7de-3504-4ffe-8370-f88b21c8ca80,K.K. Medical Centre,moderate,procedure,Cesarean Section
+986cbcdf-65b1-4ac4-a73b-c8a8d738593a,Apex Hospitals Mulund,moderate,procedure,Cesarean delivery
+156772f5-a5c1-4185-8329-ddc1c332c4c1,Adidev Clinic,moderate,procedure,C-section (cesarean section) delivery
+40526ecd-6825-4690-a515-5f060f6bb8b2,Dr Bedekar's Hospital for Women & Children,moderate,procedure,Performs C-sections
+14721df7-2100-43d3-b8fa-0b0709cbefca,Currae Gynaec IVF Birthing Hospital,moderate,procedure,C Section Delivery
+8c7b1866-15d0-431c-9a17-364d8ddc8957,Heritage Health Care Hospital,moderate,procedure,Caesarean Section
+ebf431b9-8d60-48a4-b126-6ef5db3fb3eb,Dr Borkar’s Mother Care Hospital,strong,procedure,Delivery services include normal and caesarean deliveries.
+49304b90-5417-4e67-9472-16d59d5b068d,Ulwe Superspeciality Hospital,moderate,procedure,Cesarean delivery
+672d792e-dcec-40f0-a403-697636286f10,Oyster & Pearl Prime Hospital,strong,procedure,Cesarean Delivery
+ac30d25e-ad53-48a3-abcb-0c70d81299c5,Lodha Hospital And Maternity Home,moderate,procedure,Caesarean section
+31be4ed6-63fa-45bc-8b56-4c02adaf8102,Kolte Hospital,strong,procedure,LSCS (Lower Segment Cesarean Section) Delivery
+07f992f7-29f2-466c-b012-c19a24ddc895,Sarthak Maternity & Plastic Surgery Clinic,moderate,procedure,Caesarean Section
+06145f85-32c5-43ff-b6a6-2b5ac7e31d3e,Borkar Multi Specialty Hospital,strong,procedure,C-Section delivery
+5a1403dd-dd6a-40cd-89e1-e7eba36c500b,Manipal Goa Cancer & General Hospital – Dona Paula,moderate,procedure,Delivery (Caesarean Section)
+8816b549-377f-4ffc-b6b8-bba2953d403a,Sarvadnya Multispeciality Hospital,moderate,procedure,Cesarean Delivery
+fd6036dd-72c8-4651-bb42-f67b6b72eaf8,Gold Rush Hospital,strong,procedure,Painless cesarean section delivery
+567a97b5-9d25-4125-8b56-cd01ac1df049,Lady Care Clinic,moderate,procedure,Vaginal birth after cesarean (VBAC) offered
+a4a54b3a-3dd1-4c04-a78c-aafcc8243838,Prathamesh Hospital,moderate,capability,Offers obstetrics and gynecology services including cesarean section
+3f7f4c64-84ee-4faf-8614-e20761d194b6,Ganga Nursing Home,moderate,procedure,Caesarean Section (C Section)
+8d0b897f-a414-4127-8e85-f0a6e2676fdb,APS Nursing Home and IVF Centre,moderate,procedure,Performs Cesarean delivery
+fc40ee1b-599e-48c5-a18a-44ef3f7b31a9,Burute Women's Hospital & Delta IVF,moderate,procedure,Caesarean section (C-section)
+40361df5-76e3-4d19-ba23-a8ed5198787d,Vital Multispeciality Hospital,moderate,procedure,"Gynaecology and obstetric surgeries including a delivery suite, normal deliveries, cesarean sections, NICU support for complicated pregnancies"
+229caf75-5889-4ae1-804e-64811156e755,Umarji Mother and Child Care,moderate,procedure,Caesarean Section
+e84b0206-1c33-4a1f-a4e2-254231a4f046,Care Multispeciality Hospital,moderate,procedure,Cesarean Delivery
+f81add44-f78c-404e-82f5-33d80fbeeac8,Rangnath Hospital,strong,procedure,Cesarean Delivery
+a7e109ce-3da9-468e-aae2-b2c48277009d,Manthale Hospital,moderate,procedure,Performs cesarean deliveries (C-sections)
+4afa8b92-64c8-4921-a3a8-6c8a81e6c786,Runwal Accident and Maternity Hospital,strong,procedure,Provides normal vaginal delivery and caesarean delivery
+231f141f-cc05-42a9-949a-accf4bab933c,United CIIGMA Hospital,moderate,procedure,Offers labour analgesia and Caesarean sections
+9201d9c9-4ebc-4a21-bd47-9869d95e016f,Cloudnine Hospital,strong,procedure,Performs cesarean sections including elective and emergency cesarean deliveries
+6a4edbdd-44d8-45fc-bd2c-6aacc8096ee3,Janaki Hospital,moderate,procedure,Caesarean section
+52eeaba4-0483-4b3e-a7b0-0fd9f3e3b89e,Hrudayasparsh Multispeciality Hospital,strong,procedure,Cesarean delivery
+5ea704f6-7bf6-4c9b-810a-52806cc841ff,Pristine Womens Hospital,strong,procedure,Caesarean section (C-section)
+0360b38b-339c-4e59-a13d-cad7fca05ed2,"KLE Centenary Charitable Hospital, Yellur Road, Belagavi",moderate,procedure,"Performs vaginal deliveries, cesarean sections, and laparotomies"
+c2a1742d-cfcb-4f74-8542-8c036183c043,Sukhatme Hospital,moderate,procedure,Performs caesarean sections
+c7b3b7d6-81f5-4c5d-b903-4c0e4ba686db,Patel Multispeciality Hospital,moderate,procedure,Performs cesarean deliveries
+d6a60d83-5524-4010-91a6-b618bd4cf673,Parijat Hospital,moderate,procedure,Lower segment cesarean section (LSCS) is available
+8890fac9-0195-461d-be4a-c0037df60375,Manorama Super Speciality Hospital,moderate,procedure,Cesarean Delivery
+463c0cb5-9ce8-4687-b6c8-520322bb394b,Mauli Multispeciality Hospital,moderate,procedure,Provides Cesarean Section (C-section)
+ceb60af1-93a5-44db-a44f-403a8a014c2e,Mogre Children Hospital,strong,procedure,Obstetric services including normal delivery and cesarean section are offered
+18539bb7-04de-4d58-9d74-59b8b60b8b0a,Ketkar Maternity Hospital & Research Institute,moderate,procedure,Lower Segment Caesarean Section (LSCS) deliveries: 400-500 per year
+12a7b9e5-bedc-4713-abaa-d39bdbf0910d,Sneh Nursing Home,moderate,procedure,Caesarean Section (C Section)
+dca8c89c-1aae-4d65-a756-fdfa2d9c0f50,Newlife Nursing Home,moderate,procedure,Performs cesarean delivery
+13964de0-54a7-4fc2-94b5-95454187017d,Orange City Hospital & Research Institute,moderate,procedure,Caesarean Section
+a385f373-09ae-494f-a9a3-af56f4181fd0,Central Hospital Gondia,strong,procedure,Caesarean section
+b2aab442-8a7f-4ce1-b9cc-8fa986c016b5,Gurjar Hospital and Endoscopy Centre - AB Road,moderate,procedure,Caesarean Section
+51c1ed79-d536-4293-832e-56db4c3a2c50,Dolphin Hospital,moderate,procedure,Performs cesarean sections
+3c1cc7a7-e754-4fd0-82bc-c2fe975f9ca8,V One Hospital,moderate,procedure,Caesarean Section
+90f2f1b8-850c-4e85-b596-48c0cfd3b8d6,SAMPAT CLINIC,moderate,capability,Emergency obstetric care
+26793603-5819-4186-a17d-f1c40f0da996,Chandrayan Health Care,moderate,procedure,Caesarean section
+e07deb30-384c-468b-bd0e-cd4e54ad65ca,Christian Hospital Mungeli,moderate,procedure,Performs cesarean sections
+3933c2cf-fae4-439e-a72d-39d2c28ddf4e,Kanwar Nursing Home,strong,procedure,Caesarean Delivery
+6c08e1f3-1d59-42c0-bb0c-4617f95a8986,"Devi Woman and Child Hospital, Raipur",moderate,procedure,Performs Caesarean Section
+818121a4-bb10-44a5-9d1d-256a3070416c,Shreyansh Multispeciality Hospital SMH,strong,procedure,Normal and cesarean deliveries
+0b02d119-a409-4554-9979-39817ed38e3e,Smc Heart Institute And Ivf Research Center,moderate,procedure,Performs cesarean delivery
+f73efb65-a436-45a4-b6b3-8409e412525d,Tiwari Nursing Home,moderate,procedure,Caesarean Section (C Section)
+76c77c05-0978-4e19-b41f-1fc23b28cfe0,Aditya Hospital and Maternity Home,moderate,procedure,"Delivery procedures include normal delivery, forceps delivery, vacuum delivery, and cesarean section."
+fede230e-ee20-4fe4-81b9-10360144f542,Nori Hospital,strong,procedure,Caesarean section (C-section) deliveries
+257efb93-0148-431c-a2d0-c81e8dbff406,Medicover Woman & Child Hospitals,moderate,procedure,Caesarean section (C-section) deliveries
+d40967c4-3ae4-4d3e-a3c3-e93f820adc57,Uma Super Speciality Hospital,strong,procedure,Cesarean Sections
+b6a873ce-095b-4b66-8605-387951737ad3,Dr. Lal’s Hospital & Research Centre,moderate,procedure,Cesarean Delivery
+bbdf6de2-17ba-4029-a7e5-81e902b11067,Osmania General Hospital,strong,procedure,Performs elective cesarean sections under spinal anesthesia
+001f21d5-3cb9-4ae5-b05c-46bc85fed8c3,Kirloskar Hospital,moderate,procedure,Cesarean Delivery
+82e91e8c-4967-4a54-a1d4-3801174eaad4,Manasa Hospitals,strong,procedure,Normal delivery and cesarean section services
+d2a805f9-953b-4d1d-9e3d-2373f70480c8,Geetha Multi Speciality Hospital,moderate,procedure,Cesarean delivery
+7346f35c-499c-42c6-b2eb-9e82cbe31b3a,Vijay Marie Hospital,moderate,procedure,Performs cesarean delivery
+10078a2f-3c74-4587-b84d-bfc92d4c1c25,Suraksha Women & Children Hospital,moderate,procedure,Performs cesarean delivery
+c975a844-09b0-4eaa-88b4-8f2e40e4ec67,Ferty9 Fertility Center,moderate,procedure,Cesarean section delivery
+53e74afb-e931-4f45-8fc2-ead997acb8c4,Fernandez - Stork Home (Unit 5),moderate,procedure,Performs normal deliveries and cesarean (C-section) deliveries
+fe8fb83a-b4a9-40da-a46a-277ec4c9661e,AMVI Hospital,moderate,procedure,Cesarean Delivery is offered
+f407e788-0b2f-4c12-8662-a32aa2175d6f,Omni Hospitals,strong,procedure,Cesarean Delivery – C Section
+2f5d3c0a-3385-4a16-b5c1-bf51153e0ca6,Ashwini Clinic,moderate,procedure,Cesarean section
+6625a069-d961-42dc-a7bf-92a58a452fb0,Haritha Hospital,moderate,procedure,Delivery through cesarean section
+439fc924-7e86-4631-8723-374a70e61b20,Zoi Hospitals - Attapur,moderate,procedure,Caesarean section (C-section) offered at Zoi Hospitals Attapur
+a32b5dae-30f2-4165-aba1-f53129f5151a,Sree Manju Hospitals - Hyderabad,moderate,procedure,Performs cesarean delivery
+d608092e-1e41-49c3-89f7-7cc6063916b3,Priya Hospitals,moderate,procedure,Caesarean Section
+118d8047-e498-4d2a-a3e8-9765dcccea0d,Kanumuri Hospitals,moderate,procedure,Performs cesarean section
+4dd6712b-70bb-493f-9c9f-d11192051354,Regal Hospital,strong,procedure,Caesarean Section (C Section)
+1199e1d7-dce5-4b74-8e76-d7e17b2c82f9,KOMMA SUPER speciality Hospital,moderate,procedure,Cesarean Delivery
+08a21360-7853-4b61-810e-d4b1240daa8b,Megha Siri Hospital,moderate,procedure,Performs cesarean section
+0f78f083-cead-442c-b80b-ee418a931815,Neha Prakash Hospital,moderate,procedure,Cesarean Delivery
+67333154-bd69-4acc-b954-a728a2e62322,Srinivas Priya Hospital (P) Ltd,strong,procedure,Perform cesarean sections
+c2330b59-dca9-416e-8de7-5f6230264417,"Aster Narayanadri, Tirupati",moderate,procedure,Caesarean section
+06bdf654-fc15-49eb-89c5-e3c14010ebe1,Rela Hospital,strong,procedure,Vaginal birth after cesarean section
+c01d319c-0dbe-412f-a381-074685b602bb,Nalam Medical Centre & Hospital,moderate,procedure,Performs cesarean delivery
+52e78d9c-3a6d-4792-97e5-4efefdcbf601,"Government Dharmapuri Medical College, Nethaji Byebass Road, Dharmapuri – 636701 (Tamilnadu)",strong,procedure,Operates SNCU and NICU units as part of CeMONC/Trauma/NICU services
+479743d8-f28c-4056-b12e-829bad5e3115,Miracle Women & Children's Hospital,moderate,procedure,Performs caesarean section (C-section)
+86a33104-2959-4ddf-aeda-4e6f42b2395d,The Family Tree Hospital,moderate,procedure,Provides normal delivery and cesarean-section (C-section) delivery services.
+0d2e5d58-98a2-4138-ab1e-eb7393b9beda,Deegee Clinic,moderate,procedure,Caesarean Section (C Section)
+18eaa161-f30b-4861-8ce9-a2300cca3932,Raja Superspeciality Clinic,moderate,procedure,Performs caesarean sections
+e32777f9-185c-40b1-b83f-39c7215f5554,Sevita Nursing Home,moderate,procedure,Cesarean Delivery
+ae20b125-7b8f-4851-89a7-06480eea6bd4,Nishamani Nursing Home,strong,procedure,Performs caesarean section deliveries; about 50 per month
+04bae564-9f3f-4b55-8854-3bfd587793a8,Life Institute Of Gastroenterology & Gyenaecology,moderate,procedure,Performs cesarean delivery
+7906b99f-196c-4a71-b315-76a670ebc408,Shree Vaishnavi Heart Centre & Multi Speciality Clinic,moderate,procedure,Caesarean Section (C Section)
+671afbc5-790d-4564-92f6-e68a94e4b2ec,Vivan Bone And Women Care,moderate,procedure,Caesarean Section
+b56c909a-53a7-4ab6-9006-740b86866520,Supra South City Hospital,moderate,procedure,Delivery – normal and caesarean section (LSCS)
+180df6d2-2cb4-4bc9-a564-238aea44a2f0,Nandini Women’s Clinic,moderate,procedure,Delivers babies (delivery) and performs cesarean sections
+736416dc-e905-41fe-9556-62d1fe2694db,"Sparsh Super Speciality Hospital (Y), Yeshwantpur",moderate,procedure,Cesarean Delivery
+365f2743-e87d-473a-89fa-26a19d7f34c4,Sai Speciality Center,moderate,procedure,Normal Vaginal Delivery and Caesarean section
+2f715935-51cc-463e-8898-b181d2625a19,Manasi Clinic,moderate,procedure,Caesarean Section (C Section)
+cb9c39e1-8cf0-4e23-ac40-3393dcd102ea,Chaitanya Hospital,moderate,procedure,Caesarean section
+f3b09829-a5ec-4585-8e3e-eee7d8e98ee8,Shankar Super Speciality Hospital,moderate,procedure,Cesarean delivery
+7ad719cf-9e0e-4a4e-b04b-bd379b089f8b,Nelivigi Multispeciality and Urology Hospital,moderate,procedure,Cesarean Delivery
+8735c338-9b18-43d1-a4da-1e835fd1559a,Comfort Multi Speciality Hospital,moderate,procedure,General gynecology including normal and high-risk pregnancy and caesarean section deliveries
+168b1a8e-d797-43b3-9a8d-83a59ee22927,Sisu Hospital India,moderate,procedure,Offers Cesarean section
+2f988dbd-519d-432d-8993-ca89f4e376a0,Vasavi Hospital,moderate,procedure,Caesarean Section (C Section) is provided at Vasavi Hospital
+5df215f5-81cb-4525-826b-ddbe9ff54eee,Camry Hospitals,moderate,procedure,Caesarean Section (C-Section)
+5accfa52-afb2-4bc2-8a65-23880b92104e,Dhanalakshmi Hospital,strong,procedure,Caesarean Section
+dc44e562-bef9-4f3b-8ba7-c1181676b072,Dr. UNITED MEDICAL CENTRE,moderate,procedure,Performs cesarean sections
+b0e2b9d2-1b6d-4270-bce6-d7f1b4f1bff0,Mother Care Hospital,moderate,procedure,Provides cesarean section (CS) delivery services
+0b42f014-2210-4659-a228-70e06bc607c3,"Revathi Medical Center, Kumar Nagar South",strong,procedure,Performs cesarean deliveries
+47b0b4c8-6de7-41c1-93c8-6d913091fed1,Dr.Dasarathan Memorial Hospital,moderate,procedure,Cesarean delivery
+765748bf-d5f6-4aed-a8ad-f6be8c7d8360,Care 24 Medical Centre And Hospital,moderate,procedure,"Delivers babies, including cesarean section deliveries (as reported by patients)"
+dd017dc5-5ac6-4849-8c0b-9cff41493f86,Usha Nursing Home,moderate,procedure,Performs cesarean delivery
+d2fe3b5b-f8d3-4bf6-89ae-aee15258d8f8,Maya Nursing Home,moderate,procedure,LSCS (Lower Segment Caesarean Section)
+f8469571-905f-4365-8695-5a412a4ac094,Kola Saraswathi Agarwal Samaj Health Centre,moderate,procedure,Performed cesarean sections (lower segment cesarean section) for deliveries
+177628f3-9d5b-477a-9875-4763ab9194df,The Crescent Hospital,moderate,procedure,Caesarean Section
+21e02669-8f5d-495c-a486-308151970958,Shreeja Clinic,moderate,procedure,Provides emergency obstetric care
+d64d2823-89da-48a2-ad4e-40683da48f72,Raju Hospital,moderate,procedure,Cesarean Delivery
+91baac6c-3cb2-4230-846a-1432acf42c7b,Anjakha Hospital,moderate,procedure,Delivers obstetric and gynecologic care including deliveries and caesarean sections
+bd7998c7-a6b4-4205-ad1a-fe3118e8b582,Venkataeswara Hospitals,moderate,procedure,Lower Segment Caesarean Section
+44b6ff8f-70cb-4406-a762-f864931503fa,Fertility Foundation,moderate,procedure,Performs Caesarean section
+38052702-b81c-4640-bd73-7f96a8c7aa51,"Arjun Nursing Home, KK Nagar",moderate,procedure,Caesarean Section
+5de90c4f-6d17-4173-a4ab-9c32bb5f2217,Prime Indian Hospital,moderate,procedure,Caesarean section (C-section) performed
+7330d09f-44c7-4c9b-ad66-df64173537aa,Mahatma Gandhi Medical College and Research Institute,moderate,procedure,Performs cesarean sections in Obstetrics and Gynecology
+80e10e2a-fc36-402b-bae4-05bf510dda6e,Ramana Maharishi Rangammal Hospital,moderate,procedure,Cesarean Delivery
+04122c10-02cd-4710-a3af-d735894dda89,Iniya Multispeciality Hospital,moderate,procedure,Cesarean Delivery
+e1021523-5264-4bda-872b-5bfb182111ee,Sundaram Arulrhaj Hospital,strong,procedure,Cesarean delivery
+cdc9fcd2-aaf2-4209-bec2-eda8cb338303,Arthur Asirvatham Hospital,moderate,procedure,Cesarean Delivery
+532421e0-8744-40a0-b527-913422a84c5f,Sudha Fertility Centre,moderate,procedure,C-section (Cesarean)
+786e24b9-e66f-453a-a81e-c618e1f6801c,Ananya Kidney Stone Clinic,moderate,procedure,Cesarean Delivery
+4237f35e-c204-40c5-9726-e9df2dc9c5e7,Sri Subam Hospital Madurai,moderate,procedure,Performs normal deliveries and Cesarean section deliveries
+2520f156-8643-46e8-ac7e-d661351fcd33,Krishnammal Memorial Hospital,moderate,procedure,"Gynaecological surgeries such as C-section, Laparoscopy, Hysteroscopy, SSG, Cervical cerclage, Cyst and fluid aspiration, Myomectomy, ERA, OBS"
+eb33e303-f824-4acd-aefb-bae2c9cec94b,Rajeshwari Nursing Home,moderate,procedure,Performs caesarean sections
+17615adf-fb9e-4fc2-b7a2-7fc24f008ebf,Government Tirunelveli Medical College and Hospital,strong,capability,"Is listed as a CeMONC, trauma and SNCU / NICU facility under Category A3"
+74fa5ec2-b7fb-498a-84c3-0a0fd3a8c81b,Muthamil Hospital,moderate,procedure,High‑risk cesarean deliveries performed
+b1db49e0-6d6a-46e9-8363-a1e5bf7c27c0,Dr. Morris Mathias Hospital,moderate,procedure,Cesarean Delivery
+697f3b96-bc68-44d3-9e08-6854cea38997,Rathna Memorial Hospital,moderate,procedure,Cesarean Delivery
+61000c87-25e7-49a8-999d-a9a021d7a859,Women & Children Hospital,strong,procedure,Performs Caesarean Section in the operation theatre
+a56291bc-94f6-4536-9946-a7e1f7bbc570,Credence Hospital,strong,procedure,Cesarean delivery procedures
+9a7c8cd7-5c16-427e-8e14-2a5c4efa1231,Ganga Hospital,moderate,procedure,Performs lower segment cesarean section
+839dc181-7841-477d-a981-2c4611219329,Vijayalakshmi Medical Centre,moderate,procedure,Caesarean section deliveries
+d9aa248a-2d53-44bb-b508-937dafead66a,Dr. Nairs Hospital,moderate,procedure,Caesarean Section
+2085253f-24a0-4a3d-aa48-81dc4d3b8161,Travancore Medical College and Hospital,moderate,procedure,Conducts obstetric and gynecologic surgeries including cesarean sections and laparoscopic interventions
+76d3602d-974e-4a89-a19e-ad4d508337ed,Kasturi Medical Centre (A Nabh Multi Speciality Hospital),strong,procedure,C Section
+66050273-84ab-4f81-a903-198419364120,Spandan Hospital,moderate,procedure,Cesarean delivery performed at Spandan Hospital
+6fe81262-b066-4545-ac56-420a94c55ff9,Zenith Super Specialist Hospital,strong,procedure,Normal delivery and Caesarean section
+c0dfce8a-7692-4ba9-b89f-c053acf728a3,Neel Kuthi Medical Complex,moderate,procedure,Caesarean Section/Caesarean Delivery is performed by Dr. Susmita Chowdhury
+b0131c42-fbf6-4837-a6fc-4967d849097f,Medline Nursing Home,moderate,procedure,Performs cesarean delivery
+5853b359-ea74-4613-83b1-062038f1a9cc,Petals Family Clinic | Woman & Child Care | Infertility | Diagnostic Centre,moderate,procedure,Caesarean Section/Caesarean Delivery
+0c199bdf-5e22-4906-af58-c055dad6aba7,IRIS Hospital,strong,procedure,Performs obstetric delivery including normal and cesarean section deliveries
+d019b76c-137a-4fa4-a8cf-7c438d47e9c7,Bright Nursing Home,moderate,procedure,Caesarean Section (C Section)
+982d5dfa-f74f-4a42-8858-4e2bab101c2f,Woodlands Multispeciality Hospital,moderate,procedure,Performs caesarean section
+f6a5364f-f24d-4054-b8c0-663304779b89,"Apollo Clinic Ballygunge Phari, Kolkata",moderate,procedure,Cesarean section delivery
+cfe5573a-17a7-464b-9919-955d72fc2b9c,"N.G. Nursing Home, Kalighat",moderate,procedure,Cesarean Delivery
+5d2126fd-bbb9-4f3d-bfe8-431c256b1f1b,Friends Diagnostic,moderate,procedure,Cesarean section
+c0fa9d6f-281d-4d65-9572-ed07d08f9172,IRIS MULTISPECIALITY HOSPITAL,moderate,procedure,Caesarean Section
+eb2ec20b-04b5-49f5-9530-65eded2e8685,Ruby General Hospital,moderate,procedure,Caesarean Section
+9f25a38c-c40a-43df-bf27-180299e144e1,Techno India Dama Healthcare & Medical Research Centre,moderate,procedure,Performs caesarean section deliveries
+dd1f6150-c1c3-4ada-960a-c01633df9e42,Ispat Cooperative Hospital,moderate,procedure,Cesarean delivery
+73f398ef-1860-4263-a549-c7ff567b9e36,Monoranjan Seva Sadan,moderate,procedure,"Provides comprehensive maternity services including prenatal checkups, normal and cesarean deliveries, postnatal care, and pediatric services for newborns"
+d4225cd0-ff43-48a3-9d6c-eedef66ffa82,Murshidabad Medical College & Hospital,strong,procedure,"Spinal anaesthesia for caesarean section was studied for haemodynamic stability using norepinephrine and phenylephrine infusions at Murshidabad Medical College & Hospital, Berhampore"
+04d49602-3fc3-4c1b-a994-b3969133731a,Gouri Devi Institute of Medical Sciences and Hospital,moderate,procedure,Caesarean Section
+aa4621f2-0b6a-4256-a39c-4098101d92a4,Asian Dwarkadas Jalan Super Speciality Hospital,moderate,procedure,Cesarean delivery
+22f6c258-b765-4864-9f48-d5e365a5a0be,"Tata Main Hospital, Jamshedpur, Jharkhand, India",moderate,procedure,Caesarean Section
+7f0a880d-249c-471f-a02b-7c0dffd0caa4,Raj Hospital & Research Centre,moderate,procedure,Caesarean section
+9526592c-3f0e-4970-8ddd-d7be11947443,Shivay Hospital,moderate,procedure,Offers free-of-cost delivery of a female child (normal or cesarean).
+a122e838-90c4-4be0-a4cc-0b66e0ea62a0,Desun Hospital,moderate,procedure,Normal delivery and caesarean delivery are offered at Desun Hospital
+398d9f9c-7552-4e3a-9951-d38fbe46366e,Miracare Hospital,strong,procedure,Performs Cesarean sections
+55894fd2-0483-45b2-b169-6176c124dc8c,Roy's Clinic & Multispeciality Hospital,moderate,procedure,Performs cesarean birth
+8921a012-0941-40a3-8cfa-eb56e3f867d6,Paramount Hospital,moderate,procedure,Performs emergency caesarean sections
+f75d5250-6df0-46f5-8548-aa5705be2725,Marwari Hospitals,moderate,procedure,Performs cesarean sections
+d750cfa3-e9eb-4c0a-98e2-d397eab3d747,Matrikas IVF Centre,moderate,procedure,LSCS
+e7f45d40-a5f7-4d3b-ae82-0c5f8501458d,Ayursundra Superspeciality Hospital,moderate,procedure,Vaginal Birth After Cesarean (VBAC)
+374d3fdf-4539-4899-b427-d26d2f2f0577,Srimanta Sankardeva Hospital & Research Institute,moderate,procedure,Cesarean delivery
+2ee91ec2-1e36-4498-a1a5-ef628c7eb9b4,Dibrugarh Assam Medical College,moderate,equipment,Cesarean Section Operation Theater (CS OT) is available
+01b48e00-7414-4452-94b8-8506a25fb50b,Prime Care Nursing Home,moderate,procedure,Caesarean section is performed
+673aee98-ff44-4305-9830-43c052547193,MGM Hospital and Research Centre,moderate,procedure,Performs cesarean delivery
+c105191a-45ea-4b81-933c-419f5cb07cfa,Shrinivas Hospital,strong,procedure,Caesarean Section
+30ed41d1-ce7e-4936-9569-cb59d2990443,Patna Medical College & Hospital,strong,procedure,Caesarean Section
+c5eaede8-e497-4365-bc2d-59e1db067fa3,Sun Hospita,moderate,procedure,Caesarean Section (C Section) is performed at Sun Hospita
+94cf9f27-4538-43b3-9514-fc13ba49e661,Ruban Memorial Hospital,moderate,procedure,Normal delivery (vaginal delivery) and cesarean delivery
+f8463d81-07be-4de0-a882-f13ae1530f60,Dr. Pranjal Shri Hospital (Dr. Ravindra & Dr. Vinita),moderate,procedure,Performs cesarean section when indicated
+ac382cdf-8ff9-4539-a453-00bec0989719,Orchid Medical Centre,moderate,procedure,Performs Caesarean Section
+1774eb01-bb63-4cbb-b1ad-c9b4cf03c605,Harsh Hospital,strong,procedure,Provides caesarean section delivery.
+5e6fe7e7-8929-4b07-9687-a6054091f89c,Mishra Hospital Test Tube Baby Centre,moderate,procedure,Performs caesarean section
