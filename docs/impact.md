@@ -81,7 +81,7 @@ adults with raised blood sugar, median 127 km to documented dialysis), Ganjam, O
 Telangana (18.4%, 91 km, 8 hospitals listed nearby but none documents dialysis).
 Full list: [`analysis/priority_dialysis.csv`](../analysis/priority_dialysis.csv).
 
-## Recommended actions
+## Actionable insights: recommended actions
 
 | # | Action | Where | Why this, here |
 | --- | --- | --- | --- |

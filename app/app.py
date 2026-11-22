@@ -19,7 +19,20 @@ from carematch import datasource  # noqa: E402
 from carematch.recommend import BANDS_KM, CareIndex, recommend  # noqa: E402
 from carematch.services import SERVICES  # noqa: E402
 
+try:                          # describe-the-situation lexicon (core module); the box is hidden without it
+    from carematch.needs import interpret_need  # noqa: E402
+except ImportError:
+    interpret_need = None
+
 st.set_page_config(page_title='CareMatch · Find care', page_icon='🏥', layout='wide')
+
+URGENCY_OPTIONS = {'Default: evidence first, then distance': 'default',
+                   'Time-critical: every minute on the road counts': 'time_critical',
+                   'Can travel further for better-prepared care': 'can_travel'}
+URGENCY_LABEL = {v: k for k, v in URGENCY_OPTIONS.items()}
+COST_OPTIONS = {'Cost does not change the order': 'any',
+                'Prefer care documented as free, government-scheme or insured': 'low_cost'}
+SERVICE_LABELS = {spec['label']: key for key, spec in SERVICES.items()}
 
 EXAMPLES = ['Patna', 'Lucknow', '800001', 'Darbhanga, Bihar', '25.61, 85.14']
 FIELD_TEXT = {'procedure': 'procedures', 'equipment': 'equipment', 'capability': 'capabilities',
@@ -193,7 +206,62 @@ def cost_text(cost):
 # ---- rendering -----------------------------------------------------------------------------------------------
 
 def _set_place(value):
+    """Switch to a suggested place name and search again with it (the visitor asked for exactly this place)."""
     st.session_state.place = value
+    if st.session_state.get('query'):
+        st.session_state.query = {**st.session_state.query, 'place': value}
+
+
+def _submit():
+    """Freeze the search the visitor asked for. Results follow this, not every edit of the form, so a suggestion
+    from the description box changes the form but never runs a search by itself."""
+    st.session_state.query = {
+        'service': SERVICE_LABELS[st.session_state.service],
+        'place': (st.session_state.get('place') or '').strip(),
+        'prefs': {'urgency': URGENCY_OPTIONS[st.session_state.urgency], 'cost': COST_OPTIONS[st.session_state.cost]},
+    }
+
+
+def _interpret():
+    """Read the description and prefill service and urgency. Only a clear match changes the form; an ambiguous one
+    only offers switches, and no match leaves the form as it was."""
+    text = st.session_state.get('need_text') or ''
+    x = interpret_need(text) if interpret_need and text.strip() else None
+    st.session_state.need = x
+    if x and x.get('status') == 'matched' and x.get('service') in SERVICES:
+        st.session_state.service = SERVICES[x['service']]['label']
+        if x.get('urgency') in URGENCY_LABEL:
+            st.session_state.urgency = URGENCY_LABEL[x['urgency']]
+
+
+def _use_service(key):
+    st.session_state.service = SERVICES[key]['label']
+
+
+def render_need():
+    """The interpretation of the description: emergency first, then what was understood and how to change it."""
+    x = st.session_state.get('need')
+    if not x:
+        return
+    if x.get('red_flag'):
+        st.error(f"**Danger signs: call {x.get('call_now') or '108'} now.** Do not wait for this search; use it while "
+                 'help is on the way.', icon='🚑')
+    if x.get('understood_as'):
+        st.markdown(esc(x['understood_as']))
+    if x.get('status') == 'matched':
+        st.caption('Service and urgency are filled in below. Check them, add the place, then press **Find care**.')
+    if x.get('status') == 'ambiguous':
+        st.warning('More than one service could fit. Choose one below or in the form, then press Find care.')
+    switches = ([x['service']] if x.get('status') == 'ambiguous' and x.get('service') else []) + list(x.get('also_possible') or [])
+    switches = [k for k in dict.fromkeys(switches) if k in SERVICES]
+    if switches:
+        cols = st.columns(min(4, len(switches)))
+        for col, key in zip(cols, switches):
+            col.button(f"Use {SERVICES[key]['label']}", key=f'need-{key}', on_click=_use_service, args=(key,))
+    for note in x.get('notes') or []:
+        st.caption(note)
+    if x.get('disclaimer'):
+        st.caption(x['disclaimer'])
 
 
 def render_card(index, c, label, sort_mode, extra=False, nested=False):
@@ -512,30 +580,38 @@ except Exception as exc:  # a data failure must never look like "no hospitals fo
     st.error(f'Could not load the facility data, so no search is possible right now.\n\n{exc}')
     st.stop()
 
-labels = {spec['label']: key for key, spec in SERVICES.items()}
+if interpret_need:
+    d1, d2 = st.columns([3, 1], vertical_alignment='bottom') if 'vertical_alignment' in inspect.signature(st.columns).parameters \
+        else st.columns([3, 1])
+    d1.text_input('Describe the situation (optional)', key='need_text', on_change=_interpret,
+                  placeholder='e.g. "bleeding after delivery", "road accident, head injury", "bachcha saans nahi le raha"',
+                  help='Plain words are enough. Understands common English and romanized Hindi phrases (Hindi spellings '
+                       'unreviewed). It only suggests a service and urgency; you can change both.')
+    d2.button('Suggest a service', on_click=_interpret, use_container_width=True)
+    render_need()
+
 with st.form('search'):
     c1, c2 = st.columns([1, 1.4])
-    service_label = c1.selectbox('Service needed', list(labels))
+    c1.selectbox('Service needed', list(SERVICE_LABELS), key='service')
     c2.text_input('Where is the patient?', key='place', placeholder='City, district, 6-digit PIN code, or "lat, lon"')
     st.caption('Examples: ' + ' · '.join(EXAMPLES))
     with st.expander('Preferences (optional)'):
-        urgency_options = {'Default: evidence first, then distance': 'default',
-                           'Time-critical: every minute on the road counts': 'time_critical',
-                           'Can travel further for better-prepared care': 'can_travel'}
-        cost_options = {'Cost does not change the order': 'any',
-                        'Prefer care documented as free, government-scheme or insured': 'low_cost'}
-        urgency_label = st.radio('How urgent is it?', list(urgency_options), key='urgency')
-        cost_label = st.radio('Cost', list(cost_options), key='cost')
-    st.form_submit_button('Find care', type='primary')
+        st.radio('How urgent is it?', list(URGENCY_OPTIONS), key='urgency')
+        st.radio('Cost', list(COST_OPTIONS), key='cost')
+    st.form_submit_button('Find care', type='primary', on_click=_submit)
 
-place = (st.session_state.get('place') or '').strip()
-if place:
-    service = labels[service_label]
+query = st.session_state.get('query')
+if query and not query['place']:
+    st.info('Type where the patient is, then press **Find care**.')
+elif query:
+    service, place, prefs = query['service'], query['place'], query['prefs']
     sort_choices = [k for k, v in SORTS.items() if SUPPORTS[v]]
     t1, t2 = st.columns([1.4, 1])
     sort_label = t1.radio('Sort results', sort_choices, horizontal=True, key='sort')
     sort_mode = SORTS[sort_label]
-    prefs = {'urgency': urgency_options[urgency_label], 'cost': cost_options[cost_label]}
+    if SERVICE_LABELS[st.session_state.service] != service:
+        t1.caption(f"Showing results for {SERVICES[service]['label']}. Press Find care to search for "
+                   f"{st.session_state.service}.")
     kwargs = {}
     if sort_mode == 'default':
         kwargs['preferences'] = prefs

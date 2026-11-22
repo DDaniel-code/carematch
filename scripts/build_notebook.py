@@ -35,6 +35,8 @@ MODULES = [
             'position by comparing its coordinates, its PIN centre and its city centre.'),
     ('price', 'Service-specific prices, bounds, conditions and exact source text.'),
     ('decision', 'Patient-selected preferences and their documented evidence.'),
+    ('needs', 'Describe the situation: plain words (English, romanized Hindi with unreviewed spellings) to a suggested service, '
+              'urgency and a 108 / 102 danger-sign prompt. Only prefills the form; never a diagnosis and never searches by itself.'),
     ('review', 'Eight automatic quality checks run on every answer, including citation fidelity: every quote must appear word for word in the '
                'named column of the facility record.'),
     ('recommend', 'The ranking: only Strong or Moderate evidence is recommended; take the nearest distance band (25/75/150/300 km) that has any; '
@@ -104,7 +106,7 @@ those districts also show high need** in NFHS-5?
 | --- | --- |
 | Exploration | Part 3: what a record is, how far each field can be trusted, what the claims can and cannot prove |
 | Modeling | Parts 1, 4, 5, 7: claim classification, evidence tiers, location confidence, banded ranking, quality checks, evaluation, sensitivity; a region-held-out lead model |
-| Impact | Parts 6, 7: district access gaps × NFHS need, four recommended actions, and which 3–10 facilities to verify first for the most new coverage |
+| Impact | Parts 6, 7: district access gaps × NFHS need, four actionable insights, and which 3–10 facilities to verify first for the most new coverage |
 
 **How to run.** On Databricks Free Edition (serverless): import this file and *Run all*; Part 2 reads the three Unity
 Catalog tables through Spark. Locally: put the exported CSVs in `data/` and run all cells. The outputs saved in this file
@@ -392,7 +394,7 @@ print(f"5. {len(dialysis)} districts combine poor documented dialysis access wit
       f" {sum(r['gap'] == 'service' for r in dialysis)} of them are service gaps.")
 '''
 
-ACTIONS = """### Recommended actions
+ACTIONS = """### Actionable insights: recommended actions
 
 | # | Action | Where | Why |
 | --- | --- | --- | --- |
@@ -428,6 +430,18 @@ PART7 = """## Part 7 · Which choice changes, and where should a planner call fi
 
 Three short demonstrations built on the same engine. None of them changes what a patient is recommended.
 """
+
+PART7_NEEDS = """**Describe the situation.** A health worker can type what is happening instead of picking a service. The lexicon
+suggests a service and urgency, quotes the words it matched, and puts "call 108 / 102" first for danger signs. In the
+app it only prefills the form; the user checks it and searches. Hindi entries are romanized with unreviewed spellings.
+"""
+
+NEEDS_DEMO = '''from _carematch_submission.needs import interpret_need
+for phrase in ['heavy bleeding after delivery', 'road accident, head injury', 'kidney patient needs dialysis twice a week',
+               'burns from a road accident', 'fever and cough', 'bachcha saans nahi le raha (romanized Hindi, unreviewed spelling)']:
+    x = interpret_need(phrase)
+    print(f"{phrase!r:70} -> {x['status']:9} {str(x['service']):10} urgency={str(x['urgency']):13} "
+          f"red_flag={x['red_flag']}" + (f"  also: {', '.join(x['also_possible'])}" if x['also_possible'] else ''))'''
 
 PART7_COMPARE = """**Same search, three orders.** Best evidence, nearest and compare-listed-prices can put different facilities first.
 The comparison names each first choice with its quote, and says when the starting point is too approximate to trust
@@ -512,7 +526,8 @@ from _carematch_submission.planner import district_table, maternal_priorities, d
                             f'REVIEW = {review!r}\n\n' + EVAL_REVIEW),
               new_markdown_cell(PART6), new_code_cell(GAPS_RUN), new_code_cell(GAPS_PRIORITY), new_code_cell(GAPS_FINDINGS),
               new_markdown_cell(ACTIONS),
-              new_markdown_cell(PART7), new_markdown_cell(PART7_COMPARE), new_code_cell(STRATEGY_DEMO),
+              new_markdown_cell(PART7), new_markdown_cell(PART7_NEEDS), new_code_cell(NEEDS_DEMO),
+              new_markdown_cell(PART7_COMPARE), new_code_cell(STRATEGY_DEMO),
               new_markdown_cell(PART7_CALLS), new_code_cell(CALL_DEMO),
               new_markdown_cell(PART7_LEADS), new_code_cell(LEAD_DEMO),
               new_markdown_cell(LIMITS.format(repo=REPO))]

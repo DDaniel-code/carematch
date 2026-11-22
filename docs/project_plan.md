@@ -11,7 +11,7 @@ define → prototype → evaluation → deployment 已完成：App 在 Databrick
 **官方评分标准**（cmudsc.com/datathon-fall2026，没有权重）：
 - **Exploration**："Uncover novel datasets and provide insightful analysis"
 - **Modeling**："Develop advanced models to find meaningful data relationships"
-- **Impact**："Propose actionable and impactful policies"
+- **Impact**："Propose actionable and impactful policies"（这是官方原文；按导师建议，我们自己的产出称为"可执行、有影响力的洞察"，不叫 policy）
 
 官网写的截止时间是周日 12:30 PM，标注 tentative。我们仍按 11:30 提交。
 

@@ -19,7 +19,7 @@ Built for the CMU × Databricks Datathon (Fall 2026) on Databricks Free Edition.
 | App for health workers | Databricks App (Streamlit) in [`app/`](app/), deployed on Free Edition; see [`docs/deploy.md`](docs/deploy.md) |
 | How it works | [`docs/system_design.md`](docs/system_design.md), [`docs/design.md`](docs/design.md), [`docs/evidence_calibration.md`](docs/evidence_calibration.md), [`docs/sort_modes_contract.md`](docs/sort_modes_contract.md) |
 | Does it work | [`docs/evaluation.md`](docs/evaluation.md) |
-| What planners should do | [`docs/impact.md`](docs/impact.md), [`docs/call_plan.md`](docs/call_plan.md), [`docs/lead_model.md`](docs/lead_model.md) |
+| Actionable insights for planners | [`docs/impact.md`](docs/impact.md), [`docs/call_plan.md`](docs/call_plan.md), [`docs/lead_model.md`](docs/lead_model.md) |
 
 ## Why this is hard
 
@@ -53,7 +53,12 @@ The records were extracted automatically from web pages, so every field is a cla
 
 The patient ranking trains no model and uses no LLM to score or explain: the rules fit on one page, give the same
 answer every time, and cannot invent a citation. We chose distance bands over a weighted score because a single number
-hides the trade-off between "near" and "well evidenced"; bands make it explicit. (A separate statistical model, below,
+hides the trade-off between "near" and "well evidenced"; bands make it explicit.
+
+**Why not always the closest, or always the best?** Always sending a patient to the closest facility is actionable but
+not impactful: it ignores whether that facility can actually provide the service. Always sending them to the best
+documented facility is impactful but often not actionable: it may be too far or unaffordable. CareMatch's default
+balances the two: credible evidence within the nearest reachable radius, with options for urgency, cost and price. (A separate statistical model, below,
 only suggests which facilities planners should phone to verify; it never changes what a patient is shown.)
 
 ## The app
@@ -65,6 +70,10 @@ only suggests which facilities planners should phone to verify; it never changes
   unit or with conditions are not compared, insurer limits and equipment costs are labelled "not a patient price", and
   a public operator is never described as free. Prices are rarely documented, so this order usually falls back to
   distance and says so. A side-by-side note shows when the three orders pick different facilities.
+- **Describe the situation** (optional): plain words such as "bleeding after delivery" or "road accident, head injury"
+  (common English and romanized Hindi phrases; Hindi spellings unreviewed) prefill the service and urgency. Danger
+  signs show "call 108 / 102" first. Nothing is searched until the user checks the form and presses Find care; an
+  ambiguous description only offers switches, and it is never a diagnosis.
 - **Directions** open Google Maps (driving, driving that tries to avoid tolls, or walking) for reliably located
   branches only; the link carries the destination and nothing about the patient or where they are.
 - **Planner pages**: a verification map (which PIN areas gain C-section coverage if the first 3, 5 or 10 calls succeed),
@@ -88,8 +97,9 @@ random sample of agreements. No reviewer found a quote that contradicts the serv
 
 **Planner view** (all three tables: facilities, India Post PIN directory, NFHS-5): documented C-section care is within
 50 km of only 46% of India's post offices. 27 districts are both far from it and have an NFHS caesarean rate below 5%,
-mostly in the northeast; 21 of them are partly data gaps (few listings of any kind), which is itself a policy finding.
-Details and four recommended actions: [`docs/impact.md`](docs/impact.md).
+mostly in the northeast; 21 of them are partly data gaps (few listings of any kind), which is itself an actionable
+insight: fix the data before building.
+Details and four actionable insights: [`docs/impact.md`](docs/impact.md).
 
 **Whom to call first.** For C-section within 50 km, 7,402 of 14,008 reliably located PIN areas already have a facility
 with credible evidence. Choosing calls greedily (each one adds the most still-uncovered PINs) would add **365 PINs with 3
