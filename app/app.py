@@ -9,7 +9,7 @@ import math
 import os
 import sys
 import time
-from urllib.parse import urlencode
+from urllib.parse import quote, urlencode, urlsplit
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -44,24 +44,50 @@ TIME_CRITICAL = {'c_section', 'trauma', 'emergency', 'nicu', 'burn'}
 SORTS = {'Best evidence': 'default', 'Nearest': 'nearest', 'Compare listed prices': 'price'}
 _PARAMS = set(inspect.signature(recommend).parameters)
 SUPPORTS = {'default': True, 'nearest': 'sort_mode' in _PARAMS, 'price': {'sort_mode', 'max_extra_km'} <= _PARAMS}
-PRIMARY_RGB, EXTRA_RGB = [26, 95, 122], [95, 107, 118]
+PRIMARY_RGB, EXTRA_RGB = [8, 127, 131], [95, 107, 118]
+KIND_TEXT = {'direct': 'direct statement', 'listed': 'listed item', 'indirect': 'indirect mention',
+             'negative': 'negative statement'}
 
 CSS = """
 <style>
-.cm-status{font-size:.95rem;color:#323f4b;margin:.1rem 0 .4rem}
-.cm-title{display:flex;align-items:center;gap:.55rem;font-size:1.08rem;font-weight:650;margin:.1rem 0 .3rem;line-height:1.3}
+/* Page chrome (white/teal redesign). Presentation only: native controls, keyboard navigation and status messages stay intact. */
+.stApp{background:#f6fafb;color:#153b49}
+[data-testid="stMainBlockContainer"]{max-width:1380px;padding-top:4.5rem}
+.brand{color:#087f83;font-size:1.6rem;font-weight:800;letter-spacing:-.04em}
+.brand span{font-size:.68rem;letter-spacing:.18em;margin-left:.7rem}
+h1{color:#123f50;letter-spacing:-.035em}
+h2,h3,h4{color:#163f50}
+[data-testid="stForm"],[data-testid="stVerticalBlockBorderWrapper"]{background:#fff;border-radius:16px}
+[data-testid="stForm"]{padding:1.4rem;border:1px solid #c9dfe4}
+[data-testid="stBaseButton-primary"],[data-testid="stBaseButton-primaryFormSubmit"]{background:#087f83;border-color:#087f83;min-height:2.6rem}
+[data-testid="stBaseButton-primary"]:hover,[data-testid="stBaseButton-primaryFormSubmit"]:hover{background:#06666a;border-color:#06666a}
+blockquote{border-left:3px solid #79b7be;background:#f0f7f8;padding:.65rem 1rem}
+[data-testid="stCaptionContainer"]{color:#4f6570}
+[data-testid="stMarkdownContainer"]{overflow-wrap:anywhere}
+@media (max-width:760px){
+  [data-testid="stMainBlockContainer"]{padding:4.5rem 1rem 1.5rem}
+  [data-testid="stHorizontalBlock"]{flex-direction:column;gap:1rem}
+  [data-testid="stColumn"]{width:100% !important;flex:1 1 100% !important;min-width:0 !important}
+  h1{font-size:2rem !important}
+}
+/* Result components */
+.cm-status{font-size:.95rem;color:#153b49;margin:.1rem 0 .4rem}
+.cm-title{display:flex;align-items:center;gap:.55rem;font-size:1.08rem !important;font-weight:650;margin:.1rem 0 .3rem;line-height:1.3;padding:0}
+/* Newer Streamlit wraps heading content in one span; keep the pin and the name spaced inside it too. */
+.cm-title>span:first-child{display:inline-flex;align-items:center;gap:.55rem}
 .cm-pin{display:inline-flex;align-items:center;justify-content:center;min-width:1.65rem;height:1.65rem;border-radius:50%;
-        background:#1a5f7a;color:#fff;font-weight:700;font-size:.85rem;flex:none}
+        background:#087f83;color:#fff;font-weight:700;font-size:.85rem;flex:none}
 .cm-pin.extra{background:#5f6b76}
-.cm-meta{color:#52606d;font-size:.88rem;margin:.1rem 0}
-.cm-chip{display:inline-block;border:1px solid #cbd2d9;border-radius:999px;padding:.05rem .55rem;font-size:.8rem;
-         margin:0 .3rem .2rem 0;color:#323f4b;background:#f5f7fa;white-space:nowrap}
+.cm-meta{color:#4f6570;font-size:.88rem;margin:.1rem 0}
+.cm-chip{display:inline-block;border:1px solid #c9dfe4;border-radius:999px;padding:.05rem .55rem;font-size:.8rem;
+         margin:0 .3rem .2rem 0;color:#153b49;background:#f0f7f8;white-space:nowrap}
 .cm-chip.strong{border-color:#2f855a;color:#22543d;background:#f0fff4}
 .cm-chip.moderate{border-color:#b7791f;color:#744210;background:#fffaf0}
 .cm-chip.weak{border-color:#9aa5b1;color:#3e4c59}
-.cm-quote{border-left:3px solid #cbd2d9;padding:.1rem 0 .1rem .6rem;color:#323f4b;margin:.35rem 0;font-size:.92rem}
-.cm-quote small{color:#616e7c}
-.cm-price{font-size:.9rem;margin:.25rem 0;color:#323f4b}
+.cm-quote{border-left:3px solid #79b7be;background:#f0f7f8;border-radius:0 8px 8px 0;padding:.4rem .7rem;color:#153b49;
+          margin:.35rem 0;font-size:.92rem}
+.cm-quote small{color:#4f6570}
+.cm-price{font-size:.9rem;margin:.25rem 0;color:#153b49}
 .cm-warn{font-size:.86rem;color:#7b341e;margin:.15rem 0}
 </style>
 """
@@ -77,6 +103,45 @@ def esc(value):
 
 def h(value):
     return html.escape(str(value if value is not None else ''))
+
+
+def source_link(url):
+    """Markdown for a record-level source. Only well-formed http(s) URLs become links; anything else stays visible
+    as plain text and is never made clickable."""
+    url = str(url if url is not None else '').strip()
+    try:
+        parts = urlsplit(url)
+        safe = parts.scheme in ('http', 'https') and bool(parts.hostname)
+    except ValueError:
+        safe = False
+    if not safe:
+        return esc(url)
+    return f"[{esc(url)}]({quote(url, safe=':/?#@!$&*+,;=%~-._')})"
+
+
+# Hosts that are directories or social profiles, not the facility's own site.
+LISTING_HOSTS = ('practo.com', 'justdial.com', 'lybrate.com', 'sulekha.com', 'indiamart.com', 'facebook.com',
+                 'instagram.com', 'linkedin.com', 'google.com', 'youtube.com', 'wikipedia.org', 'twitter.com', 'x.com')
+
+
+def website_link(raw):
+    """(url, host, kind) for the record's official website, or None. A bare domain gets https://; only a well-formed
+    http(s) address with a dotted host becomes a button. kind is 'listing' for directory or social pages."""
+    url = str(raw if raw is not None else '').strip()
+    if not url or url.lower() in ('null', 'none') or any(ch.isspace() for ch in url):
+        return None
+    if '://' not in url:
+        url = 'https://' + url
+    try:
+        parts = urlsplit(url)
+        host = (parts.hostname or '').lower()
+    except ValueError:
+        return None
+    if parts.scheme not in ('http', 'https') or '.' not in host:
+        return None
+    host = host[4:] if host.startswith('www.') else host
+    kind = 'listing' if any(host == d or host.endswith('.' + d) for d in LISTING_HOSTS) else 'website'
+    return quote(url, safe=':/?#@!$&*+,;=%~-._'), host, kind
 
 
 # ---- data ----------------------------------------------------------------------------------------------------
@@ -295,10 +360,19 @@ def render_card(index, c, label, sort_mode, extra=False, nested=False):
 
         loc = located(index, c)
         phone = c.get('phone')
+        site = website_link(c.get('website'))
+        contact = st.columns(2)
         if phone:
-            st.link_button(f'Call {phone}', f"tel:{phone.replace(' ', '')}")
+            contact[0].link_button(f'Call {phone}', f"tel:{phone.replace(' ', '')}", use_container_width=True)
         else:
-            st.caption('No phone number in the records.')
+            contact[0].caption('No phone number in the records.')
+        if site:
+            url, host, kind = site
+            label = (f'Website · {host}' if kind == 'website' else f'Listing page · {host}')
+            contact[1].link_button(label if len(label) <= 34 else label[:33] + '…', url, use_container_width=True,
+                                   help=('The website listed in the record, for contact details and opening hours. For a '
+                                         'hospital group it may be the main site: look for this branch.' if kind == 'website'
+                                         else 'A directory or social page from the record, not the facility\'s own site.'))
         if loc and loc[2]:
             cols = st.columns(len(DIRECTIONS))
             for col, (label, mode, avoid) in zip(cols, DIRECTIONS):
@@ -312,11 +386,20 @@ def render_card(index, c, label, sort_mode, extra=False, nested=False):
             if c.get('ask_when_calling'):
                 st.caption('Ask when you call: ' + ' · '.join(c['ask_when_calling'][:2]))
             return
-        with st.expander('Evidence, next step and sources'):
+        with st.expander('Evidence details, next step and sources'):
             if c.get('ask_when_calling'):
                 st.markdown('**Ask when you call**  \n' + '  \n'.join(f'• {esc(q)}' for q in c['ask_when_calling']))
-            for e in c.get('evidence', [])[1:]:
-                st.markdown(f"> “{esc(e['quote'])}”  \n> — *{FIELD_TEXT.get(e['field'], esc(e['field']))}* field")
+            if c.get('evidence'):
+                st.markdown('**What the records say**')
+                st.caption('Evidence strength describes support in the dataset, not independent verification.')
+            for e in c.get('evidence', []):
+                negative = e.get('kind') == 'negative'
+                trace = ' · '.join(esc(x) for x in (
+                    KIND_TEXT.get(e.get('kind'), e.get('kind')), e.get('evidence_id'),
+                    f"record {e.get('source_facility_id') or c.get('facility_id')}",
+                    e.get('verification_status') or 'unverified') if x)
+                st.markdown(('**Negative evidence: the service may be unavailable**  \n' if negative else '')
+                            + f"> “{esc(e['quote'])}”  \n> — *{FIELD_TEXT.get(e['field'], esc(e['field']))}* field  \n> {trace}")
             if c.get('tier_reasons'):
                 st.markdown('**Why this tier:** ' + esc('; '.join(c['tier_reasons'])))
             if c.get('why_ranked'):
@@ -334,10 +417,13 @@ def render_card(index, c, label, sort_mode, extra=False, nested=False):
                 for comp in pref['components']:
                     value = 'n/a' if comp['value'] is None else f"{comp['value']:.2f} × weight {comp['weight']:.2f}"
                     st.markdown(f"- *{esc(comp['name'])}* ({value}): {esc(comp['reason'])}")
+            if c.get('source_urls') or c.get('website'):
+                st.markdown('**Record-level sources**')
+                st.caption('These pages are where the record came from. They are not verified citations for single claims.')
             for u in c.get('source_urls', []):
-                st.markdown(f'- Source: {esc(u)}')
+                st.markdown(f'- Source: {source_link(u)}')
             if c.get('website'):
-                st.markdown(f"- Website: {esc(c['website'])}")
+                st.markdown(f"- Website: {source_link(c['website'])}")
             st.caption(f"Facility id {c.get('facility_id')} · location confidence: {c.get('location_confidence')} · "
                        f"distance basis: {c.get('distance_basis') or 'facility coordinates'}"
                        + (f" · merged listings: {', '.join(c['merged_ids'])}" if c.get('merged_ids') else ''))
@@ -379,7 +465,7 @@ def render_map(index, r):
                'name': f"Search centre: {o['label']}", 'detail': f"approximate, ±{o.get('precision_km')} km"}]
     layers = [
         pdk.Layer('ScatterplotLayer', data=origin, get_position='[lon, lat]', get_radius='radius',
-                  get_fill_color=[26, 95, 122, 28], get_line_color=[26, 95, 122, 140], stroked=True,
+                  get_fill_color=PRIMARY_RGB + [28], get_line_color=PRIMARY_RGB + [140], stroked=True,
                   line_width_min_pixels=1, pickable=True),
         # pydeck reads bare strings as expressions; a literal must be quoted ("'pixels'"), else the radius is 13 metres.
         pdk.Layer('ScatterplotLayer', data=pts, get_position='[lon, lat]', get_radius=13, radius_units="'pixels'",
@@ -475,8 +561,8 @@ def render_comparison(index, r, sort_mode):
 
 def render_result(index, r, sort_mode, service):
     o = r['origin']
-    st.markdown(f"**{esc(r['service_label'])}** near **{esc(o['label'])}** · search centre precision about "
-                f"{o['precision_km']} km")
+    st.subheader(f"{esc(r['service_label'])} near {esc(o['label'])}")
+    st.caption(f"Search centre precision about {o['precision_km']} km · straight-line distances")
     if o.get('alternatives'):
         cols = st.columns(min(4, len(o['alternatives'])))
         for col, alt in zip(cols, o['alternatives']):
@@ -539,7 +625,9 @@ def render_result(index, r, sort_mode, service):
                     render_card(index, c, '', sort_mode, extra=True, nested=True)
     with right:
         if map_points(index, r):
-            render_map(index, r)
+            with st.container(border=True):
+                st.markdown('### Around your search')
+                render_map(index, r)
         if r.get('service_scope'):
             st.markdown(f"**What the records can show.** {esc(r['service_scope'])}")
         for note in o.get('notes', []):
@@ -570,7 +658,9 @@ def render_result(index, r, sort_mode, service):
 # ---- page ----------------------------------------------------------------------------------------------------
 
 st.markdown(CSS, unsafe_allow_html=True)
-st.title('Find care')
+st.markdown('<div class="brand">✚ carematch<span> INDIA</span></div>', unsafe_allow_html=True)
+st.title('Care you can understand.')
+st.markdown('Find a healthcare facility. See the evidence. Know what to confirm.')
 st.caption('For health workers and families in India: one service, one place, up to three facilities, and the evidence '
            'behind each one. Always call before travelling.')
 
@@ -591,14 +681,16 @@ if interpret_need:
     render_need()
 
 with st.form('search'):
-    c1, c2 = st.columns([1, 1.4])
+    # One search bar: service, place and the button on a row (stacked on narrow screens).
+    c1, c2, c3 = st.columns([1.2, 1.4, .65], vertical_alignment='bottom') \
+        if 'vertical_alignment' in inspect.signature(st.columns).parameters else st.columns([1.2, 1.4, .65])
     c1.selectbox('Service needed', list(SERVICE_LABELS), key='service')
     c2.text_input('Where is the patient?', key='place', placeholder='City, district, 6-digit PIN code, or "lat, lon"')
+    c3.form_submit_button('Find care', type='primary', on_click=_submit, use_container_width=True)
     st.caption('Examples: ' + ' · '.join(EXAMPLES))
     with st.expander('Preferences (optional)'):
         st.radio('How urgent is it?', list(URGENCY_OPTIONS), key='urgency')
         st.radio('Cost', list(COST_OPTIONS), key='cost')
-    st.form_submit_button('Find care', type='primary', on_click=_submit)
 
 query = st.session_state.get('query')
 if query and not query['place']:
@@ -636,8 +728,10 @@ else:
 
 with st.sidebar:
     st.markdown('**Data**')
+    quarantined = (getattr(index, 'data_quality', None) or {}).get('quarantined_rows')
     st.caption(f"Source: {info['source']} · {info['facility_rows']:,} facilities · {info['pincode_rows']:,} PIN rows · "
-               f"loaded in {info['load_seconds']} s, indexed in {info['index_seconds']} s")
+               + (f"{quarantined} malformed source rows set aside · " if quarantined else '')
+               + f"loaded in {info['load_seconds']} s, indexed in {info['index_seconds']} s")
     for failure in info.get('failed_sources', []):
         st.caption(f'Fallback used; failed: {failure}')
     st.markdown('**About**')
