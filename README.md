@@ -69,6 +69,21 @@ only suggests which facilities planners should phone to verify; it never changes
 
 ## The app
 
+<table>
+  <tr>
+    <td width="50%"><a href="docs/screenshots/01_find_care_home.png"><img src="docs/screenshots/01_find_care_home.png" alt="Find care: the landing page"></a></td>
+    <td width="50%"><a href="docs/screenshots/04_did_you_mean.png"><img src="docs/screenshots/04_did_you_mean.png" alt="A misspelled place offers the place it probably meant"></a></td>
+  </tr>
+  <tr>
+    <td valign="top"><a href="docs/screenshots/02_results_dialysis_delhi.png"><img src="docs/screenshots/02_results_dialysis_delhi.png" alt="Dialysis near Delhi: three cited options and the matching map pins"></a></td>
+    <td valign="top"><a href="docs/screenshots/06_call_plan_low_caesarean.png"><img src="docs/screenshots/06_call_plan_low_caesarean.png" alt="Verification map: three calls aimed at districts where caesareans are rare"></a></td>
+  </tr>
+</table>
+
+Top: the landing page, and a misspelled place offering the place it probably meant. Bottom: dialysis near Delhi with the
+quoted evidence and matching map pins, and the planner's call plan aimed at districts where caesareans are rare.
+All eight screenshots, with captions, are in [`docs/screenshots/`](docs/screenshots/).
+
 - **Find care**: a search box, then a numbered list next to a map whose pins carry the same numbers. Three orders:
   **Best evidence** (the ranking above, with optional urgency and cost preferences), **Nearest** (straight-line, among
   credible branches whose location is certain), and **Compare listed prices** (within an extra distance you choose).
