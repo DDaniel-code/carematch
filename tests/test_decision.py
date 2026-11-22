@@ -30,6 +30,8 @@ class DecisionUnitTests(unittest.TestCase):
         self.assertEqual((c['category'], c['field']), ('covered', 'capability'))
         self.assertEqual(cost_info({'capability': json.dumps(['Offers cashless treatment'])})['category'], 'insured')
         self.assertEqual(cost_info({'capability': json.dumps(['Not empanelled under Ayushman Bharat'])})['category'], 'unknown')
+        self.assertEqual(cost_info({'capability': 'Offers infection-free dialysis'})['category'], 'unknown')
+        self.assertEqual(cost_info({'capability': 'Infection-free dialysis and free treatment for eligible patients'})['category'], 'covered')
         self.assertEqual(cost_info({})['category'], 'unknown')
 
     def test_readiness_signals_cite_quotes(self):

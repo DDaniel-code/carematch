@@ -60,6 +60,14 @@ class PriceParserTests(unittest.TestCase):
         self.assertNotEqual(p['unit'], 'per_session')                                    # package is not per session
         self.assertIsNone(price_evidence({'capability': json.dumps(['Health check package Rs 999'])}, 'dialysis')[0])
 
+    def test_eligibility_is_specific_and_negation_is_preserved(self):
+        def quote(text):
+            return price_evidence({'capability': [text]}, 'dialysis')[0]
+        self.assertIsNone(quote('No free dialysis offered'))
+        first = quote('Dialysis Rs 300 per session for students')
+        self.assertFalse(comparable(first, quote('Dialysis Rs 400 per session for employees')))
+        self.assertTrue(comparable(first, quote('Dialysis Rs 400 per session for students')))
+
     def test_comparison_rules(self):
         up = {'scope': 'dialysis', 'unit': 'per_session', 'bound': 'upper_bound', 'amount_min_inr': None, 'amount_max_inr': 350}
         ex = {'scope': 'dialysis', 'unit': 'per_session', 'bound': 'exact', 'amount_min_inr': 500, 'amount_max_inr': 500}
@@ -136,6 +144,88 @@ class SortModeTests(unittest.TestCase):
             self.assertIsNotNone(r['nearest_beyond'])
 
 
+WHERE = f'{PATNA[0]}, {PATNA[1]}'
+
+
+class RegressionFixes(unittest.TestCase):
+    """Regressions reproduced by Codex on 0cb8267."""
+
+    def test_all_unresolved_ranks_nothing_and_keeps_reasons(self):
+        idx = CareIndex([r for r in ROWS if r['name'] == 'Renal Mixed'], PINS)
+        for mode in ('nearest', 'price'):
+            with self.subTest(mode=mode):
+                r = recommend(idx, 'dialysis', WHERE, sort_mode=mode)
+                self.assertEqual(r['results'], [])
+                s = r['sort']
+                self.assertEqual(s['ranked_count'], 0)
+                self.assertIn('pinned to one branch', s['no_ranked_reason'])
+                self.assertEqual([c['name'] for c in s['branch_unresolved']], ['Renal Mixed'])
+                self.assertIn('mix several facilities', s['branch_unresolved'][0]['not_ranked_because'])
+                self.assertEqual(r['action_advice'], s['no_ranked_reason'])
+                if mode == 'price':
+                    self.assertFalse(s['price_comparison']['cheapest_claim'])
+                    self.assertIsNone(s['price_comparison']['ranked_by'])
+                self.assertTrue(r['review']['passed'], [c for c in r['review']['checks'] if not c['passed']])
+
+    def test_review_rejects_a_ranked_unresolved_record(self):
+        from carematch.review import review
+        idx = CareIndex(ROWS, PINS)
+        r = recommend(idx, 'dialysis', WHERE, sort_mode='nearest')
+        mixed = next(c for c in r['sort']['branch_unresolved'] if c['name'] == 'Renal Mixed')
+        r['results'] = [dict(mixed, rank=1)] + [dict(c, rank=i + 2) for i, c in enumerate(r['results'][:2])]
+        self.assertFalse(review(idx, r)['passed'])
+
+    def test_bpl_concession_is_not_price_ranked_against_ordinary_rate(self):
+        rows = [dial('b1', 'BPL Renal', 0.009, 'Concessional dialysis Rs 300 per session for BPL patients'),
+                dial('o1', 'Ordinary Renal', 0.004, 'Dialysis Rs 1500 per session')]
+        idx = CareIndex(rows + FACILITIES[5:], PINS)
+        r = recommend(idx, 'dialysis', WHERE, sort_mode='price')
+        pc = r['sort']['price_comparison']
+        self.assertEqual(pc['ranked_by'], 'distance')
+        self.assertFalse(pc['cheapest_claim'])
+        self.assertEqual([c['name'] for c in r['results']][:2], ['Ordinary Renal', 'BPL Renal'])   # nearest first
+        bpl = next(c for c in r['results'] if c['name'] == 'BPL Renal')
+        self.assertEqual(bpl['price_info']['amount_min_inr'], 300)                                 # quote still shown
+        self.assertIn('restricted eligibility', bpl['price_info']['conditions'])
+        self.assertTrue(r['review']['passed'], [c for c in r['review']['checks'] if not c['passed']])
+
+    def test_same_conditions_are_still_compared(self):
+        rows = [dial('b1', 'BPL Renal A', 0.009, 'Concessional dialysis Rs 300 per session for BPL patients'),
+                dial('b2', 'BPL Renal B', 0.004, 'Concessional dialysis Rs 450 per session for BPL patients')]
+        idx = CareIndex(rows + FACILITIES[5:], PINS)
+        r = recommend(idx, 'dialysis', WHERE, sort_mode='price')
+        pc = r['sort']['price_comparison']
+        self.assertEqual((pc['ranked_by'], pc['comparable_quotes']), ('price', 2))
+        self.assertEqual(r['results'][0]['name'], 'BPL Renal A')
+        self.assertIn('restricted eligibility', pc['conditions'])
+
+    def test_urgent_service_price_mode_keeps_nearest_safe_first(self):
+        rows = [fac('cs_bad', 'Near Maternity', 'Patna', 'Bihar', '800002', PATNA[0] + 0.004, PATNA[1],
+                    procedure=['Caesarean section', 'Emergency LSCS'], capability=['Caesarean section not available at night']),
+                fac('cs_near', 'Near Safe Maternity', 'Patna', 'Bihar', '800002', PATNA[0] + 0.01, PATNA[1],
+                    procedure=['Caesarean section', 'Caesarean section package Rs 40,000'],
+                    specialties=['gynecologyAndObstetrics']),
+                fac('cs_cheap', 'Cheap Maternity', 'Patna', 'Bihar', '800002', PATNA[0] + 0.05, PATNA[1],
+                    procedure=['Caesarean section', 'Caesarean section package Rs 15,000'],
+                    specialties=['gynecologyAndObstetrics'])]
+        idx = CareIndex(rows + FACILITIES[5:], PINS)
+        r = recommend(idx, 'C-section', WHERE, sort_mode='price')
+        first = r['results'][0]
+        self.assertEqual(first['name'], 'Near Safe Maternity')
+        self.assertTrue(first.get('safety_pinned'))
+        self.assertIn('emergency', r['sort']['safety_note'].lower())
+        self.assertEqual(r['sort']['price_comparison']['safety_pinned'], first['facility_id'])
+        self.assertTrue(r['review']['passed'], [c for c in r['review']['checks'] if not c['passed']])
+
+    def test_infection_free_is_not_a_free_price(self):
+        for frag in ('Infection-free dialysis unit', 'Infection free dialysis with RO water',
+                     'Hassle-free dialysis booking', 'Pain-free treatment and dialysis'):
+            with self.subTest(frag=frag):
+                self.assertIsNone(price_evidence({'capability': json.dumps([frag])}, 'dialysis')[0])
+        p = price_evidence({'capability': json.dumps(['Free dialysis for BPL patients under the state scheme'])}, 'dialysis')[0]
+        self.assertEqual(p['bound'], 'free')
+
+
 @unittest.skipUnless(os.path.exists(DATA), 'real data export not present')
 class RealDataSortModes(unittest.TestCase):
     @classmethod
@@ -173,6 +263,22 @@ class RealDataSortModes(unittest.TestCase):
                     self.assertTrue(r['review']['passed'], [c for c in r['review']['checks'] if not c['passed']])
                     self.assertEqual(bool(r['results']), bool(base['results']))
                     self.assertTrue(all(c['tier'] in ('strong', 'moderate') for c in r['results']))
+
+
+class ClauseScopeTests(unittest.TestCase):
+    def test_free_in_another_clause_is_not_a_service_price(self):
+        frag = ('Trauma care and related TB management are supported by a DOTS Centre functioning since 2003 with 3 rooms; '
+                'open 9:00 AM-1:00 PM and 2:00 PM-5:00 PM; medicines supplied free of cost by the Central TB Division.')
+        self.assertIsNone(price_evidence({'capability': json.dumps([frag])}, 'trauma')[0])
+
+    def test_price_in_the_service_clause_is_kept_with_the_full_quote(self):
+        frag = 'MRI service available on-site; MRI priced at Rs. 3000'
+        p = price_evidence({'equipment': json.dumps([frag])}, 'mri')[0]
+        self.assertEqual((p['amount_min_inr'], p['quote']), (3000, frag))
+
+    def test_real_infection_free_fragment(self):
+        self.assertIsNone(price_evidence({'procedure': json.dumps(['Offers dialysis services (infection-free dialysis)'])},
+                                         'dialysis')[0])
 
 
 if __name__ == '__main__':

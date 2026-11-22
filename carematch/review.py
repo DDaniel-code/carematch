@@ -7,6 +7,7 @@ column of that facility's source record, so the system can never show a claim th
 import re
 
 from .evidence import TIERS
+from .price import comparison_key
 from .textutil import fragments, normalize, text
 
 
@@ -59,27 +60,38 @@ def review(index, result):
                  and c['distance_km'] <= max(band, c.get('found_within_km') or band) + 0.05 for c in results)
     sort_mode = result.get('sort_mode', 'default')
     sort = result.get('sort') or {}
+    if sort_mode in ('nearest', 'price'):
+        bad_rank = [c['name'] for c in results
+                    if c['location_confidence'] == 'low' or 'possible_merged_record' in c['flags']]
+        abstained_ok = bool(results) or bool(sort.get('no_ranked_reason')) or not sort
+        checks.append(_check(f'{sort_mode.capitalize()} mode: only branch-resolved options with a certain location are ranked; '
+                             'if none qualifies, nothing is ranked and the reason is given',
+                             not bad_rank and abstained_ok, f'unresolved but ranked: {bad_rank}'))
     if sort_mode == 'nearest':
         d = [c['distance_km'] for c in results]
         moved = [c for c in results if c.get('safety_reordered')]
-        ordered = all(a <= b + 0.05 for a, b in zip(d[len(moved):], d[len(moved) + 1:])) and \
-            all(c['location_confidence'] != 'low' and 'possible_merged_record' not in c['flags'] for c in results) \
-            if sort.get('ranked_count', 0) else True
+        ordered = all(a <= b + 0.05 for a, b in zip(d[len(moved):], d[len(moved) + 1:]))
         checks.append(_check('Nearest mode: ordered by straight-line distance among branch-resolved options with a certain location',
                              ordered and inside, f'distances={d}'))
     elif sort_mode == 'price':
         pc = sort.get('price_comparison', {})
+        rest = [c for c in results if not c.get('safety_pinned')]
+        pinned_ok = all(not c.get('safety_pinned') or i == 0 for i, c in enumerate(results))
         if pc.get('ranked_by') == 'price':
-            hi = [c['price_info']['amount_max_inr'] if c['price_info']['amount_max_inr'] is not None else float('inf') for c in results]
-            units = {c['price_info']['unit'] for c in results}
-            ordered = all(a <= b for a, b in zip(hi, hi[1:])) and len(units) == 1 and 'unspecified' not in units
+            hi = [c['price_info']['amount_max_inr'] if c['price_info']['amount_max_inr'] is not None else float('inf')
+                  for c in rest if c.get('price_comparable')]
+            keys = {comparison_key(c['price_info']) for c in rest if c.get('price_comparable')}
+            ordered = all(a <= b for a, b in zip(hi, hi[1:])) and len(keys) <= 1 and \
+                all(k[0] != 'unspecified' for k in keys)
         else:
-            d = [c['distance_km'] for c in results]
+            d = [c['distance_km'] for c in rest]
             ordered = all(a <= b + 0.05 for a, b in zip(d, d[1:]))
-        in_budget = all(c['distance_km'] <= pc.get('budget_km', 0) + 0.05 for c in results)
+        budget = pc.get('budget_km')
+        in_budget = all(budget is not None and c['distance_km'] <= budget + 0.05 for c in results)
         honest = not pc.get('cheapest_claim') or pc.get('comparable_quotes', 0) >= 2
-        checks.append(_check('Price mode: same-unit documented prices only, within the extra-distance budget; no "cheapest" '
-                             'claim from fewer than two comparable quotes', ordered and in_budget and honest,
+        checks.append(_check('Price mode: only like-for-like documented prices (same unit and conditions) are ranked, within '
+                             'the extra-distance budget; urgent services keep the nearest safe option first; no "cheapest" claim '
+                             'from fewer than two comparable quotes', ordered and in_budget and honest and pinned_ok,
                              f"ranked_by={pc.get('ranked_by')}, in_budget={in_budget}, cheapest_claim={pc.get('cheapest_claim')}"))
     elif prefs_on:
         scores = [c['preference']['score'] for c in results]

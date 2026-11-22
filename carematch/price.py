@@ -29,7 +29,14 @@ UPPER = re.compile(r'\bor less\b|\bup ?to\b|\bmax(imum|\.)?\b|\bnot (more|exceed
                    r'|\bunder\b|\bwithin\b|\bat most\b', re.I)
 LOWER = re.compile(r'\bstart(s|ing)?( at| from)?\b|\bfrom\b|\bonwards\b|\bminimum\b|\bat least\b|\band above\b', re.I)
 RANGE = re.compile(r'\d\s*(?:-|–|to)\s*(?:₹|rs\.?|inr)?\s*\d', re.I)
-FREE = re.compile(r'\bfree of (cost|charge)\b|\bfree (dialysis|treatment|of charges)\b|\bat no cost\b|\bwithout (any )?charge', re.I)
+# "free" must be about money: "infection-free dialysis", "hassle-free", "pain-free", "germ-free" are not prices.
+FREE = re.compile(r'(?<![-\w])free of (cost|charge)\b|(?<![-\w])free (dialysis|treatment|of charges)\b|\bat no cost\b'
+                  r'|\bwithout (any )?charge', re.I)
+NEGATED_FREE = re.compile(r'\b(?:no|not|never|without)\s+(?:\w+\s+){0,2}$', re.I)
+NOT_MONEY_FREE = re.compile(r'\b(infection|germ|pain|hassle|stress|worry|risk|cash|paper|smoke|tobacco|drug|toxin|error'
+                            r'|complication|contamination|cross[- ]infection|barrier|wait|queue|latex|mercury|radiation)'
+                            r'[- ]free\b', re.I)
+CLAUSE = re.compile(r';|\|| - (?=[A-Z])|\.\s+(?=[A-Z])')
 DISCOUNT = re.compile(r'\b(regular|original|mrp|actual) (price|rate|cost)\b|\b\d+% off\b|\bdiscount', re.I)
 UNITS = [('per_session', r'\bper (session|sitting|cycle)\b|/\s*session\b|\beach session\b'),
          ('per_scan', r'\bper (scan|study|test|investigation)\b|/\s*scan\b'),
@@ -40,6 +47,8 @@ UNITS = [('per_session', r'\bper (session|sitting|cycle)\b|/\s*session\b|\beach 
 CONDITIONS = [('concessional / subsidised rate', r'\bconcession(al|ary)?\b|\bsubsidi[sz]ed\b|\bcharitable\b|\bfor the (poor|needy)\b|\bbpl\b'),
               ('discounted offer', DISCOUNT.pattern),
               ('scheme / insurance condition', r'\bunder\b.{0,30}\b(scheme|yojana|pm-?jay|ayushman|insurance|esi|cghs)\b'),
+              ('restricted eligibility', r'\bfor (bpl|members|employees|staff|students|senior citizens|card ?holders'
+                                         r'|beneficiaries|registered|eligible)\b|\bonly for\b|\bentitled\b'),
               ('inclusions stated', r'\binclu(ding|sive of|des)\b'),
               ('dated price', r'\bas of (19|20)\d\d\b|\bin (19|20)\d\d\b')]
 
@@ -106,12 +115,19 @@ def price_evidence(row, service):
         for frag in fragments(row.get(field)):
             if not any(p.search(frag) for p in direct):
                 continue
-            if FREE.search(frag) and not amounts(frag):
+            # Read money only in the clause(s) that name the service: in "Trauma care ...; medicines supplied free of
+            # cost by the TB Division" the "free" is about TB medicines. The quote shown stays the whole fragment.
+            scoped = ' ; '.join(c for c in CLAUSE.split(frag) if any(p.search(c) for p in direct))
+            if not scoped:
+                continue
+            financial_text = NOT_MONEY_FREE.sub(' ', scoped)
+            free_claim = FREE.search(financial_text)
+            if free_claim and not NEGATED_FREE.search(financial_text[:free_claim.start()]) and not amounts(scoped):
                 prices.append({'kind': 'patient_price', 'bound': 'free', 'amount_min_inr': 0, 'amount_max_inr': 0,
                                'unit': 'unspecified', 'conditions': [l for l, p in CONDITIONS if re.search(p, frag, re.I)],
                                'scope': service, 'field': field, 'quote': frag})
                 continue
-            c = classify(frag)
+            c = classify(scoped)
             if not c:
                 continue
             kind, d = c
@@ -133,9 +149,17 @@ def interval(info):
     return info['amount_min_inr'], info['amount_max_inr']
 
 
+def comparison_key(price):
+    conditions = tuple(sorted(price.get('conditions', ())))
+    # A broad label like "restricted eligibility" can refer to two different patient groups.
+    # For qualified offers require matching wording apart from the currency amounts.
+    wording = normalize(AMOUNT.sub(' INR ', price.get('quote', ''))) if conditions else ''
+    return price['unit'], conditions, wording
+
+
 def comparable(a, b):
     """Two price_info dicts can be compared only for the same service and the same stated unit (never 'unspecified')."""
-    return (a and b and a['scope'] == b['scope'] and a['unit'] == b['unit'] and a['unit'] != 'unspecified'
+    return (a and b and a['scope'] == b['scope'] and comparison_key(a) == comparison_key(b) and a['unit'] != 'unspecified'
             and a['bound'] != 'free' and b['bound'] != 'free')
 
 

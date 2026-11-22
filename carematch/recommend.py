@@ -17,7 +17,7 @@ from .decision import cost_info, drive_minutes, normalize_preferences
 from .decision import score as preference_score
 from .evidence import TIERS, assess, foreign_mentions, record_mixing
 from .price import comparable as price_comparable
-from .price import price_evidence, surely_cheaper
+from .price import comparison_key, price_evidence, surely_cheaper
 from .geo import CITY_ALIASES, Gazetteer, city_key, facility_location
 from .services import SERVICES, resolve_service
 from .textutil import fragments, haversine_km, normalize, source_urls, text
@@ -353,11 +353,23 @@ def _sort_mode(index, service, mode, eligible, k, max_extra_km, bands, origin_pt
             uncertain.append(c)
     unresolved.sort(key=lambda c: c.get('distance_range_km', [c['distance_km']])[0])
     uncertain.sort(key=lambda c: c.get('distance_range_km', [c['distance_km']])[0])
-    if not ranked:                       # nothing resolvable: rank everything, clearly flagged, rather than say nothing
-        ranked, unresolved, uncertain = cards, [], []
-        for c in ranked:
-            c.pop('not_ranked_because', None)
-            c['uncertainties'].append('ranked although its branch or location could not be resolved: no resolvable option nearby')
+    if not ranked:
+        # Nothing can be pinned to one branch with a certain location: rank nothing, keep every flagged card and its reason.
+        for c in unresolved + uncertain:
+            c.pop('rank', None)
+        reason = (f"None of the {len(unresolved) + len(uncertain)} credible options nearby can be pinned to one branch with a "
+                  'certain location, so no distance or price order is claimed. They are listed with the reason; call to '
+                  'confirm the address before travelling.')
+        out = {'mode': mode, 'max_extra_km': max_extra_km, 'nearest_credible_km': None, 'ranked_count': 0,
+               'no_ranked_reason': reason, 'branch_unresolved': unresolved[:3], 'location_uncertain': uncertain[:3],
+               'band_km': None, 'safety_note': None, 'results': [], 'runner_ups': [],
+               'method': (f'{mode.capitalize()} mode: Strong/Moderate evidence only (same gate as default); only branch-resolved '
+                          'options with a certain location are ranked. Here none qualifies.')}
+        if mode == 'price':
+            out.update(price_comparison={'unit': None, 'budget_km': None, 'comparable_quotes': 0, 'ranked_by': None,
+                                         'cheapest_claim': False, 'note': reason},
+                       price_unknown_nearby=[], price_not_comparable=[])
+        return out
     nearest_km = ranked[0]['distance_km']
     budget = round(nearest_km + max_extra_km, 1)
     out = {'mode': mode, 'max_extra_km': max_extra_km, 'nearest_credible_km': nearest_km, 'ranked_count': len(ranked)}
@@ -396,60 +408,99 @@ def _sort_mode(index, service, mode, eligible, k, max_extra_km, bands, origin_pt
                    location_uncertain=[c for c in uncertain if near(c)][:3])
     else:
         in_budget = [c for c in ranked if c['distance_km'] <= budget]
-        priced = [c for c in in_budget if c['price_info'] and c['price_info']['bound'] != 'free'
-                  and c['price_info']['unit'] != 'unspecified']
-        units = {}
-        for c in priced:
-            units.setdefault(c['price_info']['unit'], []).append(c)
-        unit = max(units, key=lambda u: (len(units[u]), -units[u][0]['distance_km'])) if units else None
-        comparable = units.get(unit, [])
-        comparable = [c for c in comparable if all(price_comparable(c['price_info'], d['price_info']) for d in comparable)]
+        # Like-for-like: same service, same stated unit AND the same conditions (eligibility, scheme, inclusions, ...).
+        # A concessional BPL rate and an ordinary rate share a unit but not who can get them, so they are never ranked
+        # against each other.
+        groups = {}
+        for c in in_budget:
+            p = c['price_info']
+            if p and p['bound'] != 'free' and p['unit'] != 'unspecified':
+                groups.setdefault(comparison_key(p), []).append(c)
+        key = max(groups, key=lambda g: (len(groups[g]), -groups[g][0]['distance_km'])) if groups else None
+        comparable = [c for c in groups.get(key, [])
+                      if all(price_comparable(c['price_info'], d['price_info']) for d in groups.get(key, []))]
+        unit, conditions = key[:2] if key else (None, ())
+        pinned = None
+        if service in EMERGENCY_SERVICES:
+            # Urgent service: the nearest safe option (certain location, no "not available" statement) stays first;
+            # price only orders the options after it.
+            pinned = next((c for c in in_budget if 'contradictory_claims' not in c['flags']), None)
+            safety_note = ('Urgent service: the nearest safe option is kept first; price only orders the options after it. '
+                           'In an emergency, call ahead with the questions on each card, or use the 108 ambulance.')
         inf = float('inf')
+        price_key = lambda c: (c['price_info']['amount_max_inr'] if c['price_info']['amount_max_inr'] is not None else inf,
+                               c['price_info']['amount_min_inr'] or 0, c['distance_km'])
+        cheapest = False
         if len(comparable) >= 2:
-            comparable.sort(key=lambda c: (c['price_info']['amount_max_inr'] if c['price_info']['amount_max_inr'] is not None else inf,
-                                           c['price_info']['amount_min_inr'] or 0, c['distance_km']))
+            comparable.sort(key=price_key)
             top = comparable[0]
-            same_conditions = len({tuple(c['price_info']['conditions']) for c in comparable}) == 1
-            cheapest = same_conditions and all(surely_cheaper(top['price_info'], c['price_info']) for c in comparable[1:])
-            results = comparable[:k]
+            cheapest = all(surely_cheaper(top['price_info'], c['price_info']) for c in comparable[1:])
+            ordered = comparable
             ranked_by = 'price'
+            cond_text = f" under the same conditions ({'; '.join(conditions)})" if conditions else ''
             if cheapest:
-                note = (f"{top['name']} documents a lower {PRICE_UNIT_TEXT[unit]} price than every other comparable quote within "
-                        f"{budget} km.")
+                note = (f"{top['name']} documents a lower {PRICE_UNIT_TEXT[unit]} price than every other like-for-like quote "
+                        f"within {budget} km{cond_text}.")
             else:
-                note = (f"Ordered by documented {PRICE_UNIT_TEXT[unit]} price (upper amount first). No option is called the cheapest: "
-                        + ('conditions differ between quotes' if not same_conditions else 'the documented ranges overlap') + '.')
+                note = (f"Ordered by documented {PRICE_UNIT_TEXT[unit]} price (upper amount first) among {len(comparable)} "
+                        f"like-for-like quotes{cond_text}. No option is called the cheapest: the documented ranges overlap.")
         else:
-            results = in_budget[:k]
+            ordered = in_budget
             ranked_by = 'distance'
-            note = (f"{len(comparable)} comparable documented price(s) within {budget} km (same service and unit): prices cannot "
-                    f"be ranked, so options are shown nearest first with any documented price on the card.")
-            cheapest = False
+            note = (f"{len(comparable)} like-for-like documented price(s) within {budget} km (same service, unit and "
+                    'conditions): prices cannot be ranked, so options are shown nearest first with every documented price '
+                    'labelled on its card.')
+        if pinned is not None:
+            ordered = [pinned] + [c for c in ordered if c is not pinned]
+            pinned['safety_pinned'] = True
+        results = ordered[:k]
         shown = {c['facility_id'] for c in results}
         for rank, c in enumerate(results, 1):
             c['rank'] = rank
-            c['why_ranked'] = (f"#{rank}: {_price_text(c['price_info'])}, {c['distance_km']} km" if ranked_by == 'price'
-                               else f"#{rank} by distance within {budget} km ({_price_text(c['price_info'])}).")
+            if c.get('safety_pinned'):
+                c['why_ranked'] = (f"#{rank}: nearest safe option for an urgent service ({c['distance_km']} km), kept first "
+                                   f"whatever its price ({_price_text(c['price_info'])}).")
+            elif ranked_by == 'price':
+                c['why_ranked'] = f"#{rank}: {_price_text(c['price_info'])}, {c['distance_km']} km"
+            else:
+                c['why_ranked'] = f"#{rank} by distance within {budget} km ({_price_text(c['price_info'])})."
         last = results[-1]
         runner_ups = [dict(c, why_not=(f"documented price {_price_text(c['price_info'])} is not lower" if ranked_by == 'price'
                                        else f"{round(c['distance_km'] - last['distance_km'], 1)} km farther"))
-                      for c in (comparable[k:] if ranked_by == 'price' else in_budget[k:])][:MAX_RUNNER_UPS]
+                      for c in ordered[k:]][:MAX_RUNNER_UPS]
+
+        def why_not_comparable(c):
+            p = c['price_info']
+            if p['bound'] == 'free':
+                return 'free only with conditions: ' + ('; '.join(p['conditions']) or 'none stated')
+            if p['unit'] == 'unspecified':
+                return 'unit not stated'
+            if p['unit'] != unit:
+                return f"different unit ({PRICE_UNIT_TEXT[p['unit']]})"
+            return ('different eligibility or conditions: ' + ('; '.join(p['conditions']) or 'no conditions stated')
+                    + ' vs ' + ('; '.join(conditions) or 'no conditions stated'))
+
         within = lambda c: c['distance_km'] is not None and c.get('distance_range_km', [c['distance_km']])[0] <= budget
         out.update(
             method=(f'Price mode: Strong/Moderate evidence only (same gate as default); among credible branch-resolved options '
                     f'within {max_extra_km} km of the nearest one ({budget} km), documented patient prices for this service are '
-                    'compared only when they state the same unit; upper/lower bounds and conditions are kept, never filled in. '
+                    'compared only when they state the same unit and the same conditions (eligibility, scheme, inclusions); '
+                    'upper/lower bounds are kept, never filled in. Urgent services keep the nearest safe option first. '
                     'Options without a comparable price stay visible.'),
-            price_comparison={'unit': unit, 'budget_km': budget, 'comparable_quotes': len(comparable),
-                              'ranked_by': ranked_by, 'cheapest_claim': cheapest, 'note': note},
+            price_comparison={'unit': unit, 'conditions': list(conditions), 'budget_km': budget,
+                              'comparable_quotes': len(comparable), 'ranked_by': ranked_by, 'cheapest_claim': cheapest,
+                              'safety_pinned': pinned['facility_id'] if pinned is not None else None, 'note': note},
             price_unknown_nearby=[c for c in in_budget if not c['price_info'] and c['facility_id'] not in shown][:k],
-            price_not_comparable=[dict(c, not_comparable_because=(
-                'free only with conditions' if c['price_info']['bound'] == 'free' else
-                'unit not stated' if c['price_info']['unit'] == 'unspecified' else
-                f"different unit ({PRICE_UNIT_TEXT[c['price_info']['unit']]})"))
-                for c in in_budget if c['price_info'] and c not in comparable and c['facility_id'] not in shown][:k],
+            price_not_comparable=[dict(c, not_comparable_because=why_not_comparable(c))
+                                  for c in in_budget if c['price_info'] and c not in comparable
+                                  and c['facility_id'] not in shown][:k],
             branch_unresolved=[c for c in unresolved if within(c)][:3],
             location_uncertain=[c for c in uncertain if within(c)][:3])
+        for c in results + runner_ups:      # label every shown quote: compared like-for-like, or why not
+            if c['price_info']:
+                c['price_comparable'] = c in comparable or any(c['facility_id'] == x['facility_id'] for x in comparable)
+                if not c['price_comparable']:
+                    c['not_comparable_because'] = why_not_comparable(c)
     for c in runner_ups + out.get('branch_unresolved', []) + out.get('location_uncertain', []) + \
             out.get('price_unknown_nearby', []) + out.get('price_not_comparable', []):
         c.pop('rank', None)
@@ -607,7 +658,9 @@ def recommend(index, service_text, location_text, k=MAX_RESULTS, bands=BANDS_KM,
         chosen_band, n_in_band = mode['band_km'], mode['ranked_count']
 
     first_ask = SERVICES[service]['ask'][0]
-    if not results:
+    if mode and not results and mode.get('no_ranked_reason'):
+        advice = mode['no_ranked_reason']
+    elif not results:
         advice = ('No facility with credible evidence within reach. Call the nearest option shown before travelling, '
                   'and check with the district hospital or 108 ambulance service.')
     elif n_in_band <= 2 or chosen_band >= 75:

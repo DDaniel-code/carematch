@@ -31,29 +31,41 @@ honest no-answer (`results == []`, `nearest_beyond` as today).
 | `mode`, `max_extra_km`, `nearest_credible_km`, `ranked_count`, `band_km` | context |
 | `branch_unresolved` | cards **not ranked**: the record may mix facilities/branches (`card.not_ranked_because`) |
 | `location_uncertain` | cards **not ranked**: address, PIN and map position disagree; `card.distance_range_km = [nearest, farthest]` |
-| `safety_note` | nearest mode, emergency services (C-section, trauma, emergency, NICU, burn): call-ahead / 108 message |
+| `safety_note` | emergency services (C-section, trauma, emergency, NICU, burn), nearest **and price** mode: call-ahead / 108 message |
 | `stronger_option_nearby` | nearest mode, emergency service, top result is Moderate and a Strong option is within `max_extra_km`: `{facility_id, name, distance_km, note}` |
+| `no_ranked_reason` | **new**: set when every credible option nearby is unresolved (mixed record or uncertain location). Then `results == []`, `ranked_count == 0`, `nearest_credible_km` and `band_km` are `null`, the flagged cards stay in `branch_unresolved` / `location_uncertain` with their `not_ranked_because`, and `result.action_advice` repeats this reason. Show it instead of "no facility found": credible options exist, they just cannot be pinned to one branch |
 
 `sort` (price mode only):
 
 | Key | Meaning |
 | --- | --- |
-| `price_comparison` | `{unit, budget_km, comparable_quotes, ranked_by: 'price'|'distance', cheapest_claim: bool, note}` |
+| `price_comparison` | `{unit, conditions, budget_km, comparable_quotes, ranked_by: 'price'|'distance'|null, cheapest_claim: bool, safety_pinned: facility_id|null, note}`; `ranked_by` is `null` only with `no_ranked_reason` |
 | `price_unknown_nearby` | credible options within the budget with **no documented price** (never dropped) |
-| `price_not_comparable` | options with a price that cannot be compared (`card.not_comparable_because`: unit not stated / different unit / free only with conditions) |
+| `price_not_comparable` | options with a price that cannot be compared (`card.not_comparable_because`: unit not stated / different unit / different eligibility or conditions: … / free only with conditions: …) |
 
 Show `price_comparison.note` verbatim; only say "cheapest" when `cheapest_claim` is true.
+
+Price-mode cards that show a price also carry `card.price_comparable` (bool) and, when false, `card.not_comparable_because`,
+so a quote shown in a distance-ordered list is always labelled as compared or not.
 
 ## Ordering rules
 
 - **nearest**: credible, branch-resolved options with a certain location, by conservative straight-line distance
   (farthest plausible position when location is uncertain). Emergency services: a record that also states the service
   is not available never goes first while a clean option exists within `max_extra_km` (`card.safety_reordered = True`).
+- **Both modes, all unresolved**: if no credible option nearby is branch-resolved with a certain location, nothing is
+  ranked (`results == []`, `sort.no_ranked_reason`); the flagged cards are listed, never promoted to #1.
 - **price**: candidates = same ranked set, within `nearest_credible_km + max_extra_km`. Prices are compared only when
-  they are for this service and state the same unit (most common unit wins). With ≥ 2 comparable quotes: ordered by the
-  upper documented amount (exact or range max; an upper bound counts as its maximum; lower bounds sort last). With
-  fewer: ordered by distance, `ranked_by = 'distance'`, prices shown on cards. `cheapest_claim` is true only when the top
-  quote's maximum is below every other comparable quote's minimum **and** all conditions match.
+  they are **like-for-like**: same service, same stated unit **and the same set of conditions** (eligibility such as BPL
+  or members only, concessional rate, scheme / insurance, inclusions, discounted offer, dated price). The largest such
+  group is compared (`price_comparison.unit` / `.conditions`). A concessional BPL rate and an ordinary rate share a unit
+  but not who can get them, so they are not ranked against each other: with fewer than 2 like-for-like quotes the list is
+  ordered by distance (`ranked_by = 'distance'`) and every quote is labelled on its card. With ≥ 2: ordered by the upper
+  documented amount (exact or range max; an upper bound counts as its maximum; lower bounds sort last).
+  `cheapest_claim` is true only when the top quote's maximum is below every other like-for-like quote's minimum.
+- **price, urgent services** (C-section, trauma, emergency, NICU, burn): the nearest safe option (certain location, no
+  "not available" statement) stays #1 whatever its price (`card.safety_pinned = True`,
+  `price_comparison.safety_pinned`); price orders only the options after it.
 
 ## New card keys (every mode)
 
@@ -63,7 +75,7 @@ Show `price_comparison.note` verbatim; only say "cheapest" when `cheapest_claim`
 {"kind": "patient_price", "bound": "exact|range|upper_bound|lower_bound|free",
  "amount_min_inr": 1200, "amount_max_inr": 1800, "currency": "INR",
  "unit": "per_session|per_scan|per_day|per_procedure|per_month|package|unspecified",
- "conditions": ["concessional / subsidised rate", "inclusions stated", "scheme / insurance condition", "discounted offer", "dated price"],
+ "conditions": ["concessional / subsidised rate", "restricted eligibility", "inclusions stated", "scheme / insurance condition", "discounted offer", "dated price"],
  "scope": "dialysis", "field": "capability", "quote": "<exact fragment>", "other_price_quotes": 0}
 ```
 
@@ -74,18 +86,30 @@ Show `price_comparison.note` verbatim; only say "cheapest" when `cheapest_claim`
 Show them, if at all, labelled as not a price (e.g. "PM-JAY cover up to ₹5 lakh per family — not a price").
 
 Card keys used only in sort modes: `not_ranked_because`, `distance_range_km`, `not_comparable_because`,
-`safety_reordered`, `why_not` (runner-ups).
+`price_comparable`, `safety_reordered`, `safety_pinned`, `why_not` (runner-ups).
 
 ## Never inferred (enforced by tests)
 
 Public operator ≠ free · package ≠ per session · equipment / building cost ≠ patient fee · insurer cover ≠ price ·
-one quote ≠ cheapest · a price is read only from a fragment that names the service itself.
+one quote ≠ cheapest · concessional / restricted-eligibility rate ≠ ordinary rate · "infection-free", "hassle-free",
+"pain-free" ≠ free of charge · a price is read only from a fragment that names the service itself.
 
-## Quality checks added
+## Quality checks
 
 - Every price quote (price_info and price_context) appears word for word in the facility record.
-- Nearest mode: ordered by distance among branch-resolved, location-certain options.
-- Price mode: same-unit prices only, within the budget, no "cheapest" from fewer than two comparable quotes.
+- Nearest and price mode: no ranked card is a possible mixed record or has an uncertain location; if none qualifies,
+  nothing is ranked and `no_ranked_reason` is set.
+- Nearest mode: ordered by distance (after an emergency safety move).
+- Price mode: only like-for-like prices (same unit and conditions) are price-ordered, within the budget; an urgent
+  service's safety-pinned card may only be #1; no "cheapest" from fewer than two comparable quotes.
+
+## Changelog
+
+- **Fixes after Codex review of 0cb8267**: (1) all-unresolved candidates no longer fall back to ranking a mixed record
+  #1: `results == []` + `no_ranked_reason`; (2) prices are compared only within the same unit **and** conditions (a
+  BPL concessional Rs 300 per session is no longer ranked against an ordinary Rs 1,500 per session); (3) urgent
+  services keep the nearest safe option first in price mode too (`safety_pinned`); (4) "infection-free dialysis" and
+  similar "X-free" phrases are no longer read as a free price. New condition label `restricted eligibility`.
 
 ## Data reality (worth showing)
 

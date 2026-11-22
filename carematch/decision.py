@@ -17,6 +17,7 @@ probability of being treated or of survival, and the app never presents them tha
 import math
 import re
 
+from .price import NOT_MONEY_FREE
 from .textutil import fragments, normalize, text
 
 URGENCY = ('default', 'time_critical', 'can_travel')
@@ -101,7 +102,8 @@ def _find(row, pattern, clinical_only=False):
     rx = re.compile(pattern, re.I) if isinstance(pattern, str) else pattern
     for field in CLAIM_FIELDS:
         for frag in fragments(row.get(field)):
-            m = rx.search(frag)
+            searchable = NOT_MONEY_FREE.sub(lambda match: " " * len(match[0]), frag) if rx is COVERED_TEXT else frag
+            m = rx.search(searchable)
             if m and not NEGATED.search(frag[max(0, m.start() - 30):m.start()]) \
                     and not (clinical_only and NON_CLINICAL.search(frag)):
                 return field, frag
