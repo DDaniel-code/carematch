@@ -13,17 +13,23 @@ Definitions (shared with the map, see docs/call_plan.md):
                  leads, can be pinned to one branch, and is a hospital (or has >= 20 beds). Verifying a Moderate one
                  would raise confidence but adds no coverage under this metric, so Moderate/Strong are not candidates.
   gain           newly covered unique PINs, assuming the facility confirms it provides the service.
+  need target    optional: count only PINs in districts where NFHS-5 shows the operation is under-provided (district
+                 caesarean rate below LOW_CSECTION_TARGET_PCT). Counting every PIN equally sends the calls to dense,
+                 well-served regions; the target sends them where a confirmed facility changes the most.
 """
 import re
 
 from .geo import city_key
-from .planner import PointIndex
+from .planner import NFHS_FIELDS, PointIndex, match_nfhs, nfhs_number
 from .services import SERVICES, SPECIALTY_NAME
 from .textutil import fragments, haversine_km, normalize, split_camel, text
 
 RADIUS_KM = 50
 MIN_BEDS = 20
 BRANCH_MISMATCH_KM = 50
+# WHO statement on caesarean section rates (2015): at population level, rates up to about 10% are associated with fewer
+# maternal and newborn deaths; above that, no further reduction is seen. Below 10% more access plausibly saves lives.
+LOW_CSECTION_TARGET_PCT = 10.0
 
 OBSTETRIC_LEAD = re.compile(r'\bobstetric|\bmaternity\b|\blabou?r (room|ward|suite|room)|\bdeliveries\b'
                             r'|\b(normal|vaginal|safe|institutional|painless|baby|child) ?deliver|\bdelivery (room|suite|ward)'
@@ -234,25 +240,44 @@ def candidates(index, service='c_section', cov=None, radius_km=RADIUS_KM):
 
 # ---- B line: budgeted maximum coverage -------------------------------------------------------------------------------
 
-def greedy_plan(cands, budget=10, exclude=()):
+def pin_need(pins, nfhs_rows, field='csection_pct'):
+    """{pin: the NFHS-5 value of the PIN's district, or None when that district has no NFHS match}."""
+    keys = sorted({(i['district'], i['state']) for i in pins.values() if i.get('district') and i.get('state')})
+    mapping, _ = match_nfhs(keys, nfhs_rows or [])
+    out = {}
+    for pin, info in pins.items():
+        row = mapping.get((info.get('district'), info.get('state')))
+        out[pin] = nfhs_number(row.get(NFHS_FIELDS[field]))[0] if row else None
+    return out
+
+
+def need_target(need, below=LOW_CSECTION_TARGET_PCT):
+    """PINs whose district value is known and below the threshold. Unknown need is never assumed to be high."""
+    return {pin for pin, value in need.items() if value is not None and value < below}
+
+
+def greedy_plan(cands, budget=10, exclude=(), target=None):
     """Each round pick the candidate adding the most still-uncovered PINs (ties: more leads, then facility_id).
-    Stops early when no candidate adds anything. Returns ordered rows."""
+    With `target` (a set of PINs) only those PINs count as gain; the other PINs a call would also cover are kept in
+    'other_new_pins'. Stops early when no candidate adds anything. Returns ordered rows."""
     pool = sorted([c for c in cands if c['phone_status'] == 'ok' and c['facility_id'] not in set(exclude)],
                   key=lambda c: c['facility_id'])
-    covered, rows = set(), []
+    covered, counted_total, rows = set(), 0, []
     for rank in range(1, budget + 1):
-        best, best_new, best_key = None, set(), (0, 0)
+        best, best_new, best_counted, best_key = None, set(), set(), (0, 0)
         for c in pool:            # strict '>' keeps the first facility_id on ties -> deterministic
             new = c['new_pins'] - covered
-            key = (len(new), c['lead_count'])
+            counted = new if target is None else new & target
+            key = (len(counted), c['lead_count'])
             if key > best_key:
-                best, best_new, best_key = c, new, key
-        if best is None or not best_new:
+                best, best_new, best_counted, best_key = c, new, counted, key
+        if best is None or not best_counted:
             break
         covered |= best_new
+        counted_total += len(best_counted)
         pool.remove(best)
-        rows.append({'rank': rank, 'candidate': best, 'new_pins': best_new, 'marginal_gain': len(best_new),
-                     'cumulative_gain': len(covered)})
+        rows.append({'rank': rank, 'candidate': best, 'new_pins': best_counted, 'other_new_pins': best_new - best_counted,
+                     'marginal_gain': len(best_counted), 'cumulative_gain': counted_total})
     return rows
 
 

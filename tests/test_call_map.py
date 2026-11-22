@@ -23,3 +23,18 @@ class CallMapTest(unittest.TestCase):
                 with self.subTest(failed=failed, budget=budget):
                     self.assertEqual(actual, expected)
                     self.assertEqual(len(actual), int(calls[:slots][-1]['cumulative_gain']) if calls[:slots] else 0)
+
+    def test_need_plan_highlights_only_low_caesarean_pins(self):
+        points, calls, _ = load_map(ANALYSIS, need=True)
+        by_pin = {p['pin']: p for p in points}
+        with (ANALYSIS / 'c_section_call_plan_need.csv').open(encoding='utf-8-sig', newline='') as source:
+            published = list(csv.DictReader(source))
+        self.assertEqual([c['facility_id'] for c in calls], [row['facility_id'] for row in published])
+        for budget in (3, 5, 10):
+            expected = {pin for row in published[:budget] for pin in row['new_pin_ids'].split(';') if pin}
+            actual = {p['pin'] for p in points if 0 < p['rank'] <= budget}
+            with self.subTest(budget=budget):
+                self.assertEqual(actual, expected)
+                self.assertEqual(len(actual), int(calls[budget - 1]['cumulative_gain']))
+                self.assertTrue(all(by_pin[pin]['district_csection_pct'] < 10 and not by_pin[pin]['covered_now']
+                                    for pin in actual))

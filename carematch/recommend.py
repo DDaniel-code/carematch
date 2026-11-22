@@ -575,7 +575,7 @@ def recommend(index, service_text, location_text, k=MAX_RESULTS, bands=BANDS_KM,
                          + ', '.join(s['label'] for s in SERVICES.values())}
     origin = index.gaz.resolve(location_text)
     if 'error' in origin:
-        return {'error': origin['error']}
+        return {k: origin[k] for k in ('error', 'suggestions') if k in origin}
     o = (origin['lat'], origin['lon'])
 
     scored = []          # (tier_rank, distance, i, assessment)

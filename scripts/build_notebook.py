@@ -8,6 +8,7 @@ tests always run the same code. Modules keep their own namespaces and relative i
 Golden queries and review labels are embedded from eval/ so the file stands alone.
 """
 import argparse
+import base64
 import contextlib
 import csv
 import io
@@ -16,12 +17,14 @@ import subprocess
 import sys
 import time
 import traceback
+import warnings
 
 import nbformat
 from nbformat.v4 import new_code_cell, new_markdown_cell, new_notebook, new_output
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT = os.path.join(ROOT, 'CareMatch.ipynb')
+FIGURES = os.path.join(ROOT, 'docs', 'img')      # each named figure is also saved here for the README
 REPO = 'https://github.com/DDaniel-code/carematch'
 
 MODULES = [
@@ -99,14 +102,23 @@ facilities from the Virtue Foundation dataset. Every recommendation quotes the f
 that evidence is and how far away the facility is, lists what is still uncertain, and gives the questions to ask by phone.
 When the records do not support a recommendation, it says so instead of padding the list.
 
-For planners it answers the next question: **which districts are far from any facility with credible evidence, and do
-those districts also show high need** in NFHS-5?
+For planners it answers the next questions: **which districts are far from any facility with credible evidence, do
+those districts also show high need** in NFHS-5, **and whom should we phone first to close the gap?**
+
+## What we found
+
+| # | Finding | Where |
+| --- | --- | --- |
+| 1 | **A keyword match is not a claim.** 5,155 records match C-section keywords; 9% of them carry a claim that the operation is performed. From 93% of India's PIN areas, the nearest keyword match is one of the other 91%. | Part 3, first chart |
+| 2 | **Every answer can be checked.** On 38 golden queries, all quality checks pass and every one of the 249 quotes shown appears word for word in the facility record. Where nothing credible is within 300 km, the answer says so. | Parts 4 and 5 |
+| 3 | **Documented C-section care is within 50 km of 46% of post offices.** 27 districts are both far from it and have an NFHS-5 caesarean rate below 5%. District caesarean rates fall from 24% to 14% as documented care gets farther away. | Part 6, map |
+| 4 | **The obvious call plan helps the wrong places.** Ten verification calls chosen to add the most PIN areas go to districts with a median caesarean rate of 48%. Counting need instead, three calls reach 86 PIN areas in low-caesarean districts; the obvious plan reaches none. | Part 7, last chart |
 
 | Judging criterion | Where in this notebook |
 | --- | --- |
-| Exploration | Part 3: what a record is, how far each field can be trusted, what the claims can and cannot prove |
-| Modeling | Parts 1, 4, 5, 7: claim classification, evidence tiers, location confidence, banded ranking, quality checks, evaluation, sensitivity; a region-held-out lead model |
-| Impact | Parts 6, 7: district access gaps × NFHS need, four actionable insights, and which 3–10 facilities to verify first for the most new coverage |
+| Exploration | Part 3: what a record is, how far each field can be trusted, why a keyword match is not a claim; Part 6: access distance against NFHS-5 |
+| Modeling | Parts 1, 4, 5, 7: claim classification, evidence tiers, location confidence, banded ranking, quality checks, evaluation, sensitivity; budgeted maximum coverage; a region-held-out lead model |
+| Impact | Parts 6, 7: district access gaps × NFHS need, five actionable insights, and which facilities to verify first, re-planned so the calls go where caesareans are rare |
 
 **How to run.** On Databricks Free Edition (serverless): import this file and *Run all*; Part 2 reads the three Unity
 Catalog tables through Spark. Locally: put the exported CSVs in `data/` and run all cells. The outputs saved in this file
@@ -158,6 +170,41 @@ def show(rows, cols, headers=None, limit=None):
     print(line(['-' * w for w in widths]))
     for row in cells:
         print(line(row))
+'''
+
+CHARTS = r'''# Charts are optional: every figure below is also printed as a table, so the notebook runs without matplotlib.
+try:
+    import matplotlib.pyplot as plt
+    plt.rcParams.update({'figure.facecolor': '#fcfcfb', 'axes.facecolor': '#fcfcfb', 'savefig.facecolor': '#fcfcfb',
+                         'axes.spines.top': False, 'axes.spines.right': False, 'axes.edgecolor': '#b9b8b2',
+                         'axes.labelcolor': '#52514e', 'xtick.color': '#52514e', 'ytick.color': '#52514e',
+                         'text.color': '#0b0b0b', 'font.size': 10, 'axes.titlesize': 11.5, 'axes.titleweight': 'bold',
+                         'axes.titlelocation': 'left', 'legend.frameon': False})
+except ImportError:
+    plt = None
+    print('matplotlib is not installed: charts are skipped, the tables are still printed.')
+MUTED, SURFACE = '#52514e', '#fcfcfb'
+BLUE_DARK, BLUE, GREY, ORANGE = '#174a8c', '#2a78d6', '#cfcec8', '#eb6834'
+DISTANCE_RAMP = ['#cfe1f7', '#8fbbee', '#3f86d9', '#123f7a']      # one hue, light (near) to dark (far)
+
+
+def spearman(xs, ys):
+    """Rank correlation, standard library only (ties share their average rank)."""
+    def ranks(values):
+        order = sorted(range(len(values)), key=values.__getitem__)
+        out, i = [0.0] * len(values), 0
+        while i < len(order):
+            j = i
+            while j + 1 < len(order) and values[order[j + 1]] == values[order[i]]:
+                j += 1
+            for k in range(i, j + 1):
+                out[order[k]] = (i + j) / 2 + 1
+            i = j + 1
+        return out
+    rx, ry = ranks(xs), ranks(ys)
+    mx, my = statistics.mean(rx), statistics.mean(ry)
+    return sum((a - mx) * (b - my) for a, b in zip(rx, ry)) / math.sqrt(
+        sum((a - mx) ** 2 for a in rx) * sum((b - my) ** 2 for b in ry))
 '''
 
 PART1 = """## Part 1 · The engine
@@ -248,6 +295,71 @@ for kind in ('direct', 'listed', 'indirect', 'negative', 'mention', 'related'):
     if kind in seen:
         label, field, quote = seen[kind]
         print(f'  {kind:9s} [{label}, {field}] "{quote[:110]}"')
+'''
+
+FUNNEL_MD = """**Why a keyword search is not enough.** The obvious way to answer "who offers dialysis near me" is to search the
+record for the service or its department. The cell below counts those keyword matches for each service, how many of
+them carry a claim that the service is actually provided, and, from every PIN area in India, how often the *nearest*
+keyword match is one without such a claim.
+"""
+
+FUNNEL = r'''areas = [(lat, lon) for pts in districts(index).values() for lat, lon, _ in pts]
+funnel = []
+for key, spec in SERVICES.items():
+    tiers = [a['tier'] for a in index.assessments(key)]
+    count = Counter(tiers)
+    located = [(index.locations[i]['position'], t) for i, t in enumerate(tiers) if index.locations[i]['position'] and t != 'none']
+    mention = PointIndex([(p[0], p[1], t) for p, t in located])
+    credible = PointIndex([(p[0], p[1], t) for p, t in located if t != 'weak'])
+    unsupported, extra = 0, []
+    for lat, lon in areas:
+        km, tier = mention.nearest(lat, lon)
+        if tier == 'weak':
+            unsupported += 1
+            extra.append(credible.nearest(lat, lon)[0] - km)
+    matches = count['strong'] + count['moderate'] + count['weak']
+    funnel.append({'service': spec['label'].split(' (')[0], 'keyword matches': f'{matches:,}', 'strong': count['strong'],
+                   'moderate': count['moderate'], 'keyword only': count['weak'],
+                   'credible': f"{(count['strong'] + count['moderate']) / matches:.0%}",
+                   'nearest match unsupported': f'{unsupported / len(areas):.0%}', '_share': unsupported / len(areas),
+                   'median extra km to a credible one': round(statistics.median(extra), 1) if extra else 0})
+funnel.sort(key=lambda r: r['_share'])
+print(f'From {len(areas):,} PIN areas with a reliable centre:')
+show(funnel[::-1], ['service', 'keyword matches', 'strong', 'moderate', 'keyword only', 'credible', 'nearest match unsupported',
+                    'median extra km to a credible one'])
+worst = funnel[-1]
+print(f"\nFor {worst['service']}, {worst['keyword matches']} records match the keywords but only {worst['credible']} carry a claim that the service is provided;")
+print(f"from {worst['nearest match unsupported']} of PIN areas the nearest match is one of the others. A credible facility is a median {worst['median extra km to a credible one']} km farther.")
+
+if plt:
+    fig, (left, right) = plt.subplots(1, 2, figsize=(12.5, 4.6), num='keyword_vs_claim', sharey=True,
+                                      gridspec_kw={'width_ratios': [1.3, 1]})
+    y = list(range(len(funnel)))
+    start = [0] * len(funnel)
+    for col, colour, label in (('strong', BLUE_DARK, 'Strong: two or more direct claims'),
+                               ('moderate', BLUE, 'Moderate: one direct or listed claim'),
+                               ('keyword only', GREY, 'Keyword only: a department, a referral, outsourced, or a passing mention')):
+        values = [r[col] for r in funnel]
+        left.barh(y, values, left=start, color=colour, edgecolor=SURFACE, linewidth=1.5, height=0.62, label=label)
+        start = [a + b for a, b in zip(start, values)]
+    for i, r in enumerate(funnel):
+        left.text(start[i] + 70, i, f"{r['credible']} credible", va='center', color=MUTED, fontsize=9)
+    left.set_yticks(y)
+    left.set_yticklabels([r['service'] for r in funnel])
+    left.set_xlim(0, max(start) * 1.17)
+    left.set_xlabel('facilities whose record matches the service keywords')
+    left.set_title('A keyword match is not a claim')
+    left.legend(loc='upper center', bbox_to_anchor=(0.42, -0.16), fontsize=8.5)
+    right.barh(y, [r['_share'] * 100 for r in funnel], color=BLUE, height=0.62)
+    for i, r in enumerate(funnel):
+        right.text(r['_share'] * 100 + 1.5, i, f"{r['nearest match unsupported']} · +{r['median extra km to a credible one']:.0f} km",
+                   va='center', color=MUTED, fontsize=9)
+    right.set_xlim(0, 125)
+    right.set_xticks([0, 25, 50, 75, 100])
+    right.set_xlabel('% of PIN areas whose nearest keyword match has no claim\n(+km: median extra distance to a credible facility)')
+    right.set_title('The nearest match is usually one of the grey ones')
+    fig.tight_layout()
+    plt.show()
 '''
 
 PART4 = """## Part 4 · Recommendations
@@ -347,7 +459,7 @@ print('not that it is available right now (e.g. emergency C-section readiness): 
 
 PART6 = """## Part 6 · Impact: where the referral network has the largest gaps
 
-For every India Post PIN area with a reliable centre (15,174 areas, 702 districts, weighted by number of post offices as a
+For every India Post PIN area with a reliable centre (14,917 areas, 702 districts, weighted by number of post offices as a
 rough stand-in for settlements), we measure the straight-line distance to the nearest facility with **Strong or
 Moderate** evidence for each service, using exactly the rules above. A district is an **access gap** when at least half of
 its post offices are more than 50 km away. We then put NFHS-5 need next to it: the caesarean rate (UN emergency-obstetric-care
@@ -384,6 +496,75 @@ show(dialysis, ['district', 'state', 'dialysis_median_km', 'far', '_sugar', 'hos
      ['district', 'state', 'median km', 'post offices >50 km', 'raised sugar %', 'hospitals <50 km', 'gap'], limit=12)
 '''
 
+ACCESS_MAP = r'''credible_cs = PointIndex(credible_points(index, 'c_section'))
+pin_km = [(lat, lon, credible_cs.nearest(lat, lon)[0]) for pts in districts(index).values() for lat, lon, _ in pts]
+bins = [('within 25 km', 0, 25), ('25–50 km', 25, 50), ('50–100 km', 50, 100), ('over 100 km', 100, float('inf'))]
+
+
+def district_median_km(points):
+    """{(district, state): median km from its PIN areas to the nearest of these points}."""
+    nearest = PointIndex(points)
+    return {key: statistics.median(nearest.nearest(lat, lon)[0] for lat, lon, _ in pts) for key, pts in districts(index).items()}
+
+
+rate = {(r['district'], r['state']): r['csection_pct'] for r in table if r['csection_pct'] is not None}
+to_credible, to_any_hospital = district_median_km(credible_points(index, 'c_section')), district_median_km(hospital_points(index))
+keys = sorted(rate)
+print(f'{len(keys)} districts with an NFHS-5 caesarean rate, grouped by median distance to documented C-section care:')
+gradient = []
+for label, lo, hi in bins:
+    values = sorted(rate[k] for k in keys if lo <= to_credible[k] < hi)
+    q = statistics.quantiles(values, n=4)
+    gradient.append({'median km to documented care': label, 'districts': len(values), 'median caesarean rate %': round(q[1], 1),
+                     'middle half': f'{q[0]:.1f}–{q[2]:.1f}', '_q': q})
+show(gradient, ['median km to documented care', 'districts', 'median caesarean rate %', 'middle half'])
+rho_credible = spearman([to_credible[k] for k in keys], [rate[k] for k in keys])
+rho_hospital = spearman([to_any_hospital[k] for k in keys], [rate[k] for k in keys])
+print(f'\nRank correlation with the caesarean rate: distance to documented C-section care {rho_credible:+.2f}, '
+      f'distance to any hospital listing {rho_hospital:+.2f}.')
+print('An independent survey agrees with the direction of our access measure: the farther a district is from documented care,')
+print('the fewer caesareans its women receive. The same gradient appears for any hospital listing, so it shows where listed')
+print('facilities are, not that our evidence tiers are validated; and it is an association, not a cause (cities have both).')
+
+if plt:
+    fig, (left, right) = plt.subplots(1, 2, figsize=(12.5, 6.2), num='access_gap_map', gridspec_kw={'width_ratios': [1.15, 1]})
+    for (label, lo, hi), colour in zip(bins, DISTANCE_RAMP):
+        pts = [(lon, lat) for lat, lon, km in pin_km if lo <= km < hi]
+        left.scatter([p[0] for p in pts], [p[1] for p in pts], s=3.2, color=colour, linewidths=0,
+                     label=f'{label} ({len(pts) / len(pin_km):.0%} of PIN areas)')
+    left.scatter([r['lon'] for r in maternal], [r['lat'] for r in maternal], s=95, facecolors='none', edgecolors=ORANGE,
+                 linewidths=1.8)
+    left.plot([], [], linestyle='none', marker='o', markersize=3.2, markerfacecolor='none', markeredgecolor=ORANGE,
+              markeredgewidth=0.6, label=f'{len(maternal)} priority districts: far, caesarean rate below 5%')
+    left.set_aspect(1 / math.cos(math.radians(22)))
+    left.set_xlim(67.5, 98)
+    left.set_ylim(6, 37.5)
+    left.set_xticks([])
+    left.set_yticks([])
+    for side in ('left', 'bottom'):
+        left.spines[side].set_visible(False)
+    left.set_title('Straight-line distance to the nearest facility\nthat documents C-section care')
+    left.legend(loc='upper center', bbox_to_anchor=(0.5, 0.02), fontsize=8.5, ncol=2, columnspacing=1.2, handletextpad=0.3,
+                markerscale=3)
+    x = list(range(len(gradient)))
+    right.bar(x, [g['_q'][1] for g in gradient], color=DISTANCE_RAMP, edgecolor='#8fbbee', linewidth=0.6, width=0.62)
+    right.vlines(x, [g['_q'][0] for g in gradient], [g['_q'][2] for g in gradient], color=MUTED, linewidth=1.2)
+    for i, g in enumerate(gradient):
+        right.text(i + 0.36, g['_q'][1], f"{g['_q'][1]:.0f}%", va='center', fontsize=10)
+    right.axhline(10, color=MUTED, linewidth=0.9, linestyle=(0, (4, 3)))
+    right.text(len(x) - 0.5, 9.5, 'WHO: up to about\n10%, more caesareans\ngo with fewer deaths', va='top', color=MUTED, fontsize=8.5)
+    right.set_xticks(x)
+    right.set_xticklabels([f"{g['median km to documented care']}\n{g['districts']} districts" for g in gradient])
+    right.tick_params(axis='x', length=0)
+    right.set_xlim(-0.6, len(x) + 0.75)
+    right.set_xlabel("district's median distance to documented C-section care")
+    right.set_ylim(0, None)
+    right.set_ylabel('NFHS-5 district caesarean rate, % (median, middle half)')
+    right.set_title('Fewer caesareans where documented care is far')
+    fig.tight_layout()
+    plt.show()
+'''
+
 GAPS_FINDINGS = r'''cs = national['c_section']
 by_state = Counter(r['state'] for r in maternal)
 data_gaps = sum(r['gap'] == 'data' for r in maternal)
@@ -410,6 +591,7 @@ ACTIONS = """### Actionable insights: recommended actions
 | 2 | **Verify, then upgrade, surgical obstetric capacity.** Confirm by phone which listed hospitals can do an emergency caesarean (CareMatch prints the questions); where none can, prioritise the district hospital for emergency obstetric staffing (obstetrician, anaesthetist, blood storage). | The maternal "service gap" districts, and districts where births happen in facilities but caesareans are rare | High institutional births with a very low caesarean rate points to missing surgical capacity, not missing buildings. |
 | 3 | **Pre-arranged referral routes and transport.** Name the nearest facility with credible evidence for each priority district (CareMatch's answer from the district centre) and agree a referral and ambulance protocol with it. | Northeast priority districts, where the nearest documented C-section care is often 100+ km away | When the nearest capable facility is hours away, a known destination saves the most time. |
 | 4 | **Site the next dialysis units by need × distance.** Use the dialysis priority list to decide where new units, or verification of existing ones, go first. | The dialysis "service gap" districts | Patients on dialysis travel two to three times a week; distance decides whether they keep up. |
+| 5 | **Make this week's verification calls where caesareans are rare.** Phone the facilities of the need-targeted plan in Part 7, starting with Darbhanga Medical College, Katihar Medical College and Jyothi Hospital (Mayurbhanj); CareMatch prints the questions to ask. | Low-caesarean districts of Bihar, Odisha, Rajasthan, Assam, Madhya Pradesh, Uttar Pradesh and Nagaland | Ten confirmed calls would bring documented C-section care within 50 km of 205 PIN areas in districts with a caesarean rate below 10%; the same ten calls chosen by PIN count reach 20. |
 """
 
 LIMITS = """## Limits, and what we would do next
@@ -436,7 +618,7 @@ Repository: {repo}. Design and evaluation details: `docs/system_design.md`, `doc
 
 PART7 = """## Part 7 · Which choice changes, and where should a planner call first?
 
-Three short demonstrations built on the same engine. None of them changes what a patient is recommended.
+Short demonstrations built on the same engine. None of them changes what a patient is recommended.
 """
 
 PART7_NEEDS = """**Describe the situation.** A health worker can type what is happening instead of picking a service. The lexicon
@@ -461,6 +643,67 @@ have a facility with credible evidence. Each candidate below has obstetric or su
 claim. Choosing greedily (each call adds the most still-uncovered PINs) is compared with simply taking the candidates
 with the largest individual reach, which overlap. Gains assume the facility confirms the service.
 """
+
+PART7_NEED = """**Then we checked where those calls go, and changed the objective.** Counting every PIN equally rewards dense, well-served
+regions: Kerala has many small PINs, and it also has one of India's highest caesarean rates. The cell below joins each PIN
+to its district's NFHS-5 caesarean rate and re-plans the same ten calls, counting only PINs in districts where the rate is
+below 10% (WHO: at population level, rates up to about 10% are associated with fewer maternal and newborn deaths). This is
+the one place where all three tables meet in a single decision: facility text decides who is a lead, the PIN directory
+decides who gains coverage, and NFHS decides whose coverage matters most.
+"""
+
+NEED_DEMO = '''from _carematch_submission.calls import LOW_CSECTION_TARGET_PCT, need_target, pin_need
+need = pin_need(coverage['pins'], nfhs_rows)
+target = need_target(need)
+need_plan = greedy_plan(leads, budget=10, target=target)
+reached = [need[p] for step in plan for p in step['new_pins'] if need[p] is not None]
+print(f'The ten PIN-count calls add coverage in districts with a median caesarean rate of {statistics.median(reached):.1f}%.')
+print(f'{len(target):,} PINs lie in districts with a rate below {LOW_CSECTION_TARGET_PCT:g}%; '
+      f'{len(target - coverage["covered"]):,} of them have no documented C-section care within 50 km.')
+rows = []
+for k in (3, 5, 10):
+    by_count = set().union(*(step['new_pins'] for step in plan[:k]))
+    by_need = need_plan[:k]
+    rows.append({'calls': k, 'PIN-count plan: all PINs': len(by_count), 'of which low-caesarean': len(by_count & target),
+                 'need plan: low-caesarean PINs': sum(step['marginal_gain'] for step in by_need),
+                 'need plan: all PINs': sum(step['marginal_gain'] + len(step['other_new_pins']) for step in by_need)})
+show(rows, list(rows[0]))
+print('\\nNeed-targeted call order:')
+for step in need_plan[:5]:
+    c = step['candidate']
+    rates = [need[p] for p in step['new_pins']]
+    where = Counter(coverage['pins'][p]['district'].title() for p in step['new_pins']).most_common(2)
+    print(f"  {step['rank']}. {c['name']} ({c['state']}): +{step['marginal_gain']} PINs in "
+          + ', '.join(d for d, _ in where) + f" · district caesarean rate {statistics.median(rates):.1f}% · lead: {c['leads'][0][2][:60]!r}")
+
+if plt:
+    fig, (left, right) = plt.subplots(1, 2, figsize=(12.5, 4.1), num='call_plans')
+    ks = list(range(1, 11))
+    greedy = [plan[min(k, len(plan)) - 1]['cumulative_gain'] for k in ks]
+    largest = [topk_baseline(leads, k)['unique_new_pins'] for k in ks]
+    left.plot(ks, greedy, color=BLUE, linewidth=2, marker='o', markersize=5)
+    left.plot(ks, largest, color='#8a8983', linewidth=2, marker='o', markersize=5)
+    left.text(10.25, greedy[-1], f'Deduct overlap\\neach call: {greedy[-1]}', va='center', fontsize=9)
+    left.text(10.25, largest[-1], f'Ten largest\\nindividual gains: {largest[-1]}', va='center', fontsize=9, color=MUTED)
+    left.set_title('Overlap decides how much ten calls add')
+    left.set_ylabel('PIN areas newly within 50 km, if confirmed')
+    count_hits = [len(set().union(*(step['new_pins'] for step in plan[:k])) & target) for k in ks]
+    need_hits = [need_plan[min(k, len(need_plan)) - 1]['cumulative_gain'] for k in ks]
+    right.plot(ks, need_hits, color=ORANGE, linewidth=2, marker='o', markersize=5)
+    right.plot(ks, count_hits, color=BLUE, linewidth=2, marker='o', markersize=5)
+    right.text(10.25, need_hits[-1], f'Count need: {need_hits[-1]}', va='center', fontsize=9)
+    right.text(10.25, count_hits[-1], f'Count every PIN\\nequally: {count_hits[-1]}', va='center', fontsize=9)
+    right.set_title('The objective decides who gains')
+    right.set_ylabel('newly covered PIN areas in districts\\nwith a caesarean rate below 10%')
+    for ax in (left, right):
+        ax.set_xlim(0.6, 13.4)
+        ax.set_xticks(ks)
+        ax.set_ylim(0, None)
+        ax.set_xlabel('verification calls')
+        ax.grid(axis='y', color='#e6e5df', linewidth=0.8)
+        ax.set_axisbelow(True)
+    fig.tight_layout()
+    plt.show()'''
 
 PART7_LEADS = """**A statistical second opinion on whom to verify.** A logistic regression is trained with Strong C-section evidence
 as a proxy positive and every other record unlabeled, using no C-section or maternity wording at all, and is evaluated
@@ -521,10 +764,13 @@ from _carematch_submission.textutil import is_empty, normalize
 from _carematch_submission.services import SERVICES
 from _carematch_submission.recommend import CareIndex, recommend
 from _carematch_submission.render import to_text
-from _carematch_submission.planner import district_table, maternal_priorities, dialysis_priorities, gap_kind"""),
+from _carematch_submission.planner import (PointIndex, credible_points, district_table, districts, dialysis_priorities,
+                                            gap_kind, hospital_points, maternal_priorities)"""),
+              new_code_cell(CHARTS),
               new_markdown_cell(PART2), new_code_cell(LOAD),
               new_markdown_cell(PART3), new_code_cell(EXPLORE_FIELDS), new_code_cell(EXPLORE_LOCATION),
               new_code_cell(EXPLORE_IDENTITY), new_code_cell(EXPLORE_EVIDENCE),
+              new_markdown_cell(FUNNEL_MD), new_code_cell(FUNNEL),
               new_markdown_cell(PART4), new_code_cell(f'DEMO = {DEMO!r}\n\n' + DEMO_CELL),
               new_markdown_cell(PART5),
               new_code_cell('# Golden queries, embedded from eval/queries.csv: (id, service, place, place type)\n'
@@ -532,11 +778,12 @@ from _carematch_submission.planner import district_table, maternal_priorities, d
               new_code_cell(EVAL_SENSITIVITY),
               new_code_cell('# Review labels, embedded from eval/review_sheet.csv\n'
                             f'REVIEW = {review!r}\n\n' + EVAL_REVIEW),
-              new_markdown_cell(PART6), new_code_cell(GAPS_RUN), new_code_cell(GAPS_PRIORITY), new_code_cell(GAPS_FINDINGS),
+              new_markdown_cell(PART6), new_code_cell(GAPS_RUN), new_code_cell(GAPS_PRIORITY), new_code_cell(ACCESS_MAP), new_code_cell(GAPS_FINDINGS),
               new_markdown_cell(ACTIONS),
               new_markdown_cell(PART7), new_markdown_cell(PART7_NEEDS), new_code_cell(NEEDS_DEMO),
               new_markdown_cell(PART7_COMPARE), new_code_cell(STRATEGY_DEMO),
               new_markdown_cell(PART7_CALLS), new_code_cell(CALL_DEMO),
+              new_markdown_cell(PART7_NEED), new_code_cell(NEED_DEMO),
               new_markdown_cell(PART7_LEADS), new_code_cell(LEAD_DEMO),
               new_markdown_cell(LIMITS.format(repo=REPO))]
 
@@ -553,6 +800,8 @@ from _carematch_submission.planner import district_table, maternal_priorities, d
 def run(nb):
     """Execute code cells in one namespace (as a notebook kernel would) and store their printed output."""
     os.environ.setdefault('CAREMATCH_DATA_DIR', os.path.join(ROOT, 'data'))
+    os.environ['MPLBACKEND'] = 'Agg'                   # figures are collected after each cell, never shown in a window
+    warnings.filterwarnings('ignore', message='.*non-interactive.*')
     ns = {'__name__': '__main__'}
     count = 0
     for cell in nb.cells:
@@ -574,7 +823,26 @@ def run(nb):
         cell.outputs = [new_output('stream', name='stdout', text=out.getvalue())] if out.getvalue() else []
         if err.getvalue().strip():
             cell.outputs.append(new_output('stream', name='stderr', text=err.getvalue()))
+        cell.outputs += figures()
         print(f'  cell {count:2d} ok ({time.perf_counter() - started:.1f} s)', file=sys.__stdout__)
+
+
+def figures():
+    """Open matplotlib figures as notebook image outputs; a named figure is also saved under docs/img/ for the README."""
+    plt = sys.modules.get('matplotlib.pyplot')
+    outputs = []
+    for number in (plt.get_fignums() if plt else []):
+        fig = plt.figure(number)
+        png = io.BytesIO()
+        fig.savefig(png, format='png', dpi=150)
+        if fig.get_label():
+            os.makedirs(FIGURES, exist_ok=True)
+            with open(os.path.join(FIGURES, fig.get_label() + '.png'), 'wb') as out:
+                out.write(png.getvalue())
+        outputs.append(new_output('display_data', data={'image/png': base64.b64encode(png.getvalue()).decode('ascii'),
+                                                         'text/plain': f'<Figure: {fig.get_label() or number}>'}))
+        plt.close(fig)
+    return outputs
 
 
 if __name__ == '__main__':

@@ -24,15 +24,20 @@ def _flag(value):
     raise ValueError(f'Unrecognised flag {value!r}')
 
 
-def load_map(directory, first_failed=False):
+def load_map(directory, first_failed=False, need=False):
+    """Points, ordered calls and the excluded-PIN count for one published plan: the PIN-count plan, its re-plan after a
+    failed first call, or (need=True) the plan that counts only PINs in low-caesarean districts."""
     pins = _read(directory, 'pin_status', 'pin lat lon district state reliable covered_now nearest_credible_km nearest_credible_tier nearest_facility_id newly_covered_at_rank')
     plan_fields = 'rank facility_id name new_pin_ids marginal_gain cumulative_gain'
     calls = _read(directory, 'call_plan', plan_fields)
     excluded_id = None
     alternate_ranks = {}
-    if first_failed and calls:
+    if need:
+        calls = _read(directory, 'call_plan_need', plan_fields + ' other_new_pins median_district_csection_pct districts')
+    elif first_failed and calls:
         excluded_id = min(calls, key=lambda c: int(c['rank']))['facility_id']
         calls = _read(directory, 'call_plan_if_first_fails', plan_fields)
+    if need or excluded_id:
         for c in calls:
             for pin in c['new_pin_ids'].split(';'):
                 alternate_ranks[pin.strip()] = int(c['rank'])
@@ -48,7 +53,7 @@ def load_map(directory, first_failed=False):
             raise ValueError(f'Invalid or duplicate PIN {pin!r}')
         seen.add(pin)
         rank = int(row['newly_covered_at_rank'] or 0)
-        if first_failed:
+        if need or first_failed:
             rank = alternate_ranks.get(pin, 0)
         if not _flag(row['reliable']):
             if rank or (row['covered_now'] and _flag(row['covered_now'])):
@@ -66,7 +71,9 @@ def load_map(directory, first_failed=False):
         km = float(row['nearest_credible_km']) if row['nearest_credible_km'] else None
         if km is not None and (not math.isfinite(km) or km < 0):
             raise ValueError(f'Invalid distance for {pin}')
-        points.append(dict(row, lat=lat, lon=lon, covered_now=covered, rank=rank, nearest_credible_km=km))
+        rate = row.get('district_csection_pct')
+        points.append(dict(row, lat=lat, lon=lon, covered_now=covered, rank=rank, nearest_credible_km=km,
+                           district_csection_pct=float(rate) if rate not in (None, '') else None))
 
     cumulative = 0
     selected = set()

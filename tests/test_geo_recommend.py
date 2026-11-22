@@ -63,6 +63,28 @@ class GeoTests(unittest.TestCase):
         self.assertIn('error', self.gaz.resolve('Atlantis'))
         self.assertIn('error', self.gaz.resolve('59.9, -38.3'))
 
+    def test_a_misspelled_place_gets_suggestions_it_can_resolve(self):
+        miss = self.gaz.resolve('Patnaa')
+        self.assertIn('error', miss)
+        self.assertEqual(miss['suggestions'][0], 'Patna, Bihar')
+        for suggestion in miss['suggestions']:
+            self.assertNotIn('error', self.gaz.resolve(suggestion))
+        self.assertEqual(self.gaz.resolve('near the station, Mumbai road')['suggestions'], ['Mumbai, Maharashtra'])
+        self.assertNotIn('suggestions', self.gaz.resolve('Atlantis'))      # nothing close: no guess is offered
+
+    def test_state_after_the_name_needs_no_comma(self):
+        self.assertEqual(self.gaz.resolve('Patna Bihar')['label'], self.gaz.resolve('Patna, Bihar')['label'])
+        alone = self.gaz.resolve('Bihar')
+        self.assertIn('is a state', alone['error'])
+
+    def test_coordinates_in_map_app_formats(self):
+        usual = self.gaz.resolve('25.6, 85.1')
+        swapped = self.gaz.resolve('85.1, 25.6')
+        self.assertEqual((swapped['lat'], swapped['lon']), (usual['lat'], usual['lon']))
+        self.assertTrue(any('longitude, latitude' in n for n in swapped['notes']))
+        degrees = self.gaz.resolve('25.6° N, 85.1° E')
+        self.assertEqual((degrees['lat'], degrees['lon']), (usual['lat'], usual['lon']))
+
     def test_misgeocoded_pin_centre_dropped(self):
         self.assertFalse(self.gaz.pin_info('800099')['reliable'])
 
@@ -129,6 +151,7 @@ class RecommendTests(unittest.TestCase):
     def test_bad_inputs(self):
         self.assertIn('error', recommend(self.idx, 'acupuncture', 'Patna'))
         self.assertIn('error', recommend(self.idx, 'dialysis', ''))
+        self.assertEqual(recommend(self.idx, 'dialysis', 'Patnaa')['suggestions'][0], 'Patna, Bihar')
 
     def test_deterministic(self):
         a = recommend(self.idx, 'dialysis', 'Patna')

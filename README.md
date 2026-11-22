@@ -31,6 +31,12 @@ The records were extracted automatically from web pages, so every field is a cla
 - **Some records merge two facilities.** 12% of records contain statements about another branch or city.
 - **Coverage is uneven.** 88% of facilities are private and 5% public; rural districts are thinly covered.
 
+So a keyword search is wrong most of the time. 5,155 records match C-section keywords, but only 9% carry a claim that the
+operation is performed; from 93% of India's PIN areas the nearest keyword match is one of the other 91%, and a facility
+with a credible claim is a median 26 km farther.
+
+![Keyword matches against credible claims, by service](docs/img/keyword_vs_claim.png)
+
 ## How CareMatch decides
 
 1. **Read each claim on its own.** Every item of the `procedure`, `equipment` and `capability` lists (and each
@@ -76,8 +82,11 @@ only suggests which facilities planners should phone to verify; it never changes
   ambiguous description only offers switches, and it is never a diagnosis.
 - **Directions** open Google Maps (driving, driving that tries to avoid tolls, or walking) for reliably located
   branches only; the link carries the destination and nothing about the patient or where they are.
-- **Planner pages**: a verification map (which PIN areas gain C-section coverage if the first 3, 5 or 10 calls succeed),
-  service-verification leads with their model reasons and cited text, and travel-time scenarios under stated assumptions.
+- **Planner pages**: a verification map (which PIN areas gain C-section coverage if the first 3, 5 or 10 calls succeed,
+  counting every PIN area or only those in districts where caesareans are rare), service-verification leads with their
+  model reasons and cited text, and travel-time scenarios under stated assumptions.
+- **Forgiving input**: a misspelled place ("Banglore") offers the places it probably meant; "Patna Bihar", swapped
+  coordinates and map-app formats ("25.6° N, 85.1° E") are understood.
 
 ## Results
 
@@ -98,8 +107,11 @@ random sample of agreements. No reviewer found a quote that contradicts the serv
 **Planner view** (all three tables: facilities, India Post PIN directory, NFHS-5): documented C-section care is within
 50 km of only 46% of India's post offices. 27 districts are both far from it and have an NFHS caesarean rate below 5%,
 mostly in the northeast; 21 of them are partly data gaps (few listings of any kind), which is itself an actionable
-insight: fix the data before building.
-Details and four actionable insights: [`docs/impact.md`](docs/impact.md).
+insight: fix the data before building. NFHS-5 agrees with the direction of this measure: the median district caesarean
+rate falls from 24% where documented care is within 25 km to 14% where it is over 100 km away (an association, not a cause).
+Details and five actionable insights: [`docs/impact.md`](docs/impact.md).
+
+![Distance to documented C-section care, and NFHS-5 caesarean rates by distance](docs/img/access_gap_map.png)
 
 **Whom to call first.** For C-section within 50 km, 7,402 of 14,008 reliably located PIN areas already have a facility
 with credible evidence. Choosing calls greedily (each one adds the most still-uncovered PINs) would add **365 PINs with 3
@@ -108,6 +120,16 @@ calls** if the facilities confirm the service, against 152 for the three candida
 any C-section or maternity wording and tested on whole regions it never saw, ranks proxy positives with ROC-AUC 0.839 /
 PR-AUC 0.053 (base rate 0.0125) against 0.757 / 0.031 for a simple rule, which is better at the very top of the list.
 Details: [`docs/call_plan.md`](docs/call_plan.md), [`docs/lead_model.md`](docs/lead_model.md).
+
+**Then we checked where those calls go, and changed the objective.** They go to Kerala, Andhra Pradesh and Tamil Nadu:
+districts with a median NFHS-5 caesarean rate of 48%, where one more documented facility changes little. Counting only
+PIN areas in districts with a rate below 10% (1,142 PINs; 825 have no documented C-section care within 50 km), the
+first calls go to Darbhanga Medical College (it would cover Samastipur, rate 6%), Katihar Medical College (4%) and Jyothi
+Hospital in Mayurbhanj (9%). **Three calls reach 86 of those PIN areas and ten reach 205; the PIN-count plan reaches 0
+and 20.** This is where the three tables meet in one decision: facility text decides who is a lead, the PIN directory
+decides who gains coverage, and NFHS-5 decides whose coverage matters most.
+
+![Call plans: overlap decides how much ten calls add; the objective decides who gains](docs/img/call_plans.png)
 
 ## Run it
 
@@ -127,7 +149,7 @@ python -m scripts.ask "dialysis|Patna" "C-section|Aurangabad, Bihar" "NICU|84540
 ```
 
 ```bash
-streamlit run app/app.py
+streamlit run app/Find_care.py
 ```
 
 ```bash

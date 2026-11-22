@@ -131,15 +131,15 @@ so nothing can drift from the source text.
 Streamlit, deployed as a Databricks App whose source path is the **repo root** (so `carematch/` is importable without copying):
 
 ```text
-app.yaml            # command: ["streamlit", "run", "app/app.py"]; resource: SQL warehouse
+app.yaml            # command: ["streamlit", "run", "app/Find_care.py"]; resource: SQL warehouse
 requirements.txt    # streamlit, databricks-sql-connector, databricks-sdk
-app/app.py          # UI only; no ranking logic
-app/components.py   # card, evidence drawer, no-answer state, method page
+app/Find_care.py    # UI only; no ranking logic
+app/pages/          # planner pages: verification map, travel-time scenarios, verification leads
 ```
 
-Startup: `st.cache_resource` builds `CareIndex` and assesses all 9 services **before the first search** (25 s on a laptop;
-budget about 60 s on app compute). The cache is shared by all visitors, so only the first visit after a deploy waits; the team
-opens the app once right after each deploy. A background warm-up thread was tried and rejected: the CPU-bound thread starved
+Startup: `st.cache_resource` builds `CareIndex` (locations and duplicate groups, about 5 s on a laptop). Each service is
+assessed the first time any visitor searches for it (2–3 s) and then reused. The cache is shared by all visitors, so the team
+opens the app and runs one search per service right after each deploy. A background warm-up thread was tried and rejected: the CPU-bound thread starved
 Streamlit's own thread of the GIL, and a first search took 16 s instead of 3 s.
 
 Screen, top to bottom (phone-first):
@@ -220,7 +220,7 @@ Unknown distance is `null`, never `0`.
 | Step | Work | Measured (laptop) |
 | --- | --- | --- |
 | App start | load source tables, build `CareIndex` | 0.6 s from CSV; UC fetch adds ~10–30 s (to measure) |
-| Warm-up | assess 10,088 rows × 9 services, before the first search | 25 s, once per app start |
+| Warm-up | assess 10,085 accepted rows for one service, on its first search | 2–3 s per service, once per app start |
 | Query | resolve place → scan → band → sort → dedupe → cards | < 10 ms engine; < 0.7 s end to end in the app (AppTest) |
 
 Memory: 260 MB peak.

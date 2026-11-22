@@ -6,7 +6,7 @@ Menu names below may differ slightly between workspace versions.
 ## 0. Get the code into the workspace
 
 Workspace → your Git folder for `DDaniel-code/carematch` → branch `main` → **Pull**.
-Check that `app.yaml`, `requirements.txt`, `app/app.py` and `carematch/datasource.py` are there.
+Check that `app.yaml`, `requirements.txt`, `app/Find_care.py` and `carematch/datasource.py` are there.
 
 ## 1. Notebook (do this first: it proves the code runs on the real tables)
 
@@ -52,5 +52,5 @@ open the URL once to warm it up, and run the four example searches.
 
 ```bash
 python -m unittest discover -s tests -v
-streamlit run app/app.py        # reads data/*.csv
+streamlit run app/Find_care.py        # reads data/*.csv
 ```

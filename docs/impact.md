@@ -10,7 +10,7 @@ Code: [`carematch/planner.py`](../carematch/planner.py).
 
 ## Method
 
-1. **Where people are.** 15,174 PIN areas with a reliable centre (post offices spread ≤ 60 km), grouped into 702 districts.
+1. **Where people are.** 14,917 PIN areas with a reliable centre (post offices spread ≤ 60 km), grouped into 702 districts.
    Each area is weighted by its number of post offices, a rough stand-in for settlements.
 2. **What counts as care.** A facility with **Strong or Moderate** evidence for the service, using exactly the rules the
    app uses for a patient (quoted claims, negation and referral handling, type and size caps). Duplicate listings count once.
@@ -81,6 +81,12 @@ adults with raised blood sugar, median 127 km to documented dialysis), Ganjam, O
 Telangana (18.4%, 91 km, 8 hospitals listed nearby but none documents dialysis).
 Full list: [`analysis/priority_dialysis.csv`](../analysis/priority_dialysis.csv).
 
+**5. The obvious verification plan helps the wrong places.** Choosing ten calls to add the most PIN areas sends them to
+Kerala, Andhra Pradesh and Tamil Nadu, districts with a median caesarean rate of 47.8%. Counting only PIN areas in
+districts with a rate below 10%, three calls reach 86 such areas (the obvious plan: 0) and ten reach 205 (20), starting
+with Darbhanga Medical College for Samastipur and Katihar Medical College for Katihar and Purnia.
+Details: [`call_plan.md`](call_plan.md).
+
 ## Actionable insights: recommended actions
 
 | # | Action | Where | Why this, here |
@@ -89,6 +95,7 @@ Full list: [`analysis/priority_dialysis.csv`](../analysis/priority_dialysis.csv)
 | 2 | **Verify, then upgrade, surgical obstetric capacity.** Confirm by phone which listed hospitals can do an emergency caesarean (CareMatch already prints the questions to ask); where none can, prioritise the district hospital for CEmONC staffing (obstetrician, anaesthetist, blood storage). | The 6 maternal "service gap" districts; districts like Karauli where births are in facilities but caesareans are rare | High institutional births with a very low caesarean rate points to missing surgical capacity, not missing buildings. |
 | 3 | **Pre-arranged referral routes and transport.** For each priority district, name the nearest facility with credible evidence (CareMatch's top result from the district centre) and agree a referral and ambulance (108/102) protocol with it. | Northeast priority districts (Nagaland, Meghalaya, Mizoram), where the nearest documented C-section care is 85–200 km away | When the nearest capable facility is hours away, a known destination and transport plan saves the most time. |
 | 4 | **Site the next dialysis units by need × distance.** Use the dialysis priority list (high blood sugar, far from documented dialysis) to choose where new units, or verification of existing ones, go first. | The 20 dialysis "service gap" districts, starting with Prakasam, Ganjam, Karimnagar | Kidney failure from diabetes needs dialysis 2–3 times a week; distance decides whether patients keep up. |
+| 5 | **Make this week's verification calls where caesareans are rare.** Phone the ten facilities of the need-targeted plan, starting with Darbhanga Medical College, Katihar Medical College and Jyothi Hospital (Mayurbhanj); CareMatch prints the four questions to ask. | Low-caesarean districts of Bihar, Odisha, Rajasthan, Assam, Madhya Pradesh, Uttar Pradesh and Nagaland | Ten confirmed calls would bring documented C-section care within 50 km of 205 PIN areas in districts with a caesarean rate below 10%. The same ten calls chosen by PIN count alone reach 20. |
 
 ## Limits
 

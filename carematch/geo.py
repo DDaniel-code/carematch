@@ -4,6 +4,7 @@ User input can be "lat, lon", a 6-digit PIN code, or a city / district name (opt
 Facility positions come from the record's latitude/longitude, cross-checked against the India Post PIN
 directory and against the other facilities listed in the same city.
 """
+import difflib
 import re
 import statistics
 
@@ -31,6 +32,10 @@ CITY_ALIASES = {
     'poona': 'pune', 'mysore': 'mysuru', 'baroda': 'vadodara', 'benares': 'varanasi', 'banaras': 'varanasi',
     'allahabad': 'prayagraj', 'calicut': 'kozhikode', 'mangalore': 'mangaluru', 'belgaum': 'belagavi',
 }
+
+# Well-known towns with fewer than two located listings of their own: searched from their district instead.
+TOWN_DISTRICTS = {'itanagar': 'papum pare', 'dispur': 'kamrup metro', 'dharamshala': 'kangra', 'dharamsala': 'kangra',
+                  'tura': 'west garo hills', 'silvassa': 'dadra and nagar haveli'}
 
 PIN_RE = re.compile(r'\b([1-9]\d{5})\b')
 COORD_RE = re.compile(r'^\s*(-?\d{1,2}(?:\.\d+)?)\s*[, ]\s*(-?\d{2,3}(?:\.\d+)?)\s*$')
@@ -148,12 +153,19 @@ class Gazetteer:
         raw = text(query)
         if not raw:
             return {'error': 'Please enter a place: city, district, 6-digit PIN code, or "lat, lon".'}
-        m = COORD_RE.match(raw)
+        shown = raw if len(raw) <= 60 else raw[:57] + '...'
+        # Map apps write "28.61° N, 77.21° E": drop the degree signs and compass letters before reading the numbers.
+        m = COORD_RE.match(re.sub(r'\s*°\s*[NnEe]?', ' ', raw) if '°' in raw else raw)
         if m:
             c = valid_coords(m.group(1), m.group(2))
-            if not c:
-                return {'error': f'"{raw}" is not a coordinate inside India.'}
-            return self._loc(raw, 'coordinates', f'{c[0]:.4f}, {c[1]:.4f}', c, 0.1)
+            if c:
+                return self._loc(raw, 'coordinates', f'{c[0]:.4f}, {c[1]:.4f}', c, 0.1)
+            swapped = valid_coords(m.group(2), m.group(1))
+            if not swapped:
+                return {'error': f'"{shown}" is not a coordinate inside India.'}
+            loc = self._loc(raw, 'coordinates', f'{swapped[0]:.4f}, {swapped[1]:.4f}', swapped, 0.1)
+            loc['notes'].append('The two numbers were read as longitude, latitude, because the other order is outside India.')
+            return loc
         pin = clean_pin(raw) if re.fullmatch(r'\s*\d[\d ]{4,6}\d?\s*', raw) else None
         if pin:
             return self._resolve_pin(raw, pin)
@@ -190,7 +202,49 @@ class Gazetteer:
                 if kind == 'city':
                     loc['notes'].append('Distances are measured from the centre of the listed facilities in this city.')
                 return loc
-        return {'error': f'Could not find "{raw}". Try a 6-digit PIN code, a district name, or "lat, lon".'}
+        district = TOWN_DISTRICTS.get(normalize(name))
+        if district in self.districts:
+            loc = self.resolve(district)
+            if 'error' not in loc:
+                loc['notes'].append(f'{name.strip().title()} has too few located listings of its own, so the search '
+                                    f"starts from {loc['label']}.")
+                return {**loc, 'query': raw}
+        words = raw.split()
+        if ',' not in raw:           # "Darbhanga Bihar": a state written after the name without a comma
+            for n in (3, 2, 1):
+                if len(words) > n and canonical_state(' '.join(words[-n:])):
+                    loc = self.resolve(' '.join(words[:-n]) + ', ' + ' '.join(words[-n:]))
+                    if 'error' not in loc:
+                        return {**loc, 'query': raw}
+        if canonical_state(raw):
+            return {'error': f'"{shown}" is a state. Type a city, a district or a 6-digit PIN code in {canonical_state(raw)}.'}
+        out = {'error': f'Could not find "{shown}". Try a 6-digit PIN code, a district name, or "lat, lon".'}
+        suggestions = self.suggest(raw)
+        if suggestions:
+            out['suggestions'] = suggestions
+        return out
+
+    def suggest(self, query, limit=3):
+        """Known places the query probably meant: a place named inside it ("sector 62 noida"), else a close spelling
+        ("Banglore"). Every suggestion is a string resolve() accepts."""
+        if not hasattr(self, '_names'):
+            names, size = {}, {}
+            for index in (self.districts, self.cities):       # cities win over same-name districts
+                for key, options in index.items():
+                    best = max(options, key=lambda o: o['n'])
+                    names[key] = key.title() + (f", {best['state']}" if best['state'] else '')
+                    size[names[key]] = best['n']
+            for alias, key in CITY_ALIASES.items():
+                if key in names:
+                    names[alias] = names[key]
+            self._names, self._name_size = names, size
+        key = normalize(query.partition(',')[0])
+        words = [w for w in re.split(r'[^a-z]+', normalize(query)) if len(w) >= 4]
+        inside = [self._names[w] for w in words if w in self._names]
+        close = [self._names[k] for k in difflib.get_close_matches(key, list(self._names), n=limit, cutoff=0.8)] \
+            if 4 <= len(key) <= 40 else []
+        close.sort(key=lambda label: -self._name_size.get(label, 0))      # the larger place first: Mumbai before Mumbra
+        return list(dict.fromkeys(inside + close))[:limit]
 
     def _resolve_pin(self, raw, pin):
         info = self.pin_info(pin)

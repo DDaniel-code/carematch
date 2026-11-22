@@ -16,13 +16,10 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import streamlit as st  # noqa: E402
 
 from carematch import datasource  # noqa: E402
+from carematch.needs import interpret_need  # noqa: E402
 from carematch.recommend import BANDS_KM, CareIndex, recommend  # noqa: E402
 from carematch.services import SERVICES  # noqa: E402
-
-try:                          # describe-the-situation lexicon (core module); the box is hidden without it
-    from carematch.needs import interpret_need  # noqa: E402
-except ImportError:
-    interpret_need = None
+from carematch.strategy_compare import compare_strategies  # noqa: E402
 
 st.set_page_config(page_title='CareMatch · Find care', page_icon='🏥', layout='wide')
 
@@ -41,8 +38,6 @@ TIER_CHIP = {'strong': ('strong', 'Strong evidence'), 'moderate': ('moderate', '
 # Services where minutes matter: price sorting is shown with a safety note.
 TIME_CRITICAL = {'c_section', 'trauma', 'emergency', 'nicu', 'burn'}
 SORTS = {'Best evidence': 'default', 'Nearest': 'nearest', 'Compare listed prices': 'price'}
-_PARAMS = set(inspect.signature(recommend).parameters)
-SUPPORTS = {'default': True, 'nearest': 'sort_mode' in _PARAMS, 'price': {'sort_mode', 'max_extra_km'} <= _PARAMS}
 PRIMARY_RGB, EXTRA_RGB = [8, 127, 131], [95, 107, 118]
 KIND_TEXT = {'direct': 'direct statement', 'listed': 'listed item', 'indirect': 'indirect mention',
              'negative': 'negative statement'}
@@ -179,15 +174,8 @@ def directions_url(lat, lon, mode, avoid_tolls=False):
     return 'https://www.google.com/maps/dir/?' + urlencode(params)
 
 
-DIRECTIONS = [('Driving', 'driving', False), ('Driving · try to avoid tolls', 'driving', True), ('Walking', 'walking', False)]
-
-
-# ---- strategy comparison (Codex module; optional until it lands) ----------------------------------------------
-
-try:
-    from carematch.strategy_compare import compare_strategies  # noqa: E402
-except ImportError:          # module not in this build yet: the comparison block is simply not shown
-    compare_strategies = None
+# The card shows one route button; the other two travel modes sit with the evidence details.
+MORE_ROUTES = [('Driving · try to avoid tolls', 'driving', True), ('Walking', 'walking', False)]
 
 
 # ---- prices and cost (disclosure only; the engine decides order) --------------------------------------------------
@@ -287,7 +275,7 @@ def _interpret():
     """Read the description and suggest a service. Travel preferences belong to the user. Only a clear match changes the form; an ambiguous one
     only offers switches, and no match leaves the form as it was."""
     text = st.session_state.get('need_text') or ''
-    x = interpret_need(text) if interpret_need and text.strip() else None
+    x = interpret_need(text) if text.strip() else None
     st.session_state.need = x
     if x and x.get('status') == 'matched' and x.get('service') in SERVICES:
         st.session_state.service = SERVICES[x['service']]['label']
@@ -358,7 +346,7 @@ def render_card(index, c, label, sort_mode, extra=False, nested=False):
         loc = located(index, c)
         phone = c.get('phone')
         site = website_link(c.get('website'))
-        contact = st.columns(2)
+        contact = st.columns([1.05, 1.25, .8])
         if phone:
             contact[0].link_button(f'Call {phone}', f"tel:{phone.replace(' ', '')}", use_container_width=True)
         else:
@@ -366,16 +354,14 @@ def render_card(index, c, label, sort_mode, extra=False, nested=False):
         if site:
             url, host, kind = site
             label = (f'Website · {host}' if kind == 'website' else f'Listing page · {host}')
-            contact[1].link_button(label if len(label) <= 34 else label[:33] + '…', url, use_container_width=True,
+            contact[1].link_button(label if len(label) <= 30 else label[:29] + '…', url, use_container_width=True,
                                    help=('The website listed in the record, for contact details and opening hours. For a '
                                          'hospital group it may be the main site: look for this branch.' if kind == 'website'
                                          else 'A directory or social page from the record, not the facility\'s own site.'))
+        routes_help = f"Opens Google Maps directions to {c.get('name')} from your phone's own location"
         if loc and loc[2]:
-            cols = st.columns(len(DIRECTIONS))
-            for col, (label, mode, avoid) in zip(cols, DIRECTIONS):
-                col.link_button(label, directions_url(loc[0], loc[1], mode, avoid), use_container_width=True,
-                                help=f"Opens Google Maps directions to {c.get('name')} from your phone's own location"
-                                     + ('; Google avoids tolls where it can.' if avoid else '.'))
+            contact[2].link_button('Directions', directions_url(loc[0], loc[1], 'driving'), use_container_width=True,
+                                   help=routes_help + ' (driving). Other routes are under the evidence details.')
         else:
             st.caption('Location approximate: confirm the address by phone before travelling (no directions link).')
 
@@ -386,6 +372,11 @@ def render_card(index, c, label, sort_mode, extra=False, nested=False):
         with st.expander('Evidence details, next step and sources'):
             if c.get('ask_when_calling'):
                 st.markdown('**Ask when you call**  \n' + '  \n'.join(f'• {esc(q)}' for q in c['ask_when_calling']))
+            if loc and loc[2]:
+                st.markdown('**Other routes**')
+                for col, (label, mode, avoid) in zip(st.columns([1.7, 1]), MORE_ROUTES):
+                    col.link_button(label, directions_url(loc[0], loc[1], mode, avoid), use_container_width=True,
+                                    help=routes_help + ('; Google avoids tolls where it can.' if avoid else '.'))
             if c.get('evidence'):
                 st.markdown('**What the records say**')
                 st.caption('Evidence strength describes support in the dataset, not independent verification.')
@@ -514,8 +505,6 @@ def status_line(r, sort_mode):
 def comparison(index, r, sort_mode):
     """compare_strategies output for this search, computed once per (service, place, distance budget) and reused when
     the visitor only switches the sort order (the comparison covers all three orders anyway)."""
-    if compare_strategies is None:
-        return None
     extra = (r.get('sort') or {}).get('max_extra_km', st.session_state.get('max_extra_km', 25))
     key = (r.get('service'), (r.get('origin') or {}).get('query'), extra)
     cached = st.session_state.get('_strategy_cache')
@@ -695,10 +684,14 @@ def render_result(index, r, sort_mode, service):
 
 st.markdown(CSS, unsafe_allow_html=True)
 st.markdown('<div class="brand">✚ carematch<span> INDIA</span></div>', unsafe_allow_html=True)
-st.title('Care you can understand.')
-st.markdown('Find a healthcare facility. See the evidence. Know what to confirm.')
-st.caption('For health workers and families in India: one service, one place, up to three facilities, and the evidence '
-           'behind each one. Always call before travelling.')
+if st.session_state.get('query'):
+    # After the first search the introduction steps aside, so the answer starts on the first screen.
+    st.caption('Find a healthcare facility. See the evidence. Know what to confirm. Always call before travelling.')
+else:
+    st.title('Care you can understand.')
+    st.markdown('Find a healthcare facility. See the evidence. Know what to confirm.')
+    st.caption('For health workers and families in India: one service, one place, up to three facilities, and the evidence '
+               'behind each one. Always call before travelling.')
 
 try:
     index, info = get_index()
@@ -706,16 +699,15 @@ except Exception as exc:  # a data failure must never look like "no hospitals fo
     st.error(f'Could not load the facility data, so no search is possible right now.\n\n{exc}')
     st.stop()
 
-if interpret_need:
-    with st.expander('Help me choose a service'):
-        d1, d2 = st.columns([3, 1], vertical_alignment='bottom') if 'vertical_alignment' in inspect.signature(st.columns).parameters \
-            else st.columns([3, 1])
-        d1.text_input('Describe the situation (optional)', key='need_text',
-                      placeholder='e.g. "bleeding after delivery", "road accident, head injury", "bachcha saans nahi le raha"',
-                      help='Plain words are enough. Understands common English and romanized Hindi phrases (Hindi spellings '
-                           'unreviewed). You choose the travel preference in the search form.')
-        d2.button('Suggest a service', on_click=_interpret, use_container_width=True)
-    render_need()
+with st.expander('Help me choose a service'):
+    d1, d2 = st.columns([3, 1], vertical_alignment='bottom') if 'vertical_alignment' in inspect.signature(st.columns).parameters \
+        else st.columns([3, 1])
+    d1.text_input('Describe the situation (optional)', key='need_text',
+                  placeholder='e.g. "bleeding after delivery", "road accident, head injury", "bachcha saans nahi le raha"',
+                  help='Plain words are enough. Understands common English and romanized Hindi phrases (Hindi spellings '
+                       'unreviewed). You choose the travel preference in the search form.')
+    d2.button('Suggest a service', on_click=_interpret, use_container_width=True)
+render_need()
 
 with st.form('search'):
     # One search bar: service, place and the button on a row (stacked on narrow screens).
@@ -734,9 +726,8 @@ if query and not query['place']:
     st.info('Type where the patient is, then press **Find care**.')
 elif query:
     service, place, prefs = query['service'], query['place'], query['prefs']
-    sort_choices = [k for k, v in SORTS.items() if SUPPORTS[v]]
     t1, t2 = st.columns([1.4, 1])
-    sort_label = t1.radio('Sort results', sort_choices, horizontal=True, key='sort')
+    sort_label = t1.radio('Sort results', list(SORTS), horizontal=True, key='sort')
     sort_mode = SORTS[sort_label]
     if SERVICE_LABELS[st.session_state.service] != service:
         t1.caption(f"Showing results for {SERVICES[service]['label']}. Press Find care to search for "
@@ -752,12 +743,15 @@ elif query:
     if sort_mode == 'price':
         kwargs['max_extra_km'] = t2.slider('Extra distance you would travel for a lower price', 0, 100, 25, step=5,
                                            format='%d km', key='max_extra_km')
-    if not SUPPORTS['price']:
-        t2.caption('Sorting by listed price becomes available with the next engine update.')
     with st.spinner('Checking the evidence…'):
         result = recommend(index, service, place, **kwargs)
     if 'error' in result:
         st.error(result['error'])
+        if result.get('suggestions'):
+            st.markdown('**Did you mean?**')
+            for col, place_name in zip(st.columns(4), result['suggestions']):
+                col.button(place_name, key=f'suggest-{place_name}', on_click=_set_place, args=(place_name,),
+                           use_container_width=True)
     else:
         render_result(index, result, sort_mode, service)
 else:

@@ -58,6 +58,39 @@ The ten largest individual gains all sit in central Kerala (Kottayam, Pathanamth
 them in order would spend 10 calls to cover the same ~150 PINs. Deducting overlap sends calls 2–10 to six other states.
 The bound is loose (it ignores overlap), so the true optimum is closer to the greedy figure than the ratio suggests.
 
+## Where do those calls go? The need-targeted plan
+
+Every call in the plan above lands in a state where caesareans are already common. Joining each PIN to its district's
+NFHS-5 caesarean rate (10,740 of the 14,008 PINs have an NFHS match), the districts where the ten calls add coverage
+have a **median caesarean rate of 47.8%**. More documented coverage there changes little.
+
+So the same greedy rule is run again counting only **PINs in districts with a caesarean rate below 10%**
+(`greedy_plan(..., target=...)`). WHO's 2015 statement on caesarean section rates finds that, at population level, rates
+up to about 10% are associated with fewer maternal and newborn deaths; below that, access to the operation is plausibly
+the constraint. 1,142 PINs are in such districts and 825 of them have no documented C-section care within 50 km.
+Districts without an NFHS match are never assumed to have high need.
+
+| Rank | Facility | State | Districts gaining coverage | District caesarean rate | New low-caesarean PINs | Cumulative |
+| ---: | --- | --- | --- | ---: | ---: | ---: |
+| 1 | Darbhanga Medical College, Laheriasarai | Bihar | Samastipur, Sitamarhi | 6.2% | 38 | 38 |
+| 2 | Katihar Medical College and Hospital | Bihar | Katihar, Purnia, Araria | 4.0% | 24 | 62 |
+| 3 | Jyothi Hospital, Kuruda | Odisha | Mayurbhanj | 8.6% | 24 | 86 |
+| 4 | GBH American Hospital, Udaipur | Rajasthan | Udaipur, Rajsamand | 7.3% | 21 | 107 |
+| 5 | Karimganj Civil Hospital | Assam | Karimganj, West Jaintia Hills | 7.0% | 21 | 128 |
+| 10 | Krishna Hospital, Bhilwara | Rajasthan | Bhilwara | 5.9% | 12 | 205 |
+
+| Calls | PIN-count plan: all PINs | of which low-caesarean | Need plan: low-caesarean PINs | Need plan: all PINs |
+| ---: | ---: | ---: | ---: | ---: |
+| 3 | 365 | **0** | **86** | 135 |
+| 5 | 554 | **0** | **128** | 218 |
+| 10 | 936 | **20** | **205** | 326 |
+
+The need plan adds fewer PINs in total, because low-caesarean districts are larger and less densely divided into PINs.
+That is the point: a PIN count measures how finely an area is divided, and need is in the places it under-counts.
+The first lead is a government medical college whose scraped record only mentions a blood bank and operation theatres:
+a single phone call would very likely confirm it, which is exactly the kind of gap a verification call is for.
+Full table: `analysis/c_section_call_plan_need.csv`; the verification map in the app switches between the two objectives.
+
 ## If the first facility says no
 
 Remove it and re-plan: Sanjeevani Hospital (Kottayam, +148) takes rank 1, then the same SanthaRam and Anu hospitals;
@@ -72,7 +105,10 @@ three calls still add 363 PINs. `analysis/c_section_call_plan_if_first_fails.csv
 
 - **Every gain assumes the call confirms the service.** A candidate is a lead from public text, not evidence of service.
 - **PIN counts favour dense areas.** Kerala has many small PINs, so a 50 km circle there holds ~150 PINs; post-office
-  weighted shares are reported alongside (`cumulative_share_of_post_offices`). Neither is a head count.
+  weighted shares are reported alongside (`cumulative_share_of_post_offices`). Neither is a head count. The need-targeted
+  plan above is our answer to this limit.
+- **A district caesarean rate is a proxy for need.** It mixes access with preference and private-sector practice, NFHS-5
+  is from 2019–21, and 3,268 PINs sit in districts without an NFHS match and are left out of the target.
 - **Straight-line 50 km** understates travel in hill districts.
 - **Greedy is not guaranteed optimal**; it is within (1 − 1/e) ≈ 63% of the optimum by theory and at least 67–82% of a
   loose upper bound here.

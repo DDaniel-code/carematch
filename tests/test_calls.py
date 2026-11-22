@@ -1,6 +1,7 @@
 import unittest
 
-from carematch.calls import candidates, current_coverage, greedy_plan, pin_universe, topk_baseline, upper_bound
+from carematch.calls import (candidates, current_coverage, greedy_plan, need_target, pin_need, pin_universe, topk_baseline,
+                             upper_bound)
 from carematch.recommend import CareIndex
 from tests.test_geo_recommend import FACILITIES, MUMBAI, MUZ, PATNA, PINS, fac
 
@@ -71,6 +72,26 @@ class CallPlanTests(unittest.TestCase):
         first = greedy_plan(self.cands, 3)[0]['candidate']['facility_id']
         again = greedy_plan(self.cands, 3, exclude=[first])
         self.assertNotIn(first, [r['candidate']['facility_id'] for r in again])
+
+    def test_need_target_sends_the_first_call_where_need_is(self):
+        # NFHS: caesareans are rare in Muzaffarpur and common in Mumbai. Mumbai's district has no reliable PIN centre
+        # problem here, so both candidates' PINs are in the universe.
+        nfhs = [{'district_name': 'Muzaffarpur', 'state_ut': 'Bihar', 'births_delivered_by_csection_5y_pct': '4.0'},
+                {'district_name': 'Mumbai', 'state_ut': 'Maharashtra', 'births_delivered_by_csection_5y_pct': '35.0'},
+                {'district_name': 'Patna', 'state_ut': 'Bihar', 'births_delivered_by_csection_5y_pct': '(8.0)'}]
+        need = pin_need(self.cov['pins'], nfhs)
+        self.assertEqual(need['842001'], 4.0)
+        self.assertEqual(need['800001'], 8.0)                      # a small-sample value in parentheses is still read
+        target = need_target(need)
+        self.assertTrue(all(p.startswith('8') for p in target))    # no Mumbai PIN is a target
+        plan = greedy_plan(self.cands, 10, target=target)
+        self.assertEqual([r['candidate']['facility_id'][0] for r in plan], ['a'])   # one Muzaffarpur call, then nothing to gain
+        self.assertTrue(plan[0]['new_pins'] <= target)
+        self.assertEqual(plan[0]['marginal_gain'], len(plan[0]['new_pins']))
+        self.assertNotIn('c1', [r['candidate']['facility_id'] for r in plan])        # Mumbai adds no target PIN
+        # Without a target the same call list reaches Mumbai too, and unknown need is never treated as high.
+        self.assertIn('c1', [r['candidate']['facility_id'] for r in greedy_plan(self.cands, 10)])
+        self.assertEqual(need_target({'x': None, 'y': 12.0, 'z': 9.9}), {'z'})
 
     def test_deterministic(self):
         a = [r['candidate']['facility_id'] for r in greedy_plan(self.cands, 5)]

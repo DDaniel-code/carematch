@@ -1,6 +1,6 @@
 {
   "service": "c_section",
-  "radius_km": 50,
+  "radius_km": 50.0,
   "budget": 10,
   "assumption": "assumes every selected facility confirms it provides the service",
   "pins_total": 19586,
@@ -115,5 +115,135 @@
       "cumulative_gain": 363
     }
   ],
-  "seconds": 10.6
+  "need_plan": {
+    "target": "PINs in districts with an NFHS-5 caesarean rate below 10%",
+    "threshold_pct": 10.0,
+    "pins_with_nfhs_match": 10740,
+    "target_pins": 1142,
+    "target_pins_uncovered_now": 825,
+    "coverage_plan_median_district_csection_pct": 47.8,
+    "by_budget": [
+      {
+        "k": 3,
+        "coverage_plan_target_pins": 0,
+        "need_plan_target_pins": 86,
+        "need_plan_all_pins": 135
+      },
+      {
+        "k": 5,
+        "coverage_plan_target_pins": 0,
+        "need_plan_target_pins": 128,
+        "need_plan_all_pins": 218
+      },
+      {
+        "k": 10,
+        "coverage_plan_target_pins": 20,
+        "need_plan_target_pins": 205,
+        "need_plan_all_pins": 326
+      }
+    ],
+    "plan": [
+      {
+        "rank": 1,
+        "name": "Darbhanga Medical College",
+        "branch": "Laheriasarai",
+        "state": "Bihar",
+        "marginal_gain": 38,
+        "cumulative_gain": 38,
+        "median_district_csection_pct": 6.2,
+        "districts": "Samastipur 36 | Sitamarhi 2"
+      },
+      {
+        "rank": 2,
+        "name": "Katihar Medical College and Hospital, Katihar",
+        "branch": "Katihar",
+        "state": "Bihar",
+        "marginal_gain": 24,
+        "cumulative_gain": 62,
+        "median_district_csection_pct": 4.0,
+        "districts": "Katihar 14 | Purnia 9 | Araria 1"
+      },
+      {
+        "rank": 3,
+        "name": "Jyothi Hospital",
+        "branch": "Kuruda",
+        "state": "Odisha",
+        "marginal_gain": 24,
+        "cumulative_gain": 86,
+        "median_district_csection_pct": 8.6,
+        "districts": "Mayurbhanj 24"
+      },
+      {
+        "rank": 4,
+        "name": "GBH American Hospital, Udaipur",
+        "branch": "Udaipur",
+        "state": "Rajasthan",
+        "marginal_gain": 21,
+        "cumulative_gain": 107,
+        "median_district_csection_pct": 7.3,
+        "districts": "Udaipur 17 | Rajsamand 4"
+      },
+      {
+        "rank": 5,
+        "name": "Karimganj Civil Hospital",
+        "branch": "Karimganj",
+        "state": "Assam",
+        "marginal_gain": 21,
+        "cumulative_gain": 128,
+        "median_district_csection_pct": 7.0,
+        "districts": "Karimganj 20 | West Jaintia Hills 1"
+      },
+      {
+        "rank": 6,
+        "name": "M.p. Birla Hospital & Priyamvada Birla Cancer Research Institute",
+        "branch": "Satna",
+        "state": "Madhya Pradesh",
+        "marginal_gain": 20,
+        "cumulative_gain": 148,
+        "median_district_csection_pct": 9.7,
+        "districts": "Rewa 15 | Satna 5"
+      },
+      {
+        "rank": 7,
+        "name": "Satyanand Hospital",
+        "branch": "Shahjahanpur",
+        "state": "Uttar Pradesh",
+        "marginal_gain": 17,
+        "cumulative_gain": 165,
+        "median_district_csection_pct": 8.6,
+        "districts": "Shahjahanpur 15 | Hardoi 2"
+      },
+      {
+        "rank": 8,
+        "name": "Lenjem Hospital",
+        "branch": "Mokokchung",
+        "state": "Nagaland",
+        "marginal_gain": 15,
+        "cumulative_gain": 180,
+        "median_district_csection_pct": 3.8,
+        "districts": "Mokokchung 8 | Tuensang 2 | Mon 2"
+      },
+      {
+        "rank": 9,
+        "name": "Christian Hospital Bissamcuttack",
+        "branch": "Bissamcuttack",
+        "state": "Odisha",
+        "marginal_gain": 13,
+        "cumulative_gain": 193,
+        "median_district_csection_pct": 8.5,
+        "districts": "Rayagada 12 | Koraput 1"
+      },
+      {
+        "rank": 10,
+        "name": "Krishna Hospital",
+        "branch": "Bhilwara",
+        "state": "Rajasthan",
+        "marginal_gain": 12,
+        "cumulative_gain": 205,
+        "median_district_csection_pct": 5.9,
+        "districts": "Bhilwara 12"
+      }
+    ]
+  },
+  "seconds": 10.9
 }

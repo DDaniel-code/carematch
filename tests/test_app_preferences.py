@@ -14,7 +14,7 @@ import unittest
 from urllib.parse import parse_qs, urlsplit
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-APP = os.path.join(ROOT, 'app', 'app.py')
+APP = os.path.join(ROOT, 'app', 'Find_care.py')
 RUN = os.path.exists(os.path.join(ROOT, 'data', 'facilities.csv')) and not os.environ.get('CAREMATCH_SKIP_APP_TEST')
 try:
     import streamlit  # noqa: F401
@@ -94,7 +94,7 @@ class FindCareOutcomes(unittest.TestCase):
         maps = [(label, url) for label, url in links(at) if 'google.com/maps' in url]
         self.assertTrue(maps)
         labels = {label for label, _ in maps}
-        self.assertTrue({'Driving', 'Driving · try to avoid tolls', 'Walking'} <= labels, labels)
+        self.assertTrue({'Directions', 'Driving · try to avoid tolls', 'Walking'} <= labels, labels)
         for label, url in maps:
             q = parse_qs(urlsplit(url).query)
             self.assertNotIn('origin', q)
@@ -103,7 +103,7 @@ class FindCareOutcomes(unittest.TestCase):
             mode = q['travelmode'][0]
             if label == 'Driving · try to avoid tolls':
                 self.assertEqual((mode, q.get('avoid')), ('driving', ['tolls']))
-            elif label == 'Driving':
+            elif label == 'Directions':
                 self.assertEqual(mode, 'driving')
                 self.assertNotIn('avoid', q)
             else:
@@ -171,6 +171,14 @@ class FindCareOutcomes(unittest.TestCase):
         at = self.search('Burn care', 'Port Blair')
         self.assertIn('None of these orders returned', ' '.join(text(at)))
         self.assertFalse(any('side by side' in e.label for e in at.expander))
+
+    def test_a_misspelled_place_offers_the_place_it_probably_meant(self):
+        at = self.search('Dialysis', 'Banglore')
+        self.assertTrue(any('Could not find' in e.value for e in at.error))
+        suggestion = next(b for b in at.button if b.label == 'Bengaluru, Karnataka')
+        suggestion.click().run()
+        self.assertFalse(at.error)
+        self.assertRegex(status(at), r'options? with credible evidence within')
 
     # -- resilience -----------------------------------------------------------------------------------------------
 

@@ -1,5 +1,5 @@
 # Databricks App definition. Deploy with the app's source path set to this repo folder (see docs/deploy.md).
-command: ["streamlit", "run", "app/app.py"]
+command: ["streamlit", "run", "app/Find_care.py"]
 env:
   # Key of the SQL warehouse resource added to the app in the Databricks UI.
   - name: DATABRICKS_WAREHOUSE_ID
