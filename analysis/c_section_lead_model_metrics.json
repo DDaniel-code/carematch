@@ -1,0 +1,241 @@
+{
+  "question": "Which facilities look like those that document C-section, but do not? (verification leads)",
+  "setup": {
+    "service": "c_section",
+    "proxy_positive": "Strong C-section evidence tier",
+    "unlabeled": "every other record",
+    "model": "standardized logistic regression, class_weight=balanced, C=0.3",
+    "validation": "leave-one-region-out; each facility group (duplicates + same-name branches) kept in one fold",
+    "excluded_vocabulary_regex": "caesar|cesar|\\bc[- ]?sections?\\b|\\blscs\\b|cemonc|obstet|gyn(a)?ec|matern|deliver|labou?r\\s*(room|ward|suite)|pregnan|natal|neonat|newborn|\\bnicu\\b|\\bsncu\\b|perinat|fetal|foetal|infertil|fertility|\\bivf\\b|reproductive|midwi|birth|anaesth|anesth|blood\\s*bank|\\bwomen|\\bmother|\\bobg\\b|\\bob[/ -]?gyn",
+    "use": "Planner verification lead from a statistical model, not evidence that this facility offers C-section. Confirm by phone before any referral."
+  },
+  "sample_sizes": {
+    "facilities": 10088,
+    "proxy_positives_strong": 126,
+    "unlabeled": 9962,
+    "unlabeled_by_tier": {
+      "weak": 4716,
+      "moderate": 313,
+      "none": 4933
+    },
+    "facility_groups": 9572,
+    "groups_with_several_records": 333,
+    "rows_assigned_to_their_group_region": 298,
+    "features": 42,
+    "by_region": {
+      "Central": {
+        "facilities": 432,
+        "groups": 416,
+        "proxy_positives": 6
+      },
+      "East": {
+        "facilities": 1020,
+        "groups": 986,
+        "proxy_positives": 11
+      },
+      "North": {
+        "facilities": 2981,
+        "groups": 2773,
+        "proxy_positives": 45
+      },
+      "Northeast": {
+        "facilities": 161,
+        "groups": 161,
+        "proxy_positives": 1
+      },
+      "South": {
+        "facilities": 2679,
+        "groups": 2570,
+        "proxy_positives": 24
+      },
+      "Unknown": {
+        "facilities": 101,
+        "groups": 101,
+        "proxy_positives": 0
+      },
+      "West": {
+        "facilities": 2714,
+        "groups": 2565,
+        "proxy_positives": 39
+      }
+    }
+  },
+  "held_out": {
+    "model": {
+      "n": 10088,
+      "positives": 126,
+      "prevalence": 0.0125,
+      "roc_auc": 0.839,
+      "pr_auc": 0.053,
+      "precision_at_50": 0.04,
+      "precision_at_100": 0.05,
+      "precision_at_200": 0.075
+    },
+    "baseline_hospital_then_specialties": {
+      "n": 10088,
+      "positives": 126,
+      "prevalence": 0.0125,
+      "roc_auc": 0.757,
+      "pr_auc": 0.031,
+      "precision_at_50": 0.1,
+      "precision_at_100": 0.05,
+      "precision_at_200": 0.025
+    },
+    "random_expected_pr_auc": 0.0125,
+    "model_by_region": {
+      "Central": {
+        "n": 432,
+        "positives": 6,
+        "prevalence": 0.0139,
+        "roc_auc": 0.748,
+        "pr_auc": 0.033
+      },
+      "East": {
+        "n": 1020,
+        "positives": 11,
+        "prevalence": 0.0108,
+        "roc_auc": 0.789,
+        "pr_auc": 0.041
+      },
+      "North": {
+        "n": 2981,
+        "positives": 45,
+        "prevalence": 0.0151,
+        "roc_auc": 0.85,
+        "pr_auc": 0.073
+      },
+      "Northeast": {
+        "n": 161,
+        "positives": 1,
+        "prevalence": 0.0062,
+        "note": "fewer than 5 positives: AUC not reported"
+      },
+      "South": {
+        "n": 2679,
+        "positives": 24,
+        "prevalence": 0.009,
+        "roc_auc": 0.817,
+        "pr_auc": 0.064
+      },
+      "Unknown": {
+        "n": 101,
+        "positives": 0,
+        "prevalence": 0.0,
+        "note": "fewer than 5 positives: AUC not reported"
+      },
+      "West": {
+        "n": 2714,
+        "positives": 39,
+        "prevalence": 0.0144,
+        "roc_auc": 0.855,
+        "pr_auc": 0.057
+      }
+    },
+    "baseline_by_region": {
+      "Central": {
+        "n": 432,
+        "positives": 6,
+        "prevalence": 0.0139,
+        "roc_auc": 0.675,
+        "pr_auc": 0.024
+      },
+      "East": {
+        "n": 1020,
+        "positives": 11,
+        "prevalence": 0.0108,
+        "roc_auc": 0.881,
+        "pr_auc": 0.046
+      },
+      "North": {
+        "n": 2981,
+        "positives": 45,
+        "prevalence": 0.0151,
+        "roc_auc": 0.775,
+        "pr_auc": 0.046
+      },
+      "Northeast": {
+        "n": 161,
+        "positives": 1,
+        "prevalence": 0.0062,
+        "note": "fewer than 5 positives: AUC not reported"
+      },
+      "South": {
+        "n": 2679,
+        "positives": 24,
+        "prevalence": 0.009,
+        "roc_auc": 0.757,
+        "pr_auc": 0.02
+      },
+      "Unknown": {
+        "n": 101,
+        "positives": 0,
+        "prevalence": 0.0,
+        "note": "fewer than 5 positives: AUC not reported"
+      },
+      "West": {
+        "n": 2714,
+        "positives": 39,
+        "prevalence": 0.0144,
+        "roc_auc": 0.708,
+        "pr_auc": 0.051
+      }
+    }
+  },
+  "regularization_sensitivity": {
+    "C=0.03": {
+      "roc_auc": 0.841,
+      "pr_auc": 0.053
+    },
+    "C=0.1": {
+      "roc_auc": 0.84,
+      "pr_auc": 0.053
+    },
+    "C=0.3": {
+      "roc_auc": 0.839,
+      "pr_auc": 0.053
+    },
+    "C=1.0": {
+      "roc_auc": 0.839,
+      "pr_auc": 0.053
+    },
+    "C=3.0": {
+      "roc_auc": 0.839,
+      "pr_auc": 0.053
+    }
+  },
+  "controls": {
+    "shuffled_labels_model": {
+      "roc_auc": {
+        "mean": 0.506,
+        "min": 0.462,
+        "max": 0.555
+      },
+      "pr_auc": {
+        "mean": 0.014,
+        "min": 0.013,
+        "max": 0.015
+      },
+      "runs": 5
+    },
+    "documented_moderate_vs_no_evidence": {
+      "note": "Moderate records document C-section but were unlabeled in training; a useful model ranks them above records with no evidence",
+      "model": {
+        "n": 5246,
+        "positives": 313,
+        "prevalence": 0.0597,
+        "roc_auc": 0.861,
+        "pr_auc": 0.444
+      },
+      "baseline": {
+        "n": 5246,
+        "positives": 313,
+        "prevalence": 0.0597,
+        "roc_auc": 0.822,
+        "pr_auc": 0.345
+      }
+    }
+  },
+  "source": "local",
+  "seconds": 32.4,
+  "leads_exported": 200
+}
