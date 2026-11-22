@@ -1,10 +1,10 @@
-# Warm paper, deep plum ink and a violet accent for every CareMatch page. The rest of the look is in app/cm_style.py.
+# Warm paper, deep navy ink and a blue accent for every CareMatch page. The rest of the look is in app/cm_style.py.
 [theme]
 base = "light"
-primaryColor = "#6E4FB3"
-backgroundColor = "#FAF7F3"
-secondaryBackgroundColor = "#F3ECE4"
-textColor = "#1C1230"
+primaryColor = "#2468C8"
+backgroundColor = "#F8F7F4"
+secondaryBackgroundColor = "#EFEDE8"
+textColor = "#0F1B33"
 font = "sans serif"
 
 [browser]

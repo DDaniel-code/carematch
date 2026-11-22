@@ -95,7 +95,7 @@ if k and not first_failed and baseline_file.is_file():
                  f"{comparison['topk_by_individual_gain_new_pins']} unique PINs. Accounting for overlap yields {gain}.")
 
 labels = ['Outside documented coverage', 'Covered in current records', 'Additional if confirmed']
-colours = ['#b4abbf', '#7f68c0', '#db6332']
+colours = ['#b7bbc3', '#2a78d6', '#eb6834']
 frame['status'] = labels[0]
 frame.loc[frame.covered_now, 'status'] = labels[1]
 if need:
