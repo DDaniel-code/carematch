@@ -16,6 +16,7 @@ Built for the CMU × Databricks Datathon (Fall 2026) on Databricks Free Edition.
 | Deliverable | Where |
 | --- | --- |
 | Single-file notebook (code, analysis, results) | [`CareMatch.ipynb`](CareMatch.ipynb): run all on Databricks or locally |
+| Demo video (2.5 min) | [Team CareMatch.mp4](https://drive.google.com/file/d/10Rhk7EOS42YudWVIZFz0DcujLDztApqp/view) |
 | App for health workers | Databricks App (Streamlit) in [`app/`](app/), deployed on Free Edition; see [`docs/deploy.md`](docs/deploy.md) |
 | How it works | [`docs/system_design.md`](docs/system_design.md), [`docs/design.md`](docs/design.md), [`docs/evidence_calibration.md`](docs/evidence_calibration.md), [`docs/sort_modes_contract.md`](docs/sort_modes_contract.md) |
 | Does it work | [`docs/evaluation.md`](docs/evaluation.md) |
