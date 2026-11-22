@@ -1,0 +1,3106 @@
+{
+  "totals": {
+    "queries": 38,
+    "different_first_for_distance": 19,
+    "citations_verified": 108,
+    "price_distance": 36,
+    "price_no_rank": 2
+  },
+  "queries": [
+    {
+      "id": "q01",
+      "service": "dialysis",
+      "place": "Delhi",
+      "summary": "Moolchand Hospital is 1.6 km closer to the search centre by straight line. The records give Moderate evidence there and Strong evidence at Dashmesh Hospital. Price comparison falls back to distance. The starting point is approximate (about 10.1 km). Your closest option may differ.",
+      "options": [
+        {
+          "mode": "default",
+          "label": "Best evidence",
+          "facility_id": "afb09018-c676-418f-9151-f3b6a504614f",
+          "name": "Dashmesh Hospital",
+          "tier": "strong",
+          "distance_km": 9.2,
+          "citation": {
+            "field": "procedure",
+            "quote": "Dialysis procedures including hemodialysis and peritoneal dialysis",
+            "facility_id": "afb09018-c676-418f-9151-f3b6a504614f",
+            "source_urls": [
+              "http://www.dashmeshhospital.in/",
+              "http://www.sacredheartclinics.in/",
+              "https://www.dashmeshhospital.in/about_us.php"
+            ]
+          },
+          "price_citation": null,
+          "flags": [],
+          "price_basis": null,
+          "comparable_quotes": null,
+          "safety_pinned": false,
+          "reason": ""
+        },
+        {
+          "mode": "nearest",
+          "label": "Nearest",
+          "facility_id": "2ddc7b9f-65ac-40d1-a1a0-6b649ff9d7b2",
+          "name": "Moolchand Hospital",
+          "tier": "moderate",
+          "distance_km": 7.6,
+          "citation": {
+            "field": "capability",
+            "quote": "Centres of Excellence include Cancer Institute, Heart Institute, Neurosciences Institute, Orthopaedics Institute, Paediatrics Institute, Women’s Institute, Urology Institute, Renalcare & Dialysis, Gastrosciences Institute, Moolchand Diagnostics and The Moolchand Clinic",
+            "facility_id": "2ddc7b9f-65ac-40d1-a1a0-6b649ff9d7b2",
+            "source_urls": [
+              "http://www.drmitaverma.com/",
+              "http://www.doctorvarshney.com/",
+              "https://www.drneetansachdeva.com/"
+            ]
+          },
+          "price_citation": null,
+          "flags": [],
+          "price_basis": null,
+          "comparable_quotes": null,
+          "safety_pinned": false,
+          "reason": ""
+        },
+        {
+          "mode": "price",
+          "label": "Compare listed prices",
+          "facility_id": "2ddc7b9f-65ac-40d1-a1a0-6b649ff9d7b2",
+          "name": "Moolchand Hospital",
+          "tier": "moderate",
+          "distance_km": 7.6,
+          "citation": {
+            "field": "capability",
+            "quote": "Centres of Excellence include Cancer Institute, Heart Institute, Neurosciences Institute, Orthopaedics Institute, Paediatrics Institute, Women’s Institute, Urology Institute, Renalcare & Dialysis, Gastrosciences Institute, Moolchand Diagnostics and The Moolchand Clinic",
+            "facility_id": "2ddc7b9f-65ac-40d1-a1a0-6b649ff9d7b2",
+            "source_urls": [
+              "http://www.drmitaverma.com/",
+              "http://www.doctorvarshney.com/",
+              "https://www.drneetansachdeva.com/"
+            ]
+          },
+          "price_citation": null,
+          "flags": [],
+          "price_basis": "distance",
+          "comparable_quotes": 0,
+          "safety_pinned": false,
+          "reason": "0 like-for-like documented price(s) within 32.6 km (same service, unit and conditions): prices cannot be ranked, so options are shown nearest first with every documented price labelled on its card."
+        }
+      ],
+      "top_changed": true,
+      "straight_line_difference_km": 1.6
+    },
+    {
+      "id": "q02",
+      "service": "dialysis",
+      "place": "Patna",
+      "summary": "Nectar Hospital comes first for both evidence and distance. Price comparison falls back to distance.",
+      "options": [
+        {
+          "mode": "default",
+          "label": "Best evidence",
+          "facility_id": "2058385c-4d0f-462f-8b1d-94f0f59c087c",
+          "name": "Nectar Hospital",
+          "tier": "strong",
+          "distance_km": 0.8,
+          "citation": {
+            "field": "procedure",
+            "quote": "Performs dialysis treatment",
+            "facility_id": "2058385c-4d0f-462f-8b1d-94f0f59c087c",
+            "source_urls": [
+              "https://nectarhospital.in/",
+              "http://www.nectarhospital.in/",
+              "https://www.facebook.com/103522279319039"
+            ]
+          },
+          "price_citation": null,
+          "flags": [],
+          "price_basis": null,
+          "comparable_quotes": null,
+          "safety_pinned": false,
+          "reason": ""
+        },
+        {
+          "mode": "nearest",
+          "label": "Nearest",
+          "facility_id": "2058385c-4d0f-462f-8b1d-94f0f59c087c",
+          "name": "Nectar Hospital",
+          "tier": "strong",
+          "distance_km": 0.8,
+          "citation": {
+            "field": "procedure",
+            "quote": "Performs dialysis treatment",
+            "facility_id": "2058385c-4d0f-462f-8b1d-94f0f59c087c",
+            "source_urls": [
+              "https://nectarhospital.in/",
+              "http://www.nectarhospital.in/",
+              "https://www.facebook.com/103522279319039"
+            ]
+          },
+          "price_citation": null,
+          "flags": [],
+          "price_basis": null,
+          "comparable_quotes": null,
+          "safety_pinned": false,
+          "reason": ""
+        },
+        {
+          "mode": "price",
+          "label": "Compare listed prices",
+          "facility_id": "2058385c-4d0f-462f-8b1d-94f0f59c087c",
+          "name": "Nectar Hospital",
+          "tier": "strong",
+          "distance_km": 0.8,
+          "citation": {
+            "field": "procedure",
+            "quote": "Performs dialysis treatment",
+            "facility_id": "2058385c-4d0f-462f-8b1d-94f0f59c087c",
+            "source_urls": [
+              "https://nectarhospital.in/",
+              "http://www.nectarhospital.in/",
+              "https://www.facebook.com/103522279319039"
+            ]
+          },
+          "price_citation": null,
+          "flags": [],
+          "price_basis": "distance",
+          "comparable_quotes": 0,
+          "safety_pinned": false,
+          "reason": "0 like-for-like documented price(s) within 25.8 km (same service, unit and conditions): prices cannot be ranked, so options are shown nearest first with every documented price labelled on its card."
+        }
+      ],
+      "top_changed": false,
+      "straight_line_difference_km": null
+    },
+    {
+      "id": "q03",
+      "service": "dialysis",
+      "place": "855107",
+      "summary": "Arogyam Healthcare comes first for both evidence and distance. Price comparison falls back to distance.",
+      "options": [
+        {
+          "mode": "default",
+          "label": "Best evidence",
+          "facility_id": "ba2121a4-abb6-438d-821c-4d691c5fffec",
+          "name": "Arogyam Healthcare",
+          "tier": "strong",
+          "distance_km": 69.4,
+          "citation": {
+            "field": "procedure",
+            "quote": "Haemodialysis",
+            "facility_id": "ba2121a4-abb6-438d-821c-4d691c5fffec",
+            "source_urls": [
+              "http://www.arogyamhealthcare.in/",
+              "https://www.arogyamhealthcare.in/",
+              "https://www.arogyamhealthcare.in/about"
+            ]
+          },
+          "price_citation": null,
+          "flags": [
+            "coords_wrong_used_pin"
+          ],
+          "price_basis": null,
+          "comparable_quotes": null,
+          "safety_pinned": false,
+          "reason": ""
+        },
+        {
+          "mode": "nearest",
+          "label": "Nearest",
+          "facility_id": "ba2121a4-abb6-438d-821c-4d691c5fffec",
+          "name": "Arogyam Healthcare",
+          "tier": "strong",
+          "distance_km": 69.4,
+          "citation": {
+            "field": "procedure",
+            "quote": "Haemodialysis",
+            "facility_id": "ba2121a4-abb6-438d-821c-4d691c5fffec",
+            "source_urls": [
+              "http://www.arogyamhealthcare.in/",
+              "https://www.arogyamhealthcare.in/",
+              "https://www.arogyamhealthcare.in/about"
+            ]
+          },
+          "price_citation": null,
+          "flags": [
+            "coords_wrong_used_pin"
+          ],
+          "price_basis": null,
+          "comparable_quotes": null,
+          "safety_pinned": false,
+          "reason": ""
+        },
+        {
+          "mode": "price",
+          "label": "Compare listed prices",
+          "facility_id": "ba2121a4-abb6-438d-821c-4d691c5fffec",
+          "name": "Arogyam Healthcare",
+          "tier": "strong",
+          "distance_km": 69.4,
+          "citation": {
+            "field": "procedure",
+            "quote": "Haemodialysis",
+            "facility_id": "ba2121a4-abb6-438d-821c-4d691c5fffec",
+            "source_urls": [
+              "http://www.arogyamhealthcare.in/",
+              "https://www.arogyamhealthcare.in/",
+              "https://www.arogyamhealthcare.in/about"
+            ]
+          },
+          "price_citation": null,
+          "flags": [
+            "coords_wrong_used_pin"
+          ],
+          "price_basis": "distance",
+          "comparable_quotes": 0,
+          "safety_pinned": false,
+          "reason": "0 like-for-like documented price(s) within 94.4 km (same service, unit and conditions): prices cannot be ranked, so options are shown nearest first with every documented price labelled on its card."
+        }
+      ],
+      "top_changed": false,
+      "straight_line_difference_km": null
+    },
+    {
+      "id": "q04",
+      "service": "dialysis",
+      "place": "Kohima",
+      "summary": "Christian Institute of Health Sciences and Research, Dimapur is 9.1 km closer to the search centre by straight line. The records give Moderate evidence there and Strong evidence at Eden Medical Centre. Price comparison falls back to distance. The starting point is approximate (about 6.1 km). Your closest option may differ.",
+      "options": [
+        {
+          "mode": "default",
+          "label": "Best evidence",
+          "facility_id": "3fc1cb91-b14c-4dd0-b488-7f0d97a9c28d",
+          "name": "Eden Medical Centre",
+          "tier": "strong",
+          "distance_km": 46.8,
+          "citation": {
+            "field": "procedure",
+            "quote": "Offers dialysis treatment in the Dialysis Unit",
+            "facility_id": "3fc1cb91-b14c-4dd0-b488-7f0d97a9c28d",
+            "source_urls": [
+              "http://edenmedicalcentre.org/",
+              "https://edenmedicalcentre.org/",
+              "https://edenmedicalcentre.org/contact-us/"
+            ]
+          },
+          "price_citation": null,
+          "flags": [],
+          "price_basis": null,
+          "comparable_quotes": null,
+          "safety_pinned": false,
+          "reason": ""
+        },
+        {
+          "mode": "nearest",
+          "label": "Nearest",
+          "facility_id": "587bf5c2-9fcd-450c-8fe1-8dbdff1adb8a",
+          "name": "Christian Institute of Health Sciences and Research, Dimapur",
+          "tier": "moderate",
+          "distance_km": 37.7,
+          "citation": {
+            "field": "equipment",
+            "quote": "Hemodialysis unit",
+            "facility_id": "587bf5c2-9fcd-450c-8fe1-8dbdff1adb8a",
+            "source_urls": [
+              "https://cihsr.in/",
+              "https://cihsr.in/family-health/",
+              "https://www.jaimahesh.com/bloodbanks/index/nagaland"
+            ]
+          },
+          "price_citation": null,
+          "flags": [],
+          "price_basis": null,
+          "comparable_quotes": null,
+          "safety_pinned": false,
+          "reason": ""
+        },
+        {
+          "mode": "price",
+          "label": "Compare listed prices",
+          "facility_id": "587bf5c2-9fcd-450c-8fe1-8dbdff1adb8a",
+          "name": "Christian Institute of Health Sciences and Research, Dimapur",
+          "tier": "moderate",
+          "distance_km": 37.7,
+          "citation": {
+            "field": "equipment",
+            "quote": "Hemodialysis unit",
+            "facility_id": "587bf5c2-9fcd-450c-8fe1-8dbdff1adb8a",
+            "source_urls": [
+              "https://cihsr.in/",
+              "https://cihsr.in/family-health/",
+              "https://www.jaimahesh.com/bloodbanks/index/nagaland"
+            ]
+          },
+          "price_citation": null,
+          "flags": [],
+          "price_basis": "distance",
+          "comparable_quotes": 0,
+          "safety_pinned": false,
+          "reason": "0 like-for-like documented price(s) within 62.7 km (same service, unit and conditions): prices cannot be ranked, so options are shown nearest first with every documented price labelled on its card."
+        }
+      ],
+      "top_changed": true,
+      "straight_line_difference_km": 9.1
+    },
+    {
+      "id": "q05",
+      "service": "emergency C-section",
+      "place": "Mumbai",
+      "summary": "Sarla Hospital comes first for both evidence and distance. The urgent-care rule keeps the closest eligible option without a conflicting service claim first when available.",
+      "options": [
+        {
+          "mode": "default",
+          "label": "Best evidence",
+          "facility_id": "14f54bc7-d489-40ea-a888-b46300c18fb9",
+          "name": "Sarla Hospital",
+          "tier": "strong",
+          "distance_km": 1.1,
+          "citation": {
+            "field": "procedure",
+            "quote": "Caesarean Section",
+            "facility_id": "14f54bc7-d489-40ea-a888-b46300c18fb9",
+            "source_urls": [
+              "https://www.drviraldesai.in/",
+              "https://mumbaigastro.com/contact-us/",
+              "https://kivihealth.com/clinic/sarla-hospital-&-icu"
+            ]
+          },
+          "price_citation": null,
+          "flags": [
+            "possible_duplicate_listing"
+          ],
+          "price_basis": null,
+          "comparable_quotes": null,
+          "safety_pinned": false,
+          "reason": ""
+        },
+        {
+          "mode": "nearest",
+          "label": "Nearest",
+          "facility_id": "14f54bc7-d489-40ea-a888-b46300c18fb9",
+          "name": "Sarla Hospital",
+          "tier": "strong",
+          "distance_km": 1.1,
+          "citation": {
+            "field": "procedure",
+            "quote": "Caesarean Section",
+            "facility_id": "14f54bc7-d489-40ea-a888-b46300c18fb9",
+            "source_urls": [
+              "https://www.drviraldesai.in/",
+              "https://mumbaigastro.com/contact-us/",
+              "https://kivihealth.com/clinic/sarla-hospital-&-icu"
+            ]
+          },
+          "price_citation": null,
+          "flags": [
+            "possible_duplicate_listing"
+          ],
+          "price_basis": null,
+          "comparable_quotes": null,
+          "safety_pinned": false,
+          "reason": ""
+        },
+        {
+          "mode": "price",
+          "label": "Compare listed prices",
+          "facility_id": "14f54bc7-d489-40ea-a888-b46300c18fb9",
+          "name": "Sarla Hospital",
+          "tier": "strong",
+          "distance_km": 1.1,
+          "citation": {
+            "field": "procedure",
+            "quote": "Caesarean Section",
+            "facility_id": "14f54bc7-d489-40ea-a888-b46300c18fb9",
+            "source_urls": [
+              "https://www.drviraldesai.in/",
+              "https://mumbaigastro.com/contact-us/",
+              "https://kivihealth.com/clinic/sarla-hospital-&-icu"
+            ]
+          },
+          "price_citation": null,
+          "flags": [
+            "possible_duplicate_listing"
+          ],
+          "price_basis": "distance",
+          "comparable_quotes": 0,
+          "safety_pinned": true,
+          "reason": "0 like-for-like documented price(s) within 26.1 km (same service, unit and conditions): prices cannot be ranked, so options are shown nearest first with every documented price labelled on its card."
+        }
+      ],
+      "top_changed": false,
+      "straight_line_difference_km": null
+    },
+    {
+      "id": "q06",
+      "service": "emergency C-section",
+      "place": "Lucknow",
+      "summary": "BNK Hospital comes first for both evidence and distance. The urgent-care rule keeps the closest eligible option without a conflicting service claim first when available.",
+      "options": [
+        {
+          "mode": "default",
+          "label": "Best evidence",
+          "facility_id": "d93e5058-3819-47e3-aaae-49e6d9cfbafb",
+          "name": "BNK Hospital",
+          "tier": "strong",
+          "distance_km": 2.1,
+          "citation": {
+            "field": "procedure",
+            "quote": "Lower Segment Caesarean Section (LSCS)",
+            "facility_id": "d93e5058-3819-47e3-aaae-49e6d9cfbafb",
+            "source_urls": [
+              "https://bnkmedicare.com/",
+              "http://www.bnkmedicare.com/",
+              "http://www.bnkmedicare.com/contacts.html"
+            ]
+          },
+          "price_citation": null,
+          "flags": [],
+          "price_basis": null,
+          "comparable_quotes": null,
+          "safety_pinned": false,
+          "reason": ""
+        },
+        {
+          "mode": "nearest",
+          "label": "Nearest",
+          "facility_id": "d93e5058-3819-47e3-aaae-49e6d9cfbafb",
+          "name": "BNK Hospital",
+          "tier": "strong",
+          "distance_km": 2.1,
+          "citation": {
+            "field": "procedure",
+            "quote": "Lower Segment Caesarean Section (LSCS)",
+            "facility_id": "d93e5058-3819-47e3-aaae-49e6d9cfbafb",
+            "source_urls": [
+              "https://bnkmedicare.com/",
+              "http://www.bnkmedicare.com/",
+              "http://www.bnkmedicare.com/contacts.html"
+            ]
+          },
+          "price_citation": null,
+          "flags": [],
+          "price_basis": null,
+          "comparable_quotes": null,
+          "safety_pinned": false,
+          "reason": ""
+        },
+        {
+          "mode": "price",
+          "label": "Compare listed prices",
+          "facility_id": "d93e5058-3819-47e3-aaae-49e6d9cfbafb",
+          "name": "BNK Hospital",
+          "tier": "strong",
+          "distance_km": 2.1,
+          "citation": {
+            "field": "procedure",
+            "quote": "Lower Segment Caesarean Section (LSCS)",
+            "facility_id": "d93e5058-3819-47e3-aaae-49e6d9cfbafb",
+            "source_urls": [
+              "https://bnkmedicare.com/",
+              "http://www.bnkmedicare.com/",
+              "http://www.bnkmedicare.com/contacts.html"
+            ]
+          },
+          "price_citation": null,
+          "flags": [],
+          "price_basis": "distance",
+          "comparable_quotes": 0,
+          "safety_pinned": true,
+          "reason": "0 like-for-like documented price(s) within 27.1 km (same service, unit and conditions): prices cannot be ranked, so options are shown nearest first with every documented price labelled on its card."
+        }
+      ],
+      "top_changed": false,
+      "straight_line_difference_km": null
+    },
+    {
+      "id": "q07",
+      "service": "emergency C-section",
+      "place": "Aurangabad, Bihar",
+      "summary": "Sanjeevan Sparsh Hospital is 5.1 km closer to the search centre by straight line. The records give Moderate evidence there and Strong evidence at Medizone Hospitals. The urgent-care rule keeps the closest eligible option without a conflicting service claim first when available. The starting point is approximate (about 15.3 km). Your closest option may differ.",
+      "options": [
+        {
+          "mode": "default",
+          "label": "Best evidence",
+          "facility_id": "531e6b63-6c19-4250-9b29-db5187429fa3",
+          "name": "Medizone Hospitals",
+          "tier": "strong",
+          "distance_km": 113.9,
+          "citation": {
+            "field": "procedure",
+            "quote": "Cesarean delivery",
+            "facility_id": "531e6b63-6c19-4250-9b29-db5187429fa3",
+            "source_urls": [
+              "https://www.medizonehospital.com/contact.php",
+              "https://hopedentalaestheticspatna.in/get-appointment/",
+              "https://in.policy.online/hospital/24287/harsh-hospital"
+            ]
+          },
+          "price_citation": null,
+          "flags": [],
+          "price_basis": null,
+          "comparable_quotes": null,
+          "safety_pinned": false,
+          "reason": ""
+        },
+        {
+          "mode": "nearest",
+          "label": "Nearest",
+          "facility_id": "4d02a4c1-e1fd-4fbe-94df-150b20d2f368",
+          "name": "Sanjeevan Sparsh Hospital",
+          "tier": "moderate",
+          "distance_km": 108.8,
+          "citation": {
+            "field": "procedure",
+            "quote": "Normal and cesarean deliveries are offered",
+            "facility_id": "4d02a4c1-e1fd-4fbe-94df-150b20d2f368",
+            "source_urls": [
+              "http://www.sanjeevansparshhospital.com/",
+              "https://www.instagram.com/p/DBTPo48y_0a/",
+              "https://in.linkedin.com/company/sanjeevan-sparsh-hospital"
+            ]
+          },
+          "price_citation": null,
+          "flags": [],
+          "price_basis": null,
+          "comparable_quotes": null,
+          "safety_pinned": false,
+          "reason": ""
+        },
+        {
+          "mode": "price",
+          "label": "Compare listed prices",
+          "facility_id": "4d02a4c1-e1fd-4fbe-94df-150b20d2f368",
+          "name": "Sanjeevan Sparsh Hospital",
+          "tier": "moderate",
+          "distance_km": 108.8,
+          "citation": {
+            "field": "procedure",
+            "quote": "Normal and cesarean deliveries are offered",
+            "facility_id": "4d02a4c1-e1fd-4fbe-94df-150b20d2f368",
+            "source_urls": [
+              "http://www.sanjeevansparshhospital.com/",
+              "https://www.instagram.com/p/DBTPo48y_0a/",
+              "https://in.linkedin.com/company/sanjeevan-sparsh-hospital"
+            ]
+          },
+          "price_citation": null,
+          "flags": [],
+          "price_basis": "distance",
+          "comparable_quotes": 0,
+          "safety_pinned": true,
+          "reason": "0 like-for-like documented price(s) within 133.8 km (same service, unit and conditions): prices cannot be ranked, so options are shown nearest first with every documented price labelled on its card."
+        }
+      ],
+      "top_changed": true,
+      "straight_line_difference_km": 5.1
+    },
+    {
+      "id": "q08",
+      "service": "emergency C-section",
+      "place": "Mon",
+      "summary": "Srimanta Sankardeva Hospital & Research Institute comes first for both evidence and distance. The urgent-care rule keeps the closest eligible option without a conflicting service claim first when available.",
+      "options": [
+        {
+          "mode": "default",
+          "label": "Best evidence",
+          "facility_id": "374d3fdf-4539-4899-b427-d26d2f2f0577",
+          "name": "Srimanta Sankardeva Hospital & Research Institute",
+          "tier": "moderate",
+          "distance_km": 89.0,
+          "citation": {
+            "field": "procedure",
+            "quote": "Cesarean delivery",
+            "facility_id": "374d3fdf-4539-4899-b427-d26d2f2f0577",
+            "source_urls": [
+              "http://sankardevahospital.com/",
+              "https://sankardevahospital.com/",
+              "https://sankardevahospital.com/about-us"
+            ]
+          },
+          "price_citation": null,
+          "flags": [],
+          "price_basis": null,
+          "comparable_quotes": null,
+          "safety_pinned": false,
+          "reason": ""
+        },
+        {
+          "mode": "nearest",
+          "label": "Nearest",
+          "facility_id": "374d3fdf-4539-4899-b427-d26d2f2f0577",
+          "name": "Srimanta Sankardeva Hospital & Research Institute",
+          "tier": "moderate",
+          "distance_km": 89.0,
+          "citation": {
+            "field": "procedure",
+            "quote": "Cesarean delivery",
+            "facility_id": "374d3fdf-4539-4899-b427-d26d2f2f0577",
+            "source_urls": [
+              "http://sankardevahospital.com/",
+              "https://sankardevahospital.com/",
+              "https://sankardevahospital.com/about-us"
+            ]
+          },
+          "price_citation": null,
+          "flags": [],
+          "price_basis": null,
+          "comparable_quotes": null,
+          "safety_pinned": false,
+          "reason": ""
+        },
+        {
+          "mode": "price",
+          "label": "Compare listed prices",
+          "facility_id": "374d3fdf-4539-4899-b427-d26d2f2f0577",
+          "name": "Srimanta Sankardeva Hospital & Research Institute",
+          "tier": "moderate",
+          "distance_km": 89.0,
+          "citation": {
+            "field": "procedure",
+            "quote": "Cesarean delivery",
+            "facility_id": "374d3fdf-4539-4899-b427-d26d2f2f0577",
+            "source_urls": [
+              "http://sankardevahospital.com/",
+              "https://sankardevahospital.com/",
+              "https://sankardevahospital.com/about-us"
+            ]
+          },
+          "price_citation": null,
+          "flags": [],
+          "price_basis": "distance",
+          "comparable_quotes": 0,
+          "safety_pinned": true,
+          "reason": "0 like-for-like documented price(s) within 114.0 km (same service, unit and conditions): prices cannot be ranked, so options are shown nearest first with every documented price labelled on its card."
+        }
+      ],
+      "top_changed": false,
+      "straight_line_difference_km": null
+    },
+    {
+      "id": "q09",
+      "service": "NICU",
+      "place": "Chennai",
+      "summary": "Shens Speciality Hospital, Ashok Nagar, Chennai is 1.1 km closer to the search centre by straight line. The records give Moderate evidence there and Strong evidence at Billroth Hospitals. The urgent-care rule keeps the closest eligible option without a conflicting service claim first when available. The starting point is approximate (about 5.6 km). Your closest option may differ.",
+      "options": [
+        {
+          "mode": "default",
+          "label": "Best evidence",
+          "facility_id": "8cbb1ecd-e2ee-44d9-b3bd-08f3855fa18a",
+          "name": "Billroth Hospitals",
+          "tier": "strong",
+          "distance_km": 3.2,
+          "citation": {
+            "field": "equipment",
+            "quote": "Intensive Care Units (ICU) and NICU facilities",
+            "facility_id": "8cbb1ecd-e2ee-44d9-b3bd-08f3855fa18a",
+            "source_urls": [
+              "https://billrothhospitals.com/",
+              "http://www.billrothhospitals.com/",
+              "https://pubmed.ncbi.nlm.nih.gov/30122238/"
+            ]
+          },
+          "price_citation": null,
+          "flags": [],
+          "price_basis": null,
+          "comparable_quotes": null,
+          "safety_pinned": false,
+          "reason": ""
+        },
+        {
+          "mode": "nearest",
+          "label": "Nearest",
+          "facility_id": "34d95cb5-3894-4547-a386-deb4610398e4",
+          "name": "Shens Speciality Hospital, Ashok Nagar, Chennai",
+          "tier": "moderate",
+          "distance_km": 2.1,
+          "citation": {
+            "field": "capability",
+            "quote": "Neonatal Intensive Care Unit (NICU) on site",
+            "facility_id": "34d95cb5-3894-4547-a386-deb4610398e4",
+            "source_urls": [
+              "https://www.indiamart.com/shens-speciality-hospital/",
+              "https://in.linkedin.com/company/shens-speciality-hospitals",
+              "https://www.sulekha.com/kensington-hospital-kilpauk-chennai-contact-address"
+            ]
+          },
+          "price_citation": null,
+          "flags": [],
+          "price_basis": null,
+          "comparable_quotes": null,
+          "safety_pinned": false,
+          "reason": ""
+        },
+        {
+          "mode": "price",
+          "label": "Compare listed prices",
+          "facility_id": "34d95cb5-3894-4547-a386-deb4610398e4",
+          "name": "Shens Speciality Hospital, Ashok Nagar, Chennai",
+          "tier": "moderate",
+          "distance_km": 2.1,
+          "citation": {
+            "field": "capability",
+            "quote": "Neonatal Intensive Care Unit (NICU) on site",
+            "facility_id": "34d95cb5-3894-4547-a386-deb4610398e4",
+            "source_urls": [
+              "https://www.indiamart.com/shens-speciality-hospital/",
+              "https://in.linkedin.com/company/shens-speciality-hospitals",
+              "https://www.sulekha.com/kensington-hospital-kilpauk-chennai-contact-address"
+            ]
+          },
+          "price_citation": null,
+          "flags": [],
+          "price_basis": "distance",
+          "comparable_quotes": 0,
+          "safety_pinned": true,
+          "reason": "0 like-for-like documented price(s) within 27.1 km (same service, unit and conditions): prices cannot be ranked, so options are shown nearest first with every documented price labelled on its card."
+        }
+      ],
+      "top_changed": true,
+      "straight_line_difference_km": 1.1
+    },
+    {
+      "id": "q10",
+      "service": "NICU",
+      "place": "Ranchi",
+      "summary": "Rani Hospital comes first for both evidence and distance. The urgent-care rule keeps the closest eligible option without a conflicting service claim first when available.",
+      "options": [
+        {
+          "mode": "default",
+          "label": "Best evidence",
+          "facility_id": "af367ffd-e872-479b-bed4-b67e420e0b35",
+          "name": "Rani Hospital",
+          "tier": "strong",
+          "distance_km": 0.7,
+          "citation": {
+            "field": "equipment",
+            "quote": "Brain monitoring system (aEEG) in NICU",
+            "facility_id": "af367ffd-e872-479b-bed4-b67e420e0b35",
+            "source_urls": [
+              "https://ranihospital.com/",
+              "https://ranihospital.com/about",
+              "https://www.hospitalby.com/medical-center-india/ranchi/"
+            ]
+          },
+          "price_citation": null,
+          "flags": [],
+          "price_basis": null,
+          "comparable_quotes": null,
+          "safety_pinned": false,
+          "reason": ""
+        },
+        {
+          "mode": "nearest",
+          "label": "Nearest",
+          "facility_id": "af367ffd-e872-479b-bed4-b67e420e0b35",
+          "name": "Rani Hospital",
+          "tier": "strong",
+          "distance_km": 0.7,
+          "citation": {
+            "field": "equipment",
+            "quote": "Brain monitoring system (aEEG) in NICU",
+            "facility_id": "af367ffd-e872-479b-bed4-b67e420e0b35",
+            "source_urls": [
+              "https://ranihospital.com/",
+              "https://ranihospital.com/about",
+              "https://www.hospitalby.com/medical-center-india/ranchi/"
+            ]
+          },
+          "price_citation": null,
+          "flags": [],
+          "price_basis": null,
+          "comparable_quotes": null,
+          "safety_pinned": false,
+          "reason": ""
+        },
+        {
+          "mode": "price",
+          "label": "Compare listed prices",
+          "facility_id": "af367ffd-e872-479b-bed4-b67e420e0b35",
+          "name": "Rani Hospital",
+          "tier": "strong",
+          "distance_km": 0.7,
+          "citation": {
+            "field": "equipment",
+            "quote": "Brain monitoring system (aEEG) in NICU",
+            "facility_id": "af367ffd-e872-479b-bed4-b67e420e0b35",
+            "source_urls": [
+              "https://ranihospital.com/",
+              "https://ranihospital.com/about",
+              "https://www.hospitalby.com/medical-center-india/ranchi/"
+            ]
+          },
+          "price_citation": null,
+          "flags": [],
+          "price_basis": "distance",
+          "comparable_quotes": 0,
+          "safety_pinned": true,
+          "reason": "0 like-for-like documented price(s) within 25.7 km (same service, unit and conditions): prices cannot be ranked, so options are shown nearest first with every documented price labelled on its card."
+        }
+      ],
+      "top_changed": false,
+      "straight_line_difference_km": null
+    },
+    {
+      "id": "q11",
+      "service": "NICU",
+      "place": "835207",
+      "summary": "Raj Hospital is 1 km closer to the search centre by straight line. The records give Moderate evidence there and Strong evidence at Santevita Hospital. The urgent-care rule keeps the closest eligible option without a conflicting service claim first when available. The starting point is approximate (about 2 km). Your closest option may differ.",
+      "options": [
+        {
+          "mode": "default",
+          "label": "Best evidence",
+          "facility_id": "cc6ef0bb-4b09-4ef8-a9cf-6456cad04bf4",
+          "name": "Santevita Hospital",
+          "tier": "strong",
+          "distance_km": 87.3,
+          "citation": {
+            "field": "capability",
+            "quote": "24×7 NICU",
+            "facility_id": "cc6ef0bb-4b09-4ef8-a9cf-6456cad04bf4",
+            "source_urls": [
+              "https://www.vermaurology.in/about/",
+              "https://mdoc.in/doctors/gynecologist/",
+              "https://www.santevitahospital.com/blog/"
+            ]
+          },
+          "price_citation": null,
+          "flags": [],
+          "price_basis": null,
+          "comparable_quotes": null,
+          "safety_pinned": false,
+          "reason": ""
+        },
+        {
+          "mode": "nearest",
+          "label": "Nearest",
+          "facility_id": "dfa073a8-e453-4fb3-bc11-691f4270e56c",
+          "name": "Raj Hospital",
+          "tier": "moderate",
+          "distance_km": 86.3,
+          "citation": {
+            "field": "equipment",
+            "quote": "Neonatal Intensive Care Unit (NICU)",
+            "facility_id": "dfa073a8-e453-4fb3-bc11-691f4270e56c",
+            "source_urls": [
+              "https://rajhospitals.com/",
+              "http://www.rajhospitals.com/",
+              "https://mdoc.in/doctor/kumari-abha"
+            ]
+          },
+          "price_citation": null,
+          "flags": [],
+          "price_basis": null,
+          "comparable_quotes": null,
+          "safety_pinned": false,
+          "reason": ""
+        },
+        {
+          "mode": "price",
+          "label": "Compare listed prices",
+          "facility_id": "dfa073a8-e453-4fb3-bc11-691f4270e56c",
+          "name": "Raj Hospital",
+          "tier": "moderate",
+          "distance_km": 86.3,
+          "citation": {
+            "field": "equipment",
+            "quote": "Neonatal Intensive Care Unit (NICU)",
+            "facility_id": "dfa073a8-e453-4fb3-bc11-691f4270e56c",
+            "source_urls": [
+              "https://rajhospitals.com/",
+              "http://www.rajhospitals.com/",
+              "https://mdoc.in/doctor/kumari-abha"
+            ]
+          },
+          "price_citation": null,
+          "flags": [],
+          "price_basis": "distance",
+          "comparable_quotes": 0,
+          "safety_pinned": true,
+          "reason": "0 like-for-like documented price(s) within 111.3 km (same service, unit and conditions): prices cannot be ranked, so options are shown nearest first with every documented price labelled on its card."
+        }
+      ],
+      "top_changed": true,
+      "straight_line_difference_km": 1.0
+    },
+    {
+      "id": "q12",
+      "service": "NICU",
+      "place": "Aizawl",
+      "summary": "Raj Medicity comes first for both evidence and distance. The urgent-care rule keeps the closest eligible option without a conflicting service claim first when available.",
+      "options": [
+        {
+          "mode": "default",
+          "label": "Best evidence",
+          "facility_id": "7d528d2e-0bd3-4a89-9161-cbfbf8f50c69",
+          "name": "Raj Medicity",
+          "tier": "strong",
+          "distance_km": 173.5,
+          "citation": {
+            "field": "equipment",
+            "quote": "SICU, MICU and NICU units",
+            "facility_id": "7d528d2e-0bd3-4a89-9161-cbfbf8f50c69",
+            "source_urls": [
+              "http://www.rajmedicity.com/",
+              "https://www.rajmedicity.com/",
+              "https://rajmedicity.com/Paediatrics.aspx"
+            ]
+          },
+          "price_citation": null,
+          "flags": [],
+          "price_basis": null,
+          "comparable_quotes": null,
+          "safety_pinned": false,
+          "reason": ""
+        },
+        {
+          "mode": "nearest",
+          "label": "Nearest",
+          "facility_id": "7d528d2e-0bd3-4a89-9161-cbfbf8f50c69",
+          "name": "Raj Medicity",
+          "tier": "strong",
+          "distance_km": 173.5,
+          "citation": {
+            "field": "equipment",
+            "quote": "SICU, MICU and NICU units",
+            "facility_id": "7d528d2e-0bd3-4a89-9161-cbfbf8f50c69",
+            "source_urls": [
+              "http://www.rajmedicity.com/",
+              "https://www.rajmedicity.com/",
+              "https://rajmedicity.com/Paediatrics.aspx"
+            ]
+          },
+          "price_citation": null,
+          "flags": [],
+          "price_basis": null,
+          "comparable_quotes": null,
+          "safety_pinned": false,
+          "reason": ""
+        },
+        {
+          "mode": "price",
+          "label": "Compare listed prices",
+          "facility_id": "7d528d2e-0bd3-4a89-9161-cbfbf8f50c69",
+          "name": "Raj Medicity",
+          "tier": "strong",
+          "distance_km": 173.5,
+          "citation": {
+            "field": "equipment",
+            "quote": "SICU, MICU and NICU units",
+            "facility_id": "7d528d2e-0bd3-4a89-9161-cbfbf8f50c69",
+            "source_urls": [
+              "http://www.rajmedicity.com/",
+              "https://www.rajmedicity.com/",
+              "https://rajmedicity.com/Paediatrics.aspx"
+            ]
+          },
+          "price_citation": null,
+          "flags": [],
+          "price_basis": "distance",
+          "comparable_quotes": 0,
+          "safety_pinned": true,
+          "reason": "0 like-for-like documented price(s) within 198.5 km (same service, unit and conditions): prices cannot be ranked, so options are shown nearest first with every documented price labelled on its card."
+        }
+      ],
+      "top_changed": false,
+      "straight_line_difference_km": null
+    },
+    {
+      "id": "q13",
+      "service": "trauma",
+      "place": "Kolkata",
+      "summary": "Park Clinic is 3 km closer to the search centre by straight line. The records give Moderate evidence there and Strong evidence at Ruby General Hospital. The urgent-care rule keeps the closest eligible option without a conflicting service claim first when available. The starting point is approximate (about 5.5 km). Your closest option may differ.",
+      "options": [
+        {
+          "mode": "default",
+          "label": "Best evidence",
+          "facility_id": "eb2ec20b-04b5-49f5-9530-65eded2e8685",
+          "name": "Ruby General Hospital",
+          "tier": "strong",
+          "distance_km": 4.5,
+          "citation": {
+            "field": "procedure",
+            "quote": "Neurosurgery services for brain and spine tumors, trauma",
+            "facility_id": "eb2ec20b-04b5-49f5-9530-65eded2e8685",
+            "source_urls": [
+              "https://rubyhospital.com/",
+              "https://ads-hospital.wheree.com/",
+              "https://en.wikivoyage.org/wiki/Kolkata"
+            ]
+          },
+          "price_citation": null,
+          "flags": [],
+          "price_basis": null,
+          "comparable_quotes": null,
+          "safety_pinned": false,
+          "reason": ""
+        },
+        {
+          "mode": "nearest",
+          "label": "Nearest",
+          "facility_id": "5506f14e-e1e9-44a7-9e76-09304e2355d4",
+          "name": "Park Clinic",
+          "tier": "moderate",
+          "distance_km": 1.5,
+          "citation": {
+            "field": "procedure",
+            "quote": "Spinal trauma and spinal tumors surgery",
+            "facility_id": "5506f14e-e1e9-44a7-9e76-09304e2355d4",
+            "source_urls": [
+              "http://drkaushiksil.com/",
+              "https://www.amitabhadas.com/",
+              "http://www.parkclinickolkata.in/"
+            ]
+          },
+          "price_citation": null,
+          "flags": [],
+          "price_basis": null,
+          "comparable_quotes": null,
+          "safety_pinned": false,
+          "reason": ""
+        },
+        {
+          "mode": "price",
+          "label": "Compare listed prices",
+          "facility_id": "5506f14e-e1e9-44a7-9e76-09304e2355d4",
+          "name": "Park Clinic",
+          "tier": "moderate",
+          "distance_km": 1.5,
+          "citation": {
+            "field": "procedure",
+            "quote": "Spinal trauma and spinal tumors surgery",
+            "facility_id": "5506f14e-e1e9-44a7-9e76-09304e2355d4",
+            "source_urls": [
+              "http://drkaushiksil.com/",
+              "https://www.amitabhadas.com/",
+              "http://www.parkclinickolkata.in/"
+            ]
+          },
+          "price_citation": null,
+          "flags": [],
+          "price_basis": "distance",
+          "comparable_quotes": 0,
+          "safety_pinned": true,
+          "reason": "0 like-for-like documented price(s) within 26.5 km (same service, unit and conditions): prices cannot be ranked, so options are shown nearest first with every documented price labelled on its card."
+        }
+      ],
+      "top_changed": true,
+      "straight_line_difference_km": 3.0
+    },
+    {
+      "id": "q14",
+      "service": "trauma",
+      "place": "Indore",
+      "summary": "V One Hospital comes first for both evidence and distance. The urgent-care rule keeps the closest eligible option without a conflicting service claim first when available.",
+      "options": [
+        {
+          "mode": "default",
+          "label": "Best evidence",
+          "facility_id": "3c1cc7a7-e754-4fd0-82bc-c2fe975f9ca8",
+          "name": "V One Hospital",
+          "tier": "strong",
+          "distance_km": 0.7,
+          "citation": {
+            "field": "procedure",
+            "quote": "Trauma and emergency care services",
+            "facility_id": "3c1cc7a7-e754-4fd0-82bc-c2fe975f9ca8",
+            "source_urls": [
+              "http://drmantri.in/",
+              "http://www.vonehospital.com/",
+              "https://dranuragbhargava.com/"
+            ]
+          },
+          "price_citation": null,
+          "flags": [],
+          "price_basis": null,
+          "comparable_quotes": null,
+          "safety_pinned": false,
+          "reason": ""
+        },
+        {
+          "mode": "nearest",
+          "label": "Nearest",
+          "facility_id": "3c1cc7a7-e754-4fd0-82bc-c2fe975f9ca8",
+          "name": "V One Hospital",
+          "tier": "strong",
+          "distance_km": 0.7,
+          "citation": {
+            "field": "procedure",
+            "quote": "Trauma and emergency care services",
+            "facility_id": "3c1cc7a7-e754-4fd0-82bc-c2fe975f9ca8",
+            "source_urls": [
+              "http://drmantri.in/",
+              "http://www.vonehospital.com/",
+              "https://dranuragbhargava.com/"
+            ]
+          },
+          "price_citation": null,
+          "flags": [],
+          "price_basis": null,
+          "comparable_quotes": null,
+          "safety_pinned": false,
+          "reason": ""
+        },
+        {
+          "mode": "price",
+          "label": "Compare listed prices",
+          "facility_id": "3c1cc7a7-e754-4fd0-82bc-c2fe975f9ca8",
+          "name": "V One Hospital",
+          "tier": "strong",
+          "distance_km": 0.7,
+          "citation": {
+            "field": "procedure",
+            "quote": "Trauma and emergency care services",
+            "facility_id": "3c1cc7a7-e754-4fd0-82bc-c2fe975f9ca8",
+            "source_urls": [
+              "http://drmantri.in/",
+              "http://www.vonehospital.com/",
+              "https://dranuragbhargava.com/"
+            ]
+          },
+          "price_citation": null,
+          "flags": [],
+          "price_basis": "distance",
+          "comparable_quotes": 0,
+          "safety_pinned": true,
+          "reason": "0 like-for-like documented price(s) within 25.7 km (same service, unit and conditions): prices cannot be ranked, so options are shown nearest first with every documented price labelled on its card."
+        }
+      ],
+      "top_changed": false,
+      "straight_line_difference_km": null
+    },
+    {
+      "id": "q15",
+      "service": "trauma",
+      "place": "271801",
+      "summary": "Apley Clinic Orthopaedic Centre is 1.1 km closer to the search centre by straight line. The records give Moderate evidence there and Strong evidence at Regency Multi Super Speciality Hospital. The urgent-care rule keeps the closest eligible option without a conflicting service claim first when available. The starting point is approximate (about 2 km). Your closest option may differ.",
+      "options": [
+        {
+          "mode": "default",
+          "label": "Best evidence",
+          "facility_id": "413c1fbc-9765-4881-8422-f44601851939",
+          "name": "Regency Multi Super Speciality Hospital",
+          "tier": "strong",
+          "distance_km": 97.4,
+          "citation": {
+            "field": "procedure",
+            "quote": "Provides trauma and emergency services",
+            "facility_id": "413c1fbc-9765-4881-8422-f44601851939",
+            "source_urls": [
+              "https://www.docindia.org/india/up/lucknow/urology",
+              "https://regencyhealthcare.in/doctors/dr-s-k-gulati/",
+              "https://regencyhealthcare.in/doctors/dr-s-k-awasthi/"
+            ]
+          },
+          "price_citation": null,
+          "flags": [],
+          "price_basis": null,
+          "comparable_quotes": null,
+          "safety_pinned": false,
+          "reason": ""
+        },
+        {
+          "mode": "nearest",
+          "label": "Nearest",
+          "facility_id": "39d0f4b3-205d-4450-b6a3-5d9d6c54586b",
+          "name": "Apley Clinic Orthopaedic Centre",
+          "tier": "moderate",
+          "distance_km": 96.3,
+          "citation": {
+            "field": "procedure",
+            "quote": "Trauma and fracture treatment",
+            "facility_id": "39d0f4b3-205d-4450-b6a3-5d9d6c54586b",
+            "source_urls": [
+              "https://drmanishkhanna.in/",
+              "https://drmanishkhanna.in/contact-us/",
+              "https://www.orthopaedicrheumatology.com/contact-us/"
+            ]
+          },
+          "price_citation": null,
+          "flags": [
+            "small_clinic_claim"
+          ],
+          "price_basis": null,
+          "comparable_quotes": null,
+          "safety_pinned": false,
+          "reason": ""
+        },
+        {
+          "mode": "price",
+          "label": "Compare listed prices",
+          "facility_id": "39d0f4b3-205d-4450-b6a3-5d9d6c54586b",
+          "name": "Apley Clinic Orthopaedic Centre",
+          "tier": "moderate",
+          "distance_km": 96.3,
+          "citation": {
+            "field": "procedure",
+            "quote": "Trauma and fracture treatment",
+            "facility_id": "39d0f4b3-205d-4450-b6a3-5d9d6c54586b",
+            "source_urls": [
+              "https://drmanishkhanna.in/",
+              "https://drmanishkhanna.in/contact-us/",
+              "https://www.orthopaedicrheumatology.com/contact-us/"
+            ]
+          },
+          "price_citation": null,
+          "flags": [
+            "small_clinic_claim"
+          ],
+          "price_basis": "distance",
+          "comparable_quotes": 0,
+          "safety_pinned": true,
+          "reason": "0 like-for-like documented price(s) within 121.3 km (same service, unit and conditions): prices cannot be ranked, so options are shown nearest first with every documented price labelled on its card."
+        }
+      ],
+      "top_changed": true,
+      "straight_line_difference_km": 1.1
+    },
+    {
+      "id": "q16",
+      "service": "trauma",
+      "place": "Kohima",
+      "summary": "Raj Medicity comes first for both evidence and distance. The urgent-care rule keeps the closest eligible option without a conflicting service claim first when available.",
+      "options": [
+        {
+          "mode": "default",
+          "label": "Best evidence",
+          "facility_id": "7d528d2e-0bd3-4a89-9161-cbfbf8f50c69",
+          "name": "Raj Medicity",
+          "tier": "strong",
+          "distance_km": 98.8,
+          "citation": {
+            "field": "capability",
+            "quote": "Provides trauma care services",
+            "facility_id": "7d528d2e-0bd3-4a89-9161-cbfbf8f50c69",
+            "source_urls": [
+              "http://www.rajmedicity.com/",
+              "https://www.rajmedicity.com/",
+              "https://rajmedicity.com/Paediatrics.aspx"
+            ]
+          },
+          "price_citation": null,
+          "flags": [],
+          "price_basis": null,
+          "comparable_quotes": null,
+          "safety_pinned": false,
+          "reason": ""
+        },
+        {
+          "mode": "nearest",
+          "label": "Nearest",
+          "facility_id": "7d528d2e-0bd3-4a89-9161-cbfbf8f50c69",
+          "name": "Raj Medicity",
+          "tier": "strong",
+          "distance_km": 98.8,
+          "citation": {
+            "field": "capability",
+            "quote": "Provides trauma care services",
+            "facility_id": "7d528d2e-0bd3-4a89-9161-cbfbf8f50c69",
+            "source_urls": [
+              "http://www.rajmedicity.com/",
+              "https://www.rajmedicity.com/",
+              "https://rajmedicity.com/Paediatrics.aspx"
+            ]
+          },
+          "price_citation": null,
+          "flags": [],
+          "price_basis": null,
+          "comparable_quotes": null,
+          "safety_pinned": false,
+          "reason": ""
+        },
+        {
+          "mode": "price",
+          "label": "Compare listed prices",
+          "facility_id": "7d528d2e-0bd3-4a89-9161-cbfbf8f50c69",
+          "name": "Raj Medicity",
+          "tier": "strong",
+          "distance_km": 98.8,
+          "citation": {
+            "field": "capability",
+            "quote": "Provides trauma care services",
+            "facility_id": "7d528d2e-0bd3-4a89-9161-cbfbf8f50c69",
+            "source_urls": [
+              "http://www.rajmedicity.com/",
+              "https://www.rajmedicity.com/",
+              "https://rajmedicity.com/Paediatrics.aspx"
+            ]
+          },
+          "price_citation": null,
+          "flags": [],
+          "price_basis": "distance",
+          "comparable_quotes": 0,
+          "safety_pinned": true,
+          "reason": "0 like-for-like documented price(s) within 123.8 km (same service, unit and conditions): prices cannot be ranked, so options are shown nearest first with every documented price labelled on its card."
+        }
+      ],
+      "top_changed": false,
+      "straight_line_difference_km": null
+    },
+    {
+      "id": "q17",
+      "service": "emergency",
+      "place": "Hyderabad",
+      "summary": "Kims Hospital is 0.5 km closer to the search centre by straight line. The records give Moderate evidence there and Strong evidence at Shishira Hospitals. The urgent-care rule keeps the closest eligible option without a conflicting service claim first when available. The starting point is approximate (about 8.1 km). Your closest option may differ.",
+      "options": [
+        {
+          "mode": "default",
+          "label": "Best evidence",
+          "facility_id": "ac7a1f74-acb7-48d8-b537-e3472ec3414b",
+          "name": "Shishira Hospitals",
+          "tier": "strong",
+          "distance_km": 0.9,
+          "citation": {
+            "field": "capability",
+            "quote": "24/7 emergency care",
+            "facility_id": "ac7a1f74-acb7-48d8-b537-e3472ec3414b",
+            "source_urls": [
+              "https://shishirahospitals.com/",
+              "http://www.shishirahospitals.com/",
+              "https://vrahealth.com/hospitaldetails/49"
+            ]
+          },
+          "price_citation": null,
+          "flags": [],
+          "price_basis": null,
+          "comparable_quotes": null,
+          "safety_pinned": false,
+          "reason": ""
+        },
+        {
+          "mode": "nearest",
+          "label": "Nearest",
+          "facility_id": "60d478ce-f2fd-4981-b18a-292785fdc401",
+          "name": "Kims Hospital",
+          "tier": "moderate",
+          "distance_km": 0.4,
+          "citation": {
+            "field": "capability",
+            "quote": "Offers 24x7 emergency services",
+            "facility_id": "60d478ce-f2fd-4981-b18a-292785fdc401",
+            "source_urls": [
+              "https://arunvontela.com/",
+              "https://ujjaindoshpuja.com/",
+              "https://breastcancerindia.org/"
+            ]
+          },
+          "price_citation": null,
+          "flags": [],
+          "price_basis": null,
+          "comparable_quotes": null,
+          "safety_pinned": false,
+          "reason": ""
+        },
+        {
+          "mode": "price",
+          "label": "Compare listed prices",
+          "facility_id": "60d478ce-f2fd-4981-b18a-292785fdc401",
+          "name": "Kims Hospital",
+          "tier": "moderate",
+          "distance_km": 0.4,
+          "citation": {
+            "field": "capability",
+            "quote": "Offers 24x7 emergency services",
+            "facility_id": "60d478ce-f2fd-4981-b18a-292785fdc401",
+            "source_urls": [
+              "https://arunvontela.com/",
+              "https://ujjaindoshpuja.com/",
+              "https://breastcancerindia.org/"
+            ]
+          },
+          "price_citation": null,
+          "flags": [],
+          "price_basis": "distance",
+          "comparable_quotes": 0,
+          "safety_pinned": true,
+          "reason": "0 like-for-like documented price(s) within 25.4 km (same service, unit and conditions): prices cannot be ranked, so options are shown nearest first with every documented price labelled on its card."
+        }
+      ],
+      "top_changed": true,
+      "straight_line_difference_km": 0.5
+    },
+    {
+      "id": "q18",
+      "service": "emergency",
+      "place": "Bhubaneswar",
+      "summary": "Swarna Hospital is 1.6 km closer to the search centre by straight line. The records give Moderate evidence there and Strong evidence at Capital Hospital. The urgent-care rule keeps the closest eligible option without a conflicting service claim first when available. The starting point is approximate (about 4.2 km). Your closest option may differ.",
+      "options": [
+        {
+          "mode": "default",
+          "label": "Best evidence",
+          "facility_id": "8600881d-b94b-4aba-b910-efeaa07fc77a",
+          "name": "Capital Hospital",
+          "tier": "strong",
+          "distance_km": 3.0,
+          "citation": {
+            "field": "capability",
+            "quote": "Offers 24/7 emergency care",
+            "facility_id": "8600881d-b94b-4aba-b910-efeaa07fc77a",
+            "source_urls": [
+              "https://swargaratha.com/",
+              "https://capitalambulance.in/",
+              "https://www.capitalambulance.in/"
+            ]
+          },
+          "price_citation": null,
+          "flags": [],
+          "price_basis": null,
+          "comparable_quotes": null,
+          "safety_pinned": false,
+          "reason": ""
+        },
+        {
+          "mode": "nearest",
+          "label": "Nearest",
+          "facility_id": "0bc24017-7dad-4eb7-a7d3-6eb0cb4f40b5",
+          "name": "Swarna Hospital",
+          "tier": "moderate",
+          "distance_km": 1.4,
+          "citation": {
+            "field": "capability",
+            "quote": "Provides 24/7 emergency care",
+            "facility_id": "0bc24017-7dad-4eb7-a7d3-6eb0cb4f40b5",
+            "source_urls": [
+              "https://www.hospitalsnearme.in/odisha-od-orissa-or/swarna-hospital-bhubaneswar/",
+              "https://www.tofler.in/swarna-hospital-private-limited/company/U00093OR2005PTC008471",
+              "https://www.mappls.com/place-swarna+hospital-jayadev+vihar-bhubaneswar-odisha-751013-kggnr7@zdata=MjAuMjk5NTA0Kzg1LjgyMDYwNysxNytrZ2ducjcrKw==ed"
+            ]
+          },
+          "price_citation": null,
+          "flags": [],
+          "price_basis": null,
+          "comparable_quotes": null,
+          "safety_pinned": false,
+          "reason": ""
+        },
+        {
+          "mode": "price",
+          "label": "Compare listed prices",
+          "facility_id": "0bc24017-7dad-4eb7-a7d3-6eb0cb4f40b5",
+          "name": "Swarna Hospital",
+          "tier": "moderate",
+          "distance_km": 1.4,
+          "citation": {
+            "field": "capability",
+            "quote": "Provides 24/7 emergency care",
+            "facility_id": "0bc24017-7dad-4eb7-a7d3-6eb0cb4f40b5",
+            "source_urls": [
+              "https://www.hospitalsnearme.in/odisha-od-orissa-or/swarna-hospital-bhubaneswar/",
+              "https://www.tofler.in/swarna-hospital-private-limited/company/U00093OR2005PTC008471",
+              "https://www.mappls.com/place-swarna+hospital-jayadev+vihar-bhubaneswar-odisha-751013-kggnr7@zdata=MjAuMjk5NTA0Kzg1LjgyMDYwNysxNytrZ2ducjcrKw==ed"
+            ]
+          },
+          "price_citation": null,
+          "flags": [],
+          "price_basis": "distance",
+          "comparable_quotes": 0,
+          "safety_pinned": true,
+          "reason": "0 like-for-like documented price(s) within 26.4 km (same service, unit and conditions): prices cannot be ranked, so options are shown nearest first with every documented price labelled on its card."
+        }
+      ],
+      "top_changed": true,
+      "straight_line_difference_km": 1.6
+    },
+    {
+      "id": "q19",
+      "service": "emergency",
+      "place": "764020",
+      "summary": "GMR Varalakshmi Care Hospital is 21.5 km closer to the search centre by straight line. The records give Moderate evidence there and Strong evidence at Usha Prime Hospital. The urgent-care rule keeps the closest eligible option without a conflicting service claim first when available.",
+      "options": [
+        {
+          "mode": "default",
+          "label": "Best evidence",
+          "facility_id": "204e8d14-e385-4d01-af46-7eb1164c29f0",
+          "name": "Usha Prime Hospital",
+          "tier": "strong",
+          "distance_km": 129.5,
+          "citation": {
+            "field": "capability",
+            "quote": "24/7 emergency care",
+            "facility_id": "204e8d14-e385-4d01-af46-7eb1164c29f0",
+            "source_urls": [
+              "http://www.ushaprime.com/",
+              "http://www.logkitcabin.com/",
+              "https://www.facebook.com/ushaprimehospital/"
+            ]
+          },
+          "price_citation": null,
+          "flags": [],
+          "price_basis": null,
+          "comparable_quotes": null,
+          "safety_pinned": false,
+          "reason": ""
+        },
+        {
+          "mode": "nearest",
+          "label": "Nearest",
+          "facility_id": "4d6863dc-85f9-4fa5-94a2-715bb4a4c3d3",
+          "name": "GMR Varalakshmi Care Hospital",
+          "tier": "moderate",
+          "distance_km": 108.0,
+          "citation": {
+            "field": "capability",
+            "quote": "Open 24 hours (24/7) emergency care",
+            "facility_id": "4d6863dc-85f9-4fa5-94a2-715bb4a4c3d3",
+            "source_urls": [
+              "https://www.gmrcarehospitals.in/",
+              "https://www.gmrcarehospitals.in/about/",
+              "https://www.gmrcarehospitals.in/specialties/ni-cardiology/"
+            ]
+          },
+          "price_citation": null,
+          "flags": [],
+          "price_basis": null,
+          "comparable_quotes": null,
+          "safety_pinned": false,
+          "reason": ""
+        },
+        {
+          "mode": "price",
+          "label": "Compare listed prices",
+          "facility_id": "4d6863dc-85f9-4fa5-94a2-715bb4a4c3d3",
+          "name": "GMR Varalakshmi Care Hospital",
+          "tier": "moderate",
+          "distance_km": 108.0,
+          "citation": {
+            "field": "capability",
+            "quote": "Open 24 hours (24/7) emergency care",
+            "facility_id": "4d6863dc-85f9-4fa5-94a2-715bb4a4c3d3",
+            "source_urls": [
+              "https://www.gmrcarehospitals.in/",
+              "https://www.gmrcarehospitals.in/about/",
+              "https://www.gmrcarehospitals.in/specialties/ni-cardiology/"
+            ]
+          },
+          "price_citation": null,
+          "flags": [],
+          "price_basis": "distance",
+          "comparable_quotes": 0,
+          "safety_pinned": true,
+          "reason": "0 like-for-like documented price(s) within 133.0 km (same service, unit and conditions): prices cannot be ranked, so options are shown nearest first with every documented price labelled on its card."
+        }
+      ],
+      "top_changed": true,
+      "straight_line_difference_km": 21.5
+    },
+    {
+      "id": "q20",
+      "service": "emergency",
+      "place": "Tawang",
+      "summary": "Udalguri Civil Hospital is 24.6 km closer to the search centre by straight line. The records give Moderate evidence there and Strong evidence at Sarathi Hospital. The urgent-care rule keeps the closest eligible option without a conflicting service claim first when available.",
+      "options": [
+        {
+          "mode": "default",
+          "label": "Best evidence",
+          "facility_id": "cec21b42-d634-47ad-b4cf-b840ec1af481",
+          "name": "Sarathi Hospital",
+          "tier": "strong",
+          "distance_km": 116.9,
+          "citation": {
+            "field": "procedure",
+            "quote": "Provides emergency care",
+            "facility_id": "cec21b42-d634-47ad-b4cf-b840ec1af481",
+            "source_urls": [
+              "http://sarathihospital.in/",
+              "https://sarathihospital.in/",
+              "https://antara-2.wheree.com/"
+            ]
+          },
+          "price_citation": null,
+          "flags": [],
+          "price_basis": null,
+          "comparable_quotes": null,
+          "safety_pinned": false,
+          "reason": ""
+        },
+        {
+          "mode": "nearest",
+          "label": "Nearest",
+          "facility_id": "6ef8d8ef-7e51-4f18-bb9a-beb999b4f93a",
+          "name": "Udalguri Civil Hospital",
+          "tier": "moderate",
+          "distance_km": 92.3,
+          "citation": {
+            "field": "capability",
+            "quote": "Emergency department available",
+            "facility_id": "6ef8d8ef-7e51-4f18-bb9a-beb999b4f93a",
+            "source_urls": [
+              "https://10bedicu.org/state-assam",
+              "https://mapcarta.com/N7153386758",
+              "https://atalamritabhiyan.assam.gov.in/about-us/district-officials"
+            ]
+          },
+          "price_citation": null,
+          "flags": [],
+          "price_basis": null,
+          "comparable_quotes": null,
+          "safety_pinned": false,
+          "reason": ""
+        },
+        {
+          "mode": "price",
+          "label": "Compare listed prices",
+          "facility_id": "6ef8d8ef-7e51-4f18-bb9a-beb999b4f93a",
+          "name": "Udalguri Civil Hospital",
+          "tier": "moderate",
+          "distance_km": 92.3,
+          "citation": {
+            "field": "capability",
+            "quote": "Emergency department available",
+            "facility_id": "6ef8d8ef-7e51-4f18-bb9a-beb999b4f93a",
+            "source_urls": [
+              "https://10bedicu.org/state-assam",
+              "https://mapcarta.com/N7153386758",
+              "https://atalamritabhiyan.assam.gov.in/about-us/district-officials"
+            ]
+          },
+          "price_citation": null,
+          "flags": [],
+          "price_basis": "distance",
+          "comparable_quotes": 0,
+          "safety_pinned": true,
+          "reason": "0 like-for-like documented price(s) within 117.3 km (same service, unit and conditions): prices cannot be ranked, so options are shown nearest first with every documented price labelled on its card."
+        }
+      ],
+      "top_changed": true,
+      "straight_line_difference_km": 24.6
+    },
+    {
+      "id": "q21",
+      "service": "burn care",
+      "place": "Bengaluru",
+      "summary": "Mallige Hospital is 2.7 km closer to the search centre by straight line. The records give Moderate evidence there and Strong evidence at SPARSH Hospital, Hennur Road. The urgent-care rule keeps the closest eligible option without a conflicting service claim first when available. The starting point is approximate (about 7.4 km). Your closest option may differ.",
+      "options": [
+        {
+          "mode": "default",
+          "label": "Best evidence",
+          "facility_id": "4b8e2383-2837-44fa-b514-6308dfd5eb8f",
+          "name": "SPARSH Hospital, Hennur Road",
+          "tier": "strong",
+          "distance_km": 4.1,
+          "citation": {
+            "field": "procedure",
+            "quote": "Burns and plastic surgery care available 24/7",
+            "facility_id": "4b8e2383-2837-44fa-b514-6308dfd5eb8f",
+            "source_urls": [
+              "http://www.sparshhospital.com/",
+              "https://www.sparshhospital.com/",
+              "https://sparshhospital.com/campaigns/home-care"
+            ]
+          },
+          "price_citation": null,
+          "flags": [
+            "coords_wrong_used_pin",
+            "possible_merged_record"
+          ],
+          "price_basis": null,
+          "comparable_quotes": null,
+          "safety_pinned": false,
+          "reason": ""
+        },
+        {
+          "mode": "nearest",
+          "label": "Nearest",
+          "facility_id": "dd87b0de-7378-410b-b6d7-e70b6a7fcb92",
+          "name": "Mallige Hospital",
+          "tier": "moderate",
+          "distance_km": 1.4,
+          "citation": {
+            "field": "capability",
+            "quote": "Burns care",
+            "facility_id": "dd87b0de-7378-410b-b6d7-e70b6a7fcb92",
+            "source_urls": [
+              "https://mallige.com/services/pediatrics",
+              "https://test.bloodlinks.in/find_hospital",
+              "https://pmc.ncbi.nlm.nih.gov/articles/PMC10043650/"
+            ]
+          },
+          "price_citation": null,
+          "flags": [],
+          "price_basis": null,
+          "comparable_quotes": null,
+          "safety_pinned": false,
+          "reason": ""
+        },
+        {
+          "mode": "price",
+          "label": "Compare listed prices",
+          "facility_id": "dd87b0de-7378-410b-b6d7-e70b6a7fcb92",
+          "name": "Mallige Hospital",
+          "tier": "moderate",
+          "distance_km": 1.4,
+          "citation": {
+            "field": "capability",
+            "quote": "Burns care",
+            "facility_id": "dd87b0de-7378-410b-b6d7-e70b6a7fcb92",
+            "source_urls": [
+              "https://mallige.com/services/pediatrics",
+              "https://test.bloodlinks.in/find_hospital",
+              "https://pmc.ncbi.nlm.nih.gov/articles/PMC10043650/"
+            ]
+          },
+          "price_citation": null,
+          "flags": [],
+          "price_basis": "distance",
+          "comparable_quotes": 0,
+          "safety_pinned": true,
+          "reason": "0 like-for-like documented price(s) within 26.4 km (same service, unit and conditions): prices cannot be ranked, so options are shown nearest first with every documented price labelled on its card."
+        }
+      ],
+      "top_changed": true,
+      "straight_line_difference_km": 2.7
+    },
+    {
+      "id": "q22",
+      "service": "burn care",
+      "place": "Gaya",
+      "summary": "Nirmala Hospital is 0.5 km closer to the search centre by straight line. The records give Moderate evidence there and Strong evidence at Palika Vinayak Hospital. The urgent-care rule keeps the closest eligible option without a conflicting service claim first when available. The starting point is approximate (about 3 km). Your closest option may differ.",
+      "options": [
+        {
+          "mode": "default",
+          "label": "Best evidence",
+          "facility_id": "d90d776c-7b1e-4bb7-abe4-5d5c6e6e0a7c",
+          "name": "Palika Vinayak Hospital",
+          "tier": "strong",
+          "distance_km": 91.9,
+          "citation": {
+            "field": "procedure",
+            "quote": "Burns management",
+            "facility_id": "d90d776c-7b1e-4bb7-abe4-5d5c6e6e0a7c",
+            "source_urls": [
+              "https://in.policy.online/hospital/24287/harsh-hospital",
+              "https://www.iffcotokio.co.in/health-insurance/city/patna",
+              "https://www.indiamart.com/palikavinayakhospital/aboutus.html"
+            ]
+          },
+          "price_citation": null,
+          "flags": [],
+          "price_basis": null,
+          "comparable_quotes": null,
+          "safety_pinned": false,
+          "reason": ""
+        },
+        {
+          "mode": "nearest",
+          "label": "Nearest",
+          "facility_id": "6c85c764-f965-42cd-81df-5edaff5a1d96",
+          "name": "Nirmala Hospital",
+          "tier": "moderate",
+          "distance_km": 91.4,
+          "citation": {
+            "field": "procedure",
+            "quote": "Provides burn surgery",
+            "facility_id": "6c85c764-f965-42cd-81df-5edaff5a1d96",
+            "source_urls": [
+              "https://www.facebook.com/100146012942948",
+              "https://www.facebook.com/173122922556857",
+              "https://www.practo.com/patna/hospital/nirmala-hospital-3-naya-panapur/services"
+            ]
+          },
+          "price_citation": null,
+          "flags": [],
+          "price_basis": null,
+          "comparable_quotes": null,
+          "safety_pinned": false,
+          "reason": ""
+        },
+        {
+          "mode": "price",
+          "label": "Compare listed prices",
+          "facility_id": "6c85c764-f965-42cd-81df-5edaff5a1d96",
+          "name": "Nirmala Hospital",
+          "tier": "moderate",
+          "distance_km": 91.4,
+          "citation": {
+            "field": "procedure",
+            "quote": "Provides burn surgery",
+            "facility_id": "6c85c764-f965-42cd-81df-5edaff5a1d96",
+            "source_urls": [
+              "https://www.facebook.com/100146012942948",
+              "https://www.facebook.com/173122922556857",
+              "https://www.practo.com/patna/hospital/nirmala-hospital-3-naya-panapur/services"
+            ]
+          },
+          "price_citation": null,
+          "flags": [],
+          "price_basis": "distance",
+          "comparable_quotes": 0,
+          "safety_pinned": true,
+          "reason": "0 like-for-like documented price(s) within 116.4 km (same service, unit and conditions): prices cannot be ranked, so options are shown nearest first with every documented price labelled on its card."
+        }
+      ],
+      "top_changed": true,
+      "straight_line_difference_km": 0.5
+    },
+    {
+      "id": "q23",
+      "service": "burn care",
+      "place": "852201",
+      "summary": "Sri Krishna Medical College and Hospital is 22.1 km closer to the search centre by straight line. The records give Moderate evidence there and Strong evidence at Palika Vinayak Hospital. The urgent-care rule keeps the closest eligible option without a conflicting service claim first when available.",
+      "options": [
+        {
+          "mode": "default",
+          "label": "Best evidence",
+          "facility_id": "d90d776c-7b1e-4bb7-abe4-5d5c6e6e0a7c",
+          "name": "Palika Vinayak Hospital",
+          "tier": "strong",
+          "distance_km": 146.4,
+          "citation": {
+            "field": "procedure",
+            "quote": "Burns management",
+            "facility_id": "d90d776c-7b1e-4bb7-abe4-5d5c6e6e0a7c",
+            "source_urls": [
+              "https://in.policy.online/hospital/24287/harsh-hospital",
+              "https://www.iffcotokio.co.in/health-insurance/city/patna",
+              "https://www.indiamart.com/palikavinayakhospital/aboutus.html"
+            ]
+          },
+          "price_citation": null,
+          "flags": [],
+          "price_basis": null,
+          "comparable_quotes": null,
+          "safety_pinned": false,
+          "reason": ""
+        },
+        {
+          "mode": "nearest",
+          "label": "Nearest",
+          "facility_id": "ce402c4a-e70e-48fb-89f1-d6c0182371c2",
+          "name": "Sri Krishna Medical College and Hospital",
+          "tier": "moderate",
+          "distance_km": 124.3,
+          "citation": {
+            "field": "procedure",
+            "quote": "Offers burn and plastic surgery",
+            "facility_id": "ce402c4a-e70e-48fb-89f1-d6c0182371c2",
+            "source_urls": [
+              "https://qa.acelearninghub.com/",
+              "https://omeducare.in/PG/suggestion",
+              "http://www.drzeeshanahmedmumtaz.com/"
+            ]
+          },
+          "price_citation": null,
+          "flags": [],
+          "price_basis": null,
+          "comparable_quotes": null,
+          "safety_pinned": false,
+          "reason": ""
+        },
+        {
+          "mode": "price",
+          "label": "Compare listed prices",
+          "facility_id": "ce402c4a-e70e-48fb-89f1-d6c0182371c2",
+          "name": "Sri Krishna Medical College and Hospital",
+          "tier": "moderate",
+          "distance_km": 124.3,
+          "citation": {
+            "field": "procedure",
+            "quote": "Offers burn and plastic surgery",
+            "facility_id": "ce402c4a-e70e-48fb-89f1-d6c0182371c2",
+            "source_urls": [
+              "https://qa.acelearninghub.com/",
+              "https://omeducare.in/PG/suggestion",
+              "http://www.drzeeshanahmedmumtaz.com/"
+            ]
+          },
+          "price_citation": null,
+          "flags": [],
+          "price_basis": "distance",
+          "comparable_quotes": 0,
+          "safety_pinned": true,
+          "reason": "0 like-for-like documented price(s) within 149.3 km (same service, unit and conditions): prices cannot be ranked, so options are shown nearest first with every documented price labelled on its card."
+        }
+      ],
+      "top_changed": true,
+      "straight_line_difference_km": 22.1
+    },
+    {
+      "id": "q24",
+      "service": "burn care",
+      "place": "Mon",
+      "summary": "Raj Medicity comes first for both evidence and distance. The urgent-care rule keeps the closest eligible option without a conflicting service claim first when available.",
+      "options": [
+        {
+          "mode": "default",
+          "label": "Best evidence",
+          "facility_id": "7d528d2e-0bd3-4a89-9161-cbfbf8f50c69",
+          "name": "Raj Medicity",
+          "tier": "moderate",
+          "distance_km": 232.0,
+          "citation": {
+            "field": "capability",
+            "quote": "Specialization: Burns Management, General Medicine, Obstetrics & Gynecology, Orthopaedics, Plastic & Reconstructive, Surgical Oncology, Urology",
+            "facility_id": "7d528d2e-0bd3-4a89-9161-cbfbf8f50c69",
+            "source_urls": [
+              "http://www.rajmedicity.com/",
+              "https://www.rajmedicity.com/",
+              "https://rajmedicity.com/Paediatrics.aspx"
+            ]
+          },
+          "price_citation": null,
+          "flags": [],
+          "price_basis": null,
+          "comparable_quotes": null,
+          "safety_pinned": false,
+          "reason": ""
+        },
+        {
+          "mode": "nearest",
+          "label": "Nearest",
+          "facility_id": "7d528d2e-0bd3-4a89-9161-cbfbf8f50c69",
+          "name": "Raj Medicity",
+          "tier": "moderate",
+          "distance_km": 232.0,
+          "citation": {
+            "field": "capability",
+            "quote": "Specialization: Burns Management, General Medicine, Obstetrics & Gynecology, Orthopaedics, Plastic & Reconstructive, Surgical Oncology, Urology",
+            "facility_id": "7d528d2e-0bd3-4a89-9161-cbfbf8f50c69",
+            "source_urls": [
+              "http://www.rajmedicity.com/",
+              "https://www.rajmedicity.com/",
+              "https://rajmedicity.com/Paediatrics.aspx"
+            ]
+          },
+          "price_citation": null,
+          "flags": [],
+          "price_basis": null,
+          "comparable_quotes": null,
+          "safety_pinned": false,
+          "reason": ""
+        },
+        {
+          "mode": "price",
+          "label": "Compare listed prices",
+          "facility_id": "7d528d2e-0bd3-4a89-9161-cbfbf8f50c69",
+          "name": "Raj Medicity",
+          "tier": "moderate",
+          "distance_km": 232.0,
+          "citation": {
+            "field": "capability",
+            "quote": "Specialization: Burns Management, General Medicine, Obstetrics & Gynecology, Orthopaedics, Plastic & Reconstructive, Surgical Oncology, Urology",
+            "facility_id": "7d528d2e-0bd3-4a89-9161-cbfbf8f50c69",
+            "source_urls": [
+              "http://www.rajmedicity.com/",
+              "https://www.rajmedicity.com/",
+              "https://rajmedicity.com/Paediatrics.aspx"
+            ]
+          },
+          "price_citation": null,
+          "flags": [],
+          "price_basis": "distance",
+          "comparable_quotes": 0,
+          "safety_pinned": true,
+          "reason": "0 like-for-like documented price(s) within 257.0 km (same service, unit and conditions): prices cannot be ranked, so options are shown nearest first with every documented price labelled on its card."
+        }
+      ],
+      "top_changed": false,
+      "straight_line_difference_km": null
+    },
+    {
+      "id": "q25",
+      "service": "cardiac surgery",
+      "place": "Ahmedabad",
+      "summary": "HCG Hospitals, Ahmedabad is 1.5 km closer to the search centre by straight line. The records give Moderate evidence there and Strong evidence at Care Institute of Medical Sciences, Ahmedabad. Price comparison falls back to distance. The starting point is approximate (about 5.4 km). Your closest option may differ.",
+      "options": [
+        {
+          "mode": "default",
+          "label": "Best evidence",
+          "facility_id": "3825b33f-8ad0-451c-9b06-cc5693d837c2",
+          "name": "Care Institute of Medical Sciences, Ahmedabad",
+          "tier": "strong",
+          "distance_km": 2.0,
+          "citation": {
+            "field": "equipment",
+            "quote": "TAVR/transcatheter valve replacement equipment",
+            "facility_id": "3825b33f-8ad0-451c-9b06-cc5693d837c2",
+            "source_urls": [
+              "https://curenearme.com/DrDeepShah",
+              "https://www.keyurparikh.com/about/",
+              "https://ahchospital.org/doctors/dr-tejas-v-patel"
+            ]
+          },
+          "price_citation": null,
+          "flags": [
+            "pin_inconsistent",
+            "possible_merged_record"
+          ],
+          "price_basis": null,
+          "comparable_quotes": null,
+          "safety_pinned": false,
+          "reason": ""
+        },
+        {
+          "mode": "nearest",
+          "label": "Nearest",
+          "facility_id": "4133ceda-e0f6-426e-8b97-0e78c9bbdd10",
+          "name": "HCG Hospitals, Ahmedabad",
+          "tier": "moderate",
+          "distance_km": 0.5,
+          "citation": {
+            "field": "capability",
+            "quote": "Specialties include Cardiothoracic and Vascular Surgery, Neurosurgery, Orthopaedic and Joint Replacement Surgery, Pulmonology, Critical Care Medicine, Cardiology, and Nephrology",
+            "facility_id": "4133ceda-e0f6-426e-8b97-0e78c9bbdd10",
+            "source_urls": [
+              "https://rivaaralabs.com/events/",
+              "https://www.hcgoncology.com/cancer-centers/",
+              "https://my1health.com/health-wellness-network"
+            ]
+          },
+          "price_citation": null,
+          "flags": [],
+          "price_basis": null,
+          "comparable_quotes": null,
+          "safety_pinned": false,
+          "reason": ""
+        },
+        {
+          "mode": "price",
+          "label": "Compare listed prices",
+          "facility_id": "4133ceda-e0f6-426e-8b97-0e78c9bbdd10",
+          "name": "HCG Hospitals, Ahmedabad",
+          "tier": "moderate",
+          "distance_km": 0.5,
+          "citation": {
+            "field": "capability",
+            "quote": "Specialties include Cardiothoracic and Vascular Surgery, Neurosurgery, Orthopaedic and Joint Replacement Surgery, Pulmonology, Critical Care Medicine, Cardiology, and Nephrology",
+            "facility_id": "4133ceda-e0f6-426e-8b97-0e78c9bbdd10",
+            "source_urls": [
+              "https://rivaaralabs.com/events/",
+              "https://www.hcgoncology.com/cancer-centers/",
+              "https://my1health.com/health-wellness-network"
+            ]
+          },
+          "price_citation": null,
+          "flags": [],
+          "price_basis": "distance",
+          "comparable_quotes": 0,
+          "safety_pinned": false,
+          "reason": "0 like-for-like documented price(s) within 25.5 km (same service, unit and conditions): prices cannot be ranked, so options are shown nearest first with every documented price labelled on its card."
+        }
+      ],
+      "top_changed": true,
+      "straight_line_difference_km": 1.5
+    },
+    {
+      "id": "q26",
+      "service": "cardiac surgery",
+      "place": "Bhopal",
+      "summary": "Akshaya Heart Hospital comes first for both evidence and distance. Price comparison falls back to distance.",
+      "options": [
+        {
+          "mode": "default",
+          "label": "Best evidence",
+          "facility_id": "160970c9-3aaf-474c-9b95-287957844262",
+          "name": "Akshaya Heart Hospital",
+          "tier": "moderate",
+          "distance_km": 2.1,
+          "citation": {
+            "field": "capability",
+            "quote": "Specialties include Anesthesiology, Cardiology, Cardiothoracic Surgery, Emergency Medicine, Endocrinology, Endoscopy, ENT (Otolaryngology), Gastroenterology, Gastrointestinal Surgery, General Medicine, General Surgery, Internal Medicine, Medical Oncology, Nephrology, Neurosurgery, Obstetrics and Gynecology, Ophthalmology, Orthopedic Surgery, Pathology, Pediatric Surgery, Plastic Surgery, Radiology, Respiratory Medicine, Surgical Oncology, Urology",
+            "facility_id": "160970c9-3aaf-474c-9b95-287957844262",
+            "source_urls": [
+              "https://zenithplasticsurgery.in/",
+              "https://dosecart.co/doctorDetail/MTY1",
+              "https://www.mpdoctors.com/doctors/cityhospital.asp"
+            ]
+          },
+          "price_citation": null,
+          "flags": [],
+          "price_basis": null,
+          "comparable_quotes": null,
+          "safety_pinned": false,
+          "reason": ""
+        },
+        {
+          "mode": "nearest",
+          "label": "Nearest",
+          "facility_id": "160970c9-3aaf-474c-9b95-287957844262",
+          "name": "Akshaya Heart Hospital",
+          "tier": "moderate",
+          "distance_km": 2.1,
+          "citation": {
+            "field": "capability",
+            "quote": "Specialties include Anesthesiology, Cardiology, Cardiothoracic Surgery, Emergency Medicine, Endocrinology, Endoscopy, ENT (Otolaryngology), Gastroenterology, Gastrointestinal Surgery, General Medicine, General Surgery, Internal Medicine, Medical Oncology, Nephrology, Neurosurgery, Obstetrics and Gynecology, Ophthalmology, Orthopedic Surgery, Pathology, Pediatric Surgery, Plastic Surgery, Radiology, Respiratory Medicine, Surgical Oncology, Urology",
+            "facility_id": "160970c9-3aaf-474c-9b95-287957844262",
+            "source_urls": [
+              "https://zenithplasticsurgery.in/",
+              "https://dosecart.co/doctorDetail/MTY1",
+              "https://www.mpdoctors.com/doctors/cityhospital.asp"
+            ]
+          },
+          "price_citation": null,
+          "flags": [],
+          "price_basis": null,
+          "comparable_quotes": null,
+          "safety_pinned": false,
+          "reason": ""
+        },
+        {
+          "mode": "price",
+          "label": "Compare listed prices",
+          "facility_id": "160970c9-3aaf-474c-9b95-287957844262",
+          "name": "Akshaya Heart Hospital",
+          "tier": "moderate",
+          "distance_km": 2.1,
+          "citation": {
+            "field": "capability",
+            "quote": "Specialties include Anesthesiology, Cardiology, Cardiothoracic Surgery, Emergency Medicine, Endocrinology, Endoscopy, ENT (Otolaryngology), Gastroenterology, Gastrointestinal Surgery, General Medicine, General Surgery, Internal Medicine, Medical Oncology, Nephrology, Neurosurgery, Obstetrics and Gynecology, Ophthalmology, Orthopedic Surgery, Pathology, Pediatric Surgery, Plastic Surgery, Radiology, Respiratory Medicine, Surgical Oncology, Urology",
+            "facility_id": "160970c9-3aaf-474c-9b95-287957844262",
+            "source_urls": [
+              "https://zenithplasticsurgery.in/",
+              "https://dosecart.co/doctorDetail/MTY1",
+              "https://www.mpdoctors.com/doctors/cityhospital.asp"
+            ]
+          },
+          "price_citation": null,
+          "flags": [],
+          "price_basis": "distance",
+          "comparable_quotes": 0,
+          "safety_pinned": false,
+          "reason": "0 like-for-like documented price(s) within 27.1 km (same service, unit and conditions): prices cannot be ranked, so options are shown nearest first with every documented price labelled on its card."
+        }
+      ],
+      "top_changed": false,
+      "straight_line_difference_km": null
+    },
+    {
+      "id": "q27",
+      "service": "cardiac surgery",
+      "place": "822101",
+      "summary": "Orchid Medical Centre comes first for both evidence and distance. Price comparison falls back to distance.",
+      "options": [
+        {
+          "mode": "default",
+          "label": "Best evidence",
+          "facility_id": "ac382cdf-8ff9-4539-a453-00bec0989719",
+          "name": "Orchid Medical Centre",
+          "tier": "strong",
+          "distance_km": 150.3,
+          "citation": {
+            "field": "procedure",
+            "quote": "Cardiothoracic vascular surgery procedures",
+            "facility_id": "ac382cdf-8ff9-4539-a453-00bec0989719",
+            "source_urls": [
+              "https://www.orchidmedcentre.com/",
+              "https://indianhelpline.com/jharkhand",
+              "https://www.instagram.com/p/DSUhblWDysi/"
+            ]
+          },
+          "price_citation": null,
+          "flags": [],
+          "price_basis": null,
+          "comparable_quotes": null,
+          "safety_pinned": false,
+          "reason": ""
+        },
+        {
+          "mode": "nearest",
+          "label": "Nearest",
+          "facility_id": "ac382cdf-8ff9-4539-a453-00bec0989719",
+          "name": "Orchid Medical Centre",
+          "tier": "strong",
+          "distance_km": 150.3,
+          "citation": {
+            "field": "procedure",
+            "quote": "Cardiothoracic vascular surgery procedures",
+            "facility_id": "ac382cdf-8ff9-4539-a453-00bec0989719",
+            "source_urls": [
+              "https://www.orchidmedcentre.com/",
+              "https://indianhelpline.com/jharkhand",
+              "https://www.instagram.com/p/DSUhblWDysi/"
+            ]
+          },
+          "price_citation": null,
+          "flags": [],
+          "price_basis": null,
+          "comparable_quotes": null,
+          "safety_pinned": false,
+          "reason": ""
+        },
+        {
+          "mode": "price",
+          "label": "Compare listed prices",
+          "facility_id": "ac382cdf-8ff9-4539-a453-00bec0989719",
+          "name": "Orchid Medical Centre",
+          "tier": "strong",
+          "distance_km": 150.3,
+          "citation": {
+            "field": "procedure",
+            "quote": "Cardiothoracic vascular surgery procedures",
+            "facility_id": "ac382cdf-8ff9-4539-a453-00bec0989719",
+            "source_urls": [
+              "https://www.orchidmedcentre.com/",
+              "https://indianhelpline.com/jharkhand",
+              "https://www.instagram.com/p/DSUhblWDysi/"
+            ]
+          },
+          "price_citation": null,
+          "flags": [],
+          "price_basis": "distance",
+          "comparable_quotes": 0,
+          "safety_pinned": false,
+          "reason": "0 like-for-like documented price(s) within 175.3 km (same service, unit and conditions): prices cannot be ranked, so options are shown nearest first with every documented price labelled on its card."
+        }
+      ],
+      "top_changed": false,
+      "straight_line_difference_km": null
+    },
+    {
+      "id": "q28",
+      "service": "cardiac surgery",
+      "place": "Shillong",
+      "summary": "PA Sangma International Medical College & Hospital is 6.8 km closer to the search centre by straight line. The records give Moderate evidence there and Strong evidence at Apollo Hospital, Guwahati, India. Price comparison falls back to distance.",
+      "options": [
+        {
+          "mode": "default",
+          "label": "Best evidence",
+          "facility_id": "bd77bf7d-4822-4932-81bf-7489f5d510e9",
+          "name": "Apollo Hospital, Guwahati, India",
+          "tier": "strong",
+          "distance_km": 65.5,
+          "citation": {
+            "field": "procedure",
+            "quote": "Mitral Valve Repair",
+            "facility_id": "bd77bf7d-4822-4932-81bf-7489f5d510e9",
+            "source_urls": [
+              "https://www.apollohospitals.com/doctors",
+              "https://www.apollohospitals.com/guwahati",
+              "https://pubmed.ncbi.nlm.nih.gov/40380093/"
+            ]
+          },
+          "price_citation": null,
+          "flags": [],
+          "price_basis": null,
+          "comparable_quotes": null,
+          "safety_pinned": false,
+          "reason": ""
+        },
+        {
+          "mode": "nearest",
+          "label": "Nearest",
+          "facility_id": "d9ad5390-e954-4ddf-8ee9-2386b0b4e9c4",
+          "name": "PA Sangma International Medical College & Hospital",
+          "tier": "moderate",
+          "distance_km": 58.7,
+          "citation": {
+            "field": "capability",
+            "quote": "Specialty Departments in Urology, Nephrology, Cardiology, CTVS, Pulmonology, and Gastroenterology",
+            "facility_id": "d9ad5390-e954-4ddf-8ee9-2386b0b4e9c4",
+            "source_urls": [
+              "https://pimc.ac.in/about-pimc/",
+              "https://www.admissionduniya.com/college-details/pa-sangma-international-medical-college-hospital",
+              "https://www.facebook.com/276425315548541"
+            ]
+          },
+          "price_citation": null,
+          "flags": [],
+          "price_basis": null,
+          "comparable_quotes": null,
+          "safety_pinned": false,
+          "reason": ""
+        },
+        {
+          "mode": "price",
+          "label": "Compare listed prices",
+          "facility_id": "d9ad5390-e954-4ddf-8ee9-2386b0b4e9c4",
+          "name": "PA Sangma International Medical College & Hospital",
+          "tier": "moderate",
+          "distance_km": 58.7,
+          "citation": {
+            "field": "capability",
+            "quote": "Specialty Departments in Urology, Nephrology, Cardiology, CTVS, Pulmonology, and Gastroenterology",
+            "facility_id": "d9ad5390-e954-4ddf-8ee9-2386b0b4e9c4",
+            "source_urls": [
+              "https://pimc.ac.in/about-pimc/",
+              "https://www.admissionduniya.com/college-details/pa-sangma-international-medical-college-hospital",
+              "https://www.facebook.com/276425315548541"
+            ]
+          },
+          "price_citation": null,
+          "flags": [],
+          "price_basis": "distance",
+          "comparable_quotes": 0,
+          "safety_pinned": false,
+          "reason": "0 like-for-like documented price(s) within 83.7 km (same service, unit and conditions): prices cannot be ranked, so options are shown nearest first with every documented price labelled on its card."
+        }
+      ],
+      "top_changed": true,
+      "straight_line_difference_km": 6.8
+    },
+    {
+      "id": "q29",
+      "service": "MRI",
+      "place": "Pune",
+      "summary": "Deccan Hardikar Hospital comes first for both evidence and distance. Price comparison falls back to distance.",
+      "options": [
+        {
+          "mode": "default",
+          "label": "Best evidence",
+          "facility_id": "5ef1d061-efbf-4cba-a726-636c486b1aaa",
+          "name": "Deccan Hardikar Hospital",
+          "tier": "strong",
+          "distance_km": 2.4,
+          "citation": {
+            "field": "equipment",
+            "quote": "3 Tesla MRI scanner",
+            "facility_id": "5ef1d061-efbf-4cba-a726-636c486b1aaa",
+            "source_urls": [
+              "https://puneoralsurgeon.com/",
+              "http://www.drdeepakmunde.com/",
+              "https://www.drsaurabhgiri.com/"
+            ]
+          },
+          "price_citation": null,
+          "flags": [],
+          "price_basis": null,
+          "comparable_quotes": null,
+          "safety_pinned": false,
+          "reason": ""
+        },
+        {
+          "mode": "nearest",
+          "label": "Nearest",
+          "facility_id": "5ef1d061-efbf-4cba-a726-636c486b1aaa",
+          "name": "Deccan Hardikar Hospital",
+          "tier": "strong",
+          "distance_km": 2.4,
+          "citation": {
+            "field": "equipment",
+            "quote": "3 Tesla MRI scanner",
+            "facility_id": "5ef1d061-efbf-4cba-a726-636c486b1aaa",
+            "source_urls": [
+              "https://puneoralsurgeon.com/",
+              "http://www.drdeepakmunde.com/",
+              "https://www.drsaurabhgiri.com/"
+            ]
+          },
+          "price_citation": null,
+          "flags": [],
+          "price_basis": null,
+          "comparable_quotes": null,
+          "safety_pinned": false,
+          "reason": ""
+        },
+        {
+          "mode": "price",
+          "label": "Compare listed prices",
+          "facility_id": "5ef1d061-efbf-4cba-a726-636c486b1aaa",
+          "name": "Deccan Hardikar Hospital",
+          "tier": "strong",
+          "distance_km": 2.4,
+          "citation": {
+            "field": "equipment",
+            "quote": "3 Tesla MRI scanner",
+            "facility_id": "5ef1d061-efbf-4cba-a726-636c486b1aaa",
+            "source_urls": [
+              "https://puneoralsurgeon.com/",
+              "http://www.drdeepakmunde.com/",
+              "https://www.drsaurabhgiri.com/"
+            ]
+          },
+          "price_citation": null,
+          "flags": [],
+          "price_basis": "distance",
+          "comparable_quotes": 0,
+          "safety_pinned": false,
+          "reason": "0 like-for-like documented price(s) within 27.4 km (same service, unit and conditions): prices cannot be ranked, so options are shown nearest first with every documented price labelled on its card."
+        }
+      ],
+      "top_changed": false,
+      "straight_line_difference_km": null
+    },
+    {
+      "id": "q30",
+      "service": "MRI",
+      "place": "Darbhanga",
+      "summary": "Paras Global Darbhanga comes first for both evidence and distance. Price comparison falls back to distance.",
+      "options": [
+        {
+          "mode": "default",
+          "label": "Best evidence",
+          "facility_id": "b668392a-bc18-4bee-b17e-0155f07e966a",
+          "name": "Paras Global Darbhanga",
+          "tier": "moderate",
+          "distance_km": 1.0,
+          "citation": {
+            "field": "equipment",
+            "quote": "MRI scanner",
+            "facility_id": "b668392a-bc18-4bee-b17e-0155f07e966a",
+            "source_urls": [
+              "https://www.parashospitals.com/darbhanga",
+              "https://www.parashospitals.com/darbhanga/doctor/urologists",
+              "https://www.scribd.com/document/639094200/Bihar-Hospitals-6"
+            ]
+          },
+          "price_citation": null,
+          "flags": [],
+          "price_basis": null,
+          "comparable_quotes": null,
+          "safety_pinned": false,
+          "reason": ""
+        },
+        {
+          "mode": "nearest",
+          "label": "Nearest",
+          "facility_id": "b668392a-bc18-4bee-b17e-0155f07e966a",
+          "name": "Paras Global Darbhanga",
+          "tier": "moderate",
+          "distance_km": 1.0,
+          "citation": {
+            "field": "equipment",
+            "quote": "MRI scanner",
+            "facility_id": "b668392a-bc18-4bee-b17e-0155f07e966a",
+            "source_urls": [
+              "https://www.parashospitals.com/darbhanga",
+              "https://www.parashospitals.com/darbhanga/doctor/urologists",
+              "https://www.scribd.com/document/639094200/Bihar-Hospitals-6"
+            ]
+          },
+          "price_citation": null,
+          "flags": [],
+          "price_basis": null,
+          "comparable_quotes": null,
+          "safety_pinned": false,
+          "reason": ""
+        },
+        {
+          "mode": "price",
+          "label": "Compare listed prices",
+          "facility_id": "b668392a-bc18-4bee-b17e-0155f07e966a",
+          "name": "Paras Global Darbhanga",
+          "tier": "moderate",
+          "distance_km": 1.0,
+          "citation": {
+            "field": "equipment",
+            "quote": "MRI scanner",
+            "facility_id": "b668392a-bc18-4bee-b17e-0155f07e966a",
+            "source_urls": [
+              "https://www.parashospitals.com/darbhanga",
+              "https://www.parashospitals.com/darbhanga/doctor/urologists",
+              "https://www.scribd.com/document/639094200/Bihar-Hospitals-6"
+            ]
+          },
+          "price_citation": null,
+          "flags": [],
+          "price_basis": "distance",
+          "comparable_quotes": 0,
+          "safety_pinned": false,
+          "reason": "0 like-for-like documented price(s) within 26.0 km (same service, unit and conditions): prices cannot be ranked, so options are shown nearest first with every documented price labelled on its card."
+        }
+      ],
+      "top_changed": false,
+      "straight_line_difference_km": null
+    },
+    {
+      "id": "q31",
+      "service": "MRI",
+      "place": "473001",
+      "summary": "Promise Children And General Hospital Bhopal comes first for both evidence and distance. Price comparison falls back to distance.",
+      "options": [
+        {
+          "mode": "default",
+          "label": "Best evidence",
+          "facility_id": "7346dccd-c0e7-43b5-a059-02d2bc5d7261",
+          "name": "Promise Children And General Hospital Bhopal",
+          "tier": "strong",
+          "distance_km": 150.1,
+          "citation": {
+            "field": "procedure",
+            "quote": "MRI",
+            "facility_id": "7346dccd-c0e7-43b5-a059-02d2bc5d7261",
+            "source_urls": [
+              "https://www.drlogy.com/ayushman-bharat/hospitals/madhya-pradesh/bhopal/promise-children-and-general-hospital",
+              "https://www.facebook.com/437389460418364",
+              "https://www.practo.com/bhopal/hospital/promise-children-general-hospital-devki-nagar"
+            ]
+          },
+          "price_citation": null,
+          "flags": [],
+          "price_basis": null,
+          "comparable_quotes": null,
+          "safety_pinned": false,
+          "reason": ""
+        },
+        {
+          "mode": "nearest",
+          "label": "Nearest",
+          "facility_id": "7346dccd-c0e7-43b5-a059-02d2bc5d7261",
+          "name": "Promise Children And General Hospital Bhopal",
+          "tier": "strong",
+          "distance_km": 150.1,
+          "citation": {
+            "field": "procedure",
+            "quote": "MRI",
+            "facility_id": "7346dccd-c0e7-43b5-a059-02d2bc5d7261",
+            "source_urls": [
+              "https://www.drlogy.com/ayushman-bharat/hospitals/madhya-pradesh/bhopal/promise-children-and-general-hospital",
+              "https://www.facebook.com/437389460418364",
+              "https://www.practo.com/bhopal/hospital/promise-children-general-hospital-devki-nagar"
+            ]
+          },
+          "price_citation": null,
+          "flags": [],
+          "price_basis": null,
+          "comparable_quotes": null,
+          "safety_pinned": false,
+          "reason": ""
+        },
+        {
+          "mode": "price",
+          "label": "Compare listed prices",
+          "facility_id": "7346dccd-c0e7-43b5-a059-02d2bc5d7261",
+          "name": "Promise Children And General Hospital Bhopal",
+          "tier": "strong",
+          "distance_km": 150.1,
+          "citation": {
+            "field": "procedure",
+            "quote": "MRI",
+            "facility_id": "7346dccd-c0e7-43b5-a059-02d2bc5d7261",
+            "source_urls": [
+              "https://www.drlogy.com/ayushman-bharat/hospitals/madhya-pradesh/bhopal/promise-children-and-general-hospital",
+              "https://www.facebook.com/437389460418364",
+              "https://www.practo.com/bhopal/hospital/promise-children-general-hospital-devki-nagar"
+            ]
+          },
+          "price_citation": null,
+          "flags": [],
+          "price_basis": "distance",
+          "comparable_quotes": 0,
+          "safety_pinned": false,
+          "reason": "0 like-for-like documented price(s) within 175.1 km (same service, unit and conditions): prices cannot be ranked, so options are shown nearest first with every documented price labelled on its card."
+        }
+      ],
+      "top_changed": false,
+      "straight_line_difference_km": null
+    },
+    {
+      "id": "q32",
+      "service": "MRI",
+      "place": "Leh",
+      "summary": "92 Base Hospital, Badami Bagh is 2.2 km closer to the search centre by straight line. The records give Moderate evidence there and Strong evidence at Paras Health, Srinagar. Price comparison falls back to distance. The starting point is approximate (about 17.1 km). Your closest option may differ.",
+      "options": [
+        {
+          "mode": "default",
+          "label": "Best evidence",
+          "facility_id": "039bcc45-f15f-4419-9a04-2aae8ab20bef",
+          "name": "Paras Health, Srinagar",
+          "tier": "strong",
+          "distance_km": 238.0,
+          "citation": {
+            "field": "procedure",
+            "quote": "Imaging for diagnosis includes X-ray, MRI, and CT imaging",
+            "facility_id": "039bcc45-f15f-4419-9a04-2aae8ab20bef",
+            "source_urls": [
+              "http://www.parashospitals.com/",
+              "https://www.parashospitals.com/",
+              "https://www.parashospitals.com/srinagar"
+            ]
+          },
+          "price_citation": null,
+          "flags": [],
+          "price_basis": null,
+          "comparable_quotes": null,
+          "safety_pinned": false,
+          "reason": ""
+        },
+        {
+          "mode": "nearest",
+          "label": "Nearest",
+          "facility_id": "eceb9e5a-2311-4f06-acb5-914a383b14a1",
+          "name": "92 Base Hospital, Badami Bagh",
+          "tier": "moderate",
+          "distance_km": 235.8,
+          "citation": {
+            "field": "equipment",
+            "quote": "MRI machines",
+            "facility_id": "eceb9e5a-2311-4f06-acb5-914a383b14a1",
+            "source_urls": [
+              "https://look4.in/showcat.php",
+              "https://jaimahesh.com/bloodbanks",
+              "https://dfcojk.org/reg_bbanks.php"
+            ]
+          },
+          "price_citation": null,
+          "flags": [],
+          "price_basis": null,
+          "comparable_quotes": null,
+          "safety_pinned": false,
+          "reason": ""
+        },
+        {
+          "mode": "price",
+          "label": "Compare listed prices",
+          "facility_id": "eceb9e5a-2311-4f06-acb5-914a383b14a1",
+          "name": "92 Base Hospital, Badami Bagh",
+          "tier": "moderate",
+          "distance_km": 235.8,
+          "citation": {
+            "field": "equipment",
+            "quote": "MRI machines",
+            "facility_id": "eceb9e5a-2311-4f06-acb5-914a383b14a1",
+            "source_urls": [
+              "https://look4.in/showcat.php",
+              "https://jaimahesh.com/bloodbanks",
+              "https://dfcojk.org/reg_bbanks.php"
+            ]
+          },
+          "price_citation": null,
+          "flags": [],
+          "price_basis": "distance",
+          "comparable_quotes": 0,
+          "safety_pinned": false,
+          "reason": "0 like-for-like documented price(s) within 260.8 km (same service, unit and conditions): prices cannot be ranked, so options are shown nearest first with every documented price labelled on its card."
+        }
+      ],
+      "top_changed": true,
+      "straight_line_difference_km": 2.2
+    },
+    {
+      "id": "q33",
+      "service": "CT scan",
+      "place": "Kolkata",
+      "summary": "Calcutta Medical Centre is 1.1 km farther from the search centre by straight line. The records give Strong evidence there and Strong evidence at Pulse Diagnostics. Price comparison falls back to distance. The starting point is approximate (about 5.5 km). Your closest option may differ.",
+      "options": [
+        {
+          "mode": "default",
+          "label": "Best evidence",
+          "facility_id": "86dc887d-e0a5-45fb-9a6d-1db9afd17f8e",
+          "name": "Pulse Diagnostics",
+          "tier": "strong",
+          "distance_km": 0.2,
+          "citation": {
+            "field": "procedure",
+            "quote": "CT Coronary Angiography",
+            "facility_id": "86dc887d-e0a5-45fb-9a6d-1db9afd17f8e",
+            "source_urls": [
+              "https://www.skedoc.com/kolkata/gastroenterologist",
+              "https://www.pulsediagnostics.com/about-pulse-diagnostics",
+              "https://www.timesmed.com/Doctor/Kolkata/dr-n-sultania-24645"
+            ]
+          },
+          "price_citation": null,
+          "flags": [
+            "partner_claim",
+            "possible_merged_record"
+          ],
+          "price_basis": null,
+          "comparable_quotes": null,
+          "safety_pinned": false,
+          "reason": ""
+        },
+        {
+          "mode": "nearest",
+          "label": "Nearest",
+          "facility_id": "34c1fc06-d8fc-4c14-991d-5d3f94c4159b",
+          "name": "Calcutta Medical Centre",
+          "tier": "strong",
+          "distance_km": 1.3,
+          "citation": {
+            "field": "procedure",
+            "quote": "CT scan",
+            "facility_id": "34c1fc06-d8fc-4c14-991d-5d3f94c4159b",
+            "source_urls": [
+              "https://www.medifee.com/dc-in-kolkata-",
+              "https://www.skedoc.com/kolkata/entally/hospitals/multi-speciality",
+              "https://www.skedoc.com/kolkata/rajpur-sonarpur/gynaecologist-obstetrician"
+            ]
+          },
+          "price_citation": null,
+          "flags": [],
+          "price_basis": null,
+          "comparable_quotes": null,
+          "safety_pinned": false,
+          "reason": ""
+        },
+        {
+          "mode": "price",
+          "label": "Compare listed prices",
+          "facility_id": "34c1fc06-d8fc-4c14-991d-5d3f94c4159b",
+          "name": "Calcutta Medical Centre",
+          "tier": "strong",
+          "distance_km": 1.3,
+          "citation": {
+            "field": "procedure",
+            "quote": "CT scan",
+            "facility_id": "34c1fc06-d8fc-4c14-991d-5d3f94c4159b",
+            "source_urls": [
+              "https://www.medifee.com/dc-in-kolkata-",
+              "https://www.skedoc.com/kolkata/entally/hospitals/multi-speciality",
+              "https://www.skedoc.com/kolkata/rajpur-sonarpur/gynaecologist-obstetrician"
+            ]
+          },
+          "price_citation": null,
+          "flags": [],
+          "price_basis": "distance",
+          "comparable_quotes": 0,
+          "safety_pinned": false,
+          "reason": "0 like-for-like documented price(s) within 26.3 km (same service, unit and conditions): prices cannot be ranked, so options are shown nearest first with every documented price labelled on its card."
+        }
+      ],
+      "top_changed": true,
+      "straight_line_difference_km": -1.1
+    },
+    {
+      "id": "q34",
+      "service": "CT scan",
+      "place": "Varanasi",
+      "summary": "Akshat Diagnostics comes first for both evidence and distance. Price comparison falls back to distance.",
+      "options": [
+        {
+          "mode": "default",
+          "label": "Best evidence",
+          "facility_id": "79933ee0-4d47-431e-888c-ae8abd2f2a10",
+          "name": "Akshat Diagnostics",
+          "tier": "strong",
+          "distance_km": 1.3,
+          "citation": {
+            "field": "procedure",
+            "quote": "Computed tomography (CT) scanning",
+            "facility_id": "79933ee0-4d47-431e-888c-ae8abd2f2a10",
+            "source_urls": [
+              "http://www.akshatdiagnostics.com/",
+              "https://akshatdiagnostics.com/about-us/",
+              "https://www.facebook.com/149305401602747"
+            ]
+          },
+          "price_citation": null,
+          "flags": [],
+          "price_basis": null,
+          "comparable_quotes": null,
+          "safety_pinned": false,
+          "reason": ""
+        },
+        {
+          "mode": "nearest",
+          "label": "Nearest",
+          "facility_id": "79933ee0-4d47-431e-888c-ae8abd2f2a10",
+          "name": "Akshat Diagnostics",
+          "tier": "strong",
+          "distance_km": 1.3,
+          "citation": {
+            "field": "procedure",
+            "quote": "Computed tomography (CT) scanning",
+            "facility_id": "79933ee0-4d47-431e-888c-ae8abd2f2a10",
+            "source_urls": [
+              "http://www.akshatdiagnostics.com/",
+              "https://akshatdiagnostics.com/about-us/",
+              "https://www.facebook.com/149305401602747"
+            ]
+          },
+          "price_citation": null,
+          "flags": [],
+          "price_basis": null,
+          "comparable_quotes": null,
+          "safety_pinned": false,
+          "reason": ""
+        },
+        {
+          "mode": "price",
+          "label": "Compare listed prices",
+          "facility_id": "79933ee0-4d47-431e-888c-ae8abd2f2a10",
+          "name": "Akshat Diagnostics",
+          "tier": "strong",
+          "distance_km": 1.3,
+          "citation": {
+            "field": "procedure",
+            "quote": "Computed tomography (CT) scanning",
+            "facility_id": "79933ee0-4d47-431e-888c-ae8abd2f2a10",
+            "source_urls": [
+              "http://www.akshatdiagnostics.com/",
+              "https://akshatdiagnostics.com/about-us/",
+              "https://www.facebook.com/149305401602747"
+            ]
+          },
+          "price_citation": null,
+          "flags": [],
+          "price_basis": "distance",
+          "comparable_quotes": 0,
+          "safety_pinned": false,
+          "reason": "0 like-for-like documented price(s) within 26.3 km (same service, unit and conditions): prices cannot be ranked, so options are shown nearest first with every documented price labelled on its card."
+        }
+      ],
+      "top_changed": false,
+      "straight_line_difference_km": null
+    },
+    {
+      "id": "q35",
+      "service": "CT scan",
+      "place": "845401",
+      "summary": "Harsh Hospital comes first for both evidence and distance. Price comparison falls back to distance.",
+      "options": [
+        {
+          "mode": "default",
+          "label": "Best evidence",
+          "facility_id": "1774eb01-bb63-4cbb-b1ad-c9b4cf03c605",
+          "name": "Harsh Hospital",
+          "tier": "strong",
+          "distance_km": 16.2,
+          "citation": {
+            "field": "procedure",
+            "quote": "Performs CT scan imaging.",
+            "facility_id": "1774eb01-bb63-4cbb-b1ad-c9b4cf03c605",
+            "source_urls": [
+              "http://www.harshhospital.com/",
+              "https://ind.5bestincity.com/private-hospitals-in-purnia-br",
+              "https://www.facebook.com/146539649322563"
+            ]
+          },
+          "price_citation": null,
+          "flags": [
+            "pin_inconsistent"
+          ],
+          "price_basis": null,
+          "comparable_quotes": null,
+          "safety_pinned": false,
+          "reason": ""
+        },
+        {
+          "mode": "nearest",
+          "label": "Nearest",
+          "facility_id": "1774eb01-bb63-4cbb-b1ad-c9b4cf03c605",
+          "name": "Harsh Hospital",
+          "tier": "strong",
+          "distance_km": 16.2,
+          "citation": {
+            "field": "procedure",
+            "quote": "Performs CT scan imaging.",
+            "facility_id": "1774eb01-bb63-4cbb-b1ad-c9b4cf03c605",
+            "source_urls": [
+              "http://www.harshhospital.com/",
+              "https://ind.5bestincity.com/private-hospitals-in-purnia-br",
+              "https://www.facebook.com/146539649322563"
+            ]
+          },
+          "price_citation": null,
+          "flags": [
+            "pin_inconsistent"
+          ],
+          "price_basis": null,
+          "comparable_quotes": null,
+          "safety_pinned": false,
+          "reason": ""
+        },
+        {
+          "mode": "price",
+          "label": "Compare listed prices",
+          "facility_id": "1774eb01-bb63-4cbb-b1ad-c9b4cf03c605",
+          "name": "Harsh Hospital",
+          "tier": "strong",
+          "distance_km": 16.2,
+          "citation": {
+            "field": "procedure",
+            "quote": "Performs CT scan imaging.",
+            "facility_id": "1774eb01-bb63-4cbb-b1ad-c9b4cf03c605",
+            "source_urls": [
+              "http://www.harshhospital.com/",
+              "https://ind.5bestincity.com/private-hospitals-in-purnia-br",
+              "https://www.facebook.com/146539649322563"
+            ]
+          },
+          "price_citation": null,
+          "flags": [
+            "pin_inconsistent"
+          ],
+          "price_basis": "distance",
+          "comparable_quotes": 0,
+          "safety_pinned": false,
+          "reason": "0 like-for-like documented price(s) within 41.2 km (same service, unit and conditions): prices cannot be ranked, so options are shown nearest first with every documented price labelled on its card."
+        }
+      ],
+      "top_changed": false,
+      "straight_line_difference_km": null
+    },
+    {
+      "id": "q36",
+      "service": "CT scan",
+      "place": "Kargil",
+      "summary": "92 Base Hospital, Badami Bagh is 1.1 km closer to the search centre by straight line. The records give Moderate evidence there and Strong evidence at North Kashmir Nursing Home & Hospital. Price comparison falls back to distance. The starting point is approximate (about 5 km). Your closest option may differ.",
+      "options": [
+        {
+          "mode": "default",
+          "label": "Best evidence",
+          "facility_id": "0914c599-783f-4e13-a05b-6cd3b06f3afc",
+          "name": "North Kashmir Nursing Home & Hospital",
+          "tier": "strong",
+          "distance_km": 130.5,
+          "citation": {
+            "field": "procedure",
+            "quote": "CT Scan",
+            "facility_id": "0914c599-783f-4e13-a05b-6cd3b06f3afc",
+            "source_urls": [
+              "https://gmcs.ac.in/InnerPagelevel1.aspx",
+              "http://northkashmirhospitalhandwara.in.net/",
+              "https://www.northkashmirhospitalhandwara.in.net/"
+            ]
+          },
+          "price_citation": null,
+          "flags": [
+            "possible_merged_record"
+          ],
+          "price_basis": null,
+          "comparable_quotes": null,
+          "safety_pinned": false,
+          "reason": ""
+        },
+        {
+          "mode": "nearest",
+          "label": "Nearest",
+          "facility_id": "eceb9e5a-2311-4f06-acb5-914a383b14a1",
+          "name": "92 Base Hospital, Badami Bagh",
+          "tier": "moderate",
+          "distance_km": 129.4,
+          "citation": {
+            "field": "equipment",
+            "quote": "CT scanners",
+            "facility_id": "eceb9e5a-2311-4f06-acb5-914a383b14a1",
+            "source_urls": [
+              "https://look4.in/showcat.php",
+              "https://jaimahesh.com/bloodbanks",
+              "https://dfcojk.org/reg_bbanks.php"
+            ]
+          },
+          "price_citation": null,
+          "flags": [],
+          "price_basis": null,
+          "comparable_quotes": null,
+          "safety_pinned": false,
+          "reason": ""
+        },
+        {
+          "mode": "price",
+          "label": "Compare listed prices",
+          "facility_id": "eceb9e5a-2311-4f06-acb5-914a383b14a1",
+          "name": "92 Base Hospital, Badami Bagh",
+          "tier": "moderate",
+          "distance_km": 129.4,
+          "citation": {
+            "field": "equipment",
+            "quote": "CT scanners",
+            "facility_id": "eceb9e5a-2311-4f06-acb5-914a383b14a1",
+            "source_urls": [
+              "https://look4.in/showcat.php",
+              "https://jaimahesh.com/bloodbanks",
+              "https://dfcojk.org/reg_bbanks.php"
+            ]
+          },
+          "price_citation": null,
+          "flags": [],
+          "price_basis": "distance",
+          "comparable_quotes": 0,
+          "safety_pinned": false,
+          "reason": "0 like-for-like documented price(s) within 154.4 km (same service, unit and conditions): prices cannot be ranked, so options are shown nearest first with every documented price labelled on its card."
+        }
+      ],
+      "top_changed": true,
+      "straight_line_difference_km": 1.1
+    },
+    {
+      "id": "q37",
+      "service": "burn care",
+      "place": "Port Blair",
+      "summary": "None of these orders returned a first choice for this search.",
+      "options": [
+        {
+          "mode": "default",
+          "label": "Best evidence",
+          "facility_id": null,
+          "name": null,
+          "tier": null,
+          "distance_km": null,
+          "citation": null,
+          "price_citation": null,
+          "flags": [],
+          "price_basis": null,
+          "comparable_quotes": null,
+          "safety_pinned": false,
+          "reason": ""
+        },
+        {
+          "mode": "nearest",
+          "label": "Nearest",
+          "facility_id": null,
+          "name": null,
+          "tier": null,
+          "distance_km": null,
+          "citation": null,
+          "price_citation": null,
+          "flags": [],
+          "price_basis": null,
+          "comparable_quotes": null,
+          "safety_pinned": false,
+          "reason": ""
+        },
+        {
+          "mode": "price",
+          "label": "Compare listed prices",
+          "facility_id": null,
+          "name": null,
+          "tier": null,
+          "distance_km": null,
+          "citation": null,
+          "price_citation": null,
+          "flags": [],
+          "price_basis": null,
+          "comparable_quotes": null,
+          "safety_pinned": false,
+          "reason": ""
+        }
+      ],
+      "top_changed": false,
+      "straight_line_difference_km": null
+    },
+    {
+      "id": "q38",
+      "service": "cardiac surgery",
+      "place": "Port Blair",
+      "summary": "None of these orders returned a first choice for this search.",
+      "options": [
+        {
+          "mode": "default",
+          "label": "Best evidence",
+          "facility_id": null,
+          "name": null,
+          "tier": null,
+          "distance_km": null,
+          "citation": null,
+          "price_citation": null,
+          "flags": [],
+          "price_basis": null,
+          "comparable_quotes": null,
+          "safety_pinned": false,
+          "reason": ""
+        },
+        {
+          "mode": "nearest",
+          "label": "Nearest",
+          "facility_id": null,
+          "name": null,
+          "tier": null,
+          "distance_km": null,
+          "citation": null,
+          "price_citation": null,
+          "flags": [],
+          "price_basis": null,
+          "comparable_quotes": null,
+          "safety_pinned": false,
+          "reason": ""
+        },
+        {
+          "mode": "price",
+          "label": "Compare listed prices",
+          "facility_id": null,
+          "name": null,
+          "tier": null,
+          "distance_km": null,
+          "citation": null,
+          "price_citation": null,
+          "flags": [],
+          "price_basis": null,
+          "comparable_quotes": null,
+          "safety_pinned": false,
+          "reason": ""
+        }
+      ],
+      "top_changed": false,
+      "straight_line_difference_km": null
+    }
+  ]
+}
