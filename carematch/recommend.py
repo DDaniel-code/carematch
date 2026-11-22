@@ -16,6 +16,8 @@ from .decision import assumptions as decision_assumptions
 from .decision import cost_info, drive_minutes, normalize_preferences
 from .decision import score as preference_score
 from .evidence import TIERS, assess, foreign_mentions, record_mixing
+from .price import comparable as price_comparable
+from .price import price_evidence, surely_cheaper
 from .geo import CITY_ALIASES, Gazetteer, city_key, facility_location
 from .services import SERVICES, resolve_service
 from .textutil import fragments, haversine_km, normalize, source_urls, text
@@ -25,6 +27,8 @@ BANDS_KM = (25, 75, 150, 300)
 MAX_RESULTS = 3
 MAX_RUNNER_UPS = 3
 DEDUP_KM = 2.0
+SORT_MODES = ('default', 'nearest', 'price')
+EMERGENCY_SERVICES = {'c_section', 'trauma', 'emergency', 'nicu', 'burn'}
 CAN_TRAVEL_EXTRA_KM = 100            # 'can travel' looks at most 2x the nearest option's distance, or +100 km
 CITY_MENTION_MIN_FACILITIES = 15     # cities this well represented are used to spot claims about another place
 
@@ -177,6 +181,7 @@ def _card(index, i, a, dist):
         'source_urls': urls[:3],
         'ask_when_calling': SERVICES[a['service']]['ask'],
         **({'merged_ids': [index.rows[j].get('unique_id') for j in dups]} if dups else {}),
+        **dict(zip(('price_info', 'price_context'), price_evidence(row, a['service']))),
     }
 
 
@@ -281,6 +286,180 @@ def _tradeoff_note(top, default_first):
     return f"{lost}. This option was preferred because " + ('; '.join(gains) if gains else 'its overall score was higher') + '.'
 
 
+PRICE_UNIT_TEXT = {'per_session': 'per session', 'per_scan': 'per scan', 'per_day': 'per day',
+                   'per_procedure': 'per procedure', 'per_month': 'per month', 'package': 'package', 'unspecified': 'unit not stated'}
+
+
+def _price_text(p):
+    if not p:
+        return 'no price documented'
+    unit = PRICE_UNIT_TEXT[p['unit']]
+    if p['bound'] == 'free':
+        return f'free ({unit})'
+    if p['bound'] == 'exact':
+        amount = f"₹{p['amount_min_inr']:,}"
+    elif p['bound'] == 'range':
+        amount = f"₹{p['amount_min_inr']:,}–{p['amount_max_inr']:,}"
+    elif p['bound'] == 'upper_bound':
+        amount = f"up to ₹{p['amount_max_inr']:,}"
+    else:
+        amount = f"from ₹{p['amount_min_inr']:,}"
+    return f'{amount} {unit}' + (f" ({'; '.join(p['conditions'])})" if p['conditions'] else '')
+
+
+def _sort_mode(index, service, mode, eligible, k, max_extra_km, bands, origin_pt):
+    """'nearest' or 'price' ordering over the same credible (Strong/Moderate) candidates within the last band.
+
+    Branch-resolved = no sign that the record mixes facilities. Location-certain = location confidence is not 'low'.
+    Candidates failing either are never ranked: they are listed separately with the reason, so a distance or price is
+    never claimed for a branch we cannot pin down.
+    """
+    pool = sorted([s for s in eligible if s[1] <= bands[-1]],
+                  key=lambda s: (round(s[1], 1), s[0], text(index.rows[s[2]].get('unique_id'))))
+    cards = _dedupe([_card(index, s[2], s[3], s[1]) for s in pool])
+    ranked, unresolved, uncertain = [], [], []
+    for c in cards:
+        if 'possible_merged_record' in c['flags']:
+            c['not_ranked_because'] = 'the record may mix several facilities or branches, so its distance and price cannot be attributed'
+            unresolved.append(c)
+        elif c['location_confidence'] == 'low':
+            c['not_ranked_because'] = 'address, PIN code and map position disagree, so the straight-line distance is uncertain'
+            i = index.by_id.get(text(c['facility_id']), [None])[0]
+            loc = index.locations[i] if i is not None else {'position': None}
+            pts = [loc['position']] + loc.get('alternatives', []) if loc['position'] else []
+            if pts:
+                c['distance_range_km'] = [round(min(haversine_km(origin_pt, p) for p in pts), 1), c['distance_km']]
+            uncertain.append(c)
+        else:
+            ranked.append(c)
+    # Records whose farthest plausible position is beyond the last band but whose nearest one is inside it (e.g. a
+    # "Nagpur" listing mapped to Mumbai): never ranked, but shown so their claims and quoted prices are not lost.
+    seen = {c['facility_id'] for c in cards}
+    for s in eligible:
+        if s[1] <= bands[-1] or index.locations[s[2]]['confidence'] != 'low':
+            continue
+        loc = index.locations[s[2]]
+        near_km = min(haversine_km(origin_pt, p) for p in [loc['position']] + loc.get('alternatives', []))
+        if near_km > bands[-1] or text(index.rows[s[2]].get('unique_id')) in seen:
+            continue
+        c = _card(index, s[2], s[3], s[1])
+        c['distance_range_km'] = [round(near_km, 1), c['distance_km']]
+        if 'possible_merged_record' in c['flags']:
+            c['not_ranked_because'] = ('the record may mix several facilities or branches and its location is uncertain, so '
+                                       'its distance and price cannot be attributed')
+            unresolved.append(c)
+        else:
+            c['not_ranked_because'] = 'address, PIN code and map position disagree, so the straight-line distance is uncertain'
+            uncertain.append(c)
+    unresolved.sort(key=lambda c: c.get('distance_range_km', [c['distance_km']])[0])
+    uncertain.sort(key=lambda c: c.get('distance_range_km', [c['distance_km']])[0])
+    if not ranked:                       # nothing resolvable: rank everything, clearly flagged, rather than say nothing
+        ranked, unresolved, uncertain = cards, [], []
+        for c in ranked:
+            c.pop('not_ranked_because', None)
+            c['uncertainties'].append('ranked although its branch or location could not be resolved: no resolvable option nearby')
+    nearest_km = ranked[0]['distance_km']
+    budget = round(nearest_km + max_extra_km, 1)
+    out = {'mode': mode, 'max_extra_km': max_extra_km, 'nearest_credible_km': nearest_km, 'ranked_count': len(ranked)}
+    safety_note = None
+
+    if mode == 'nearest':
+        order = list(ranked)
+        if service in EMERGENCY_SERVICES:
+            # Safety tie-break: a record that also says the service is NOT available never goes first while a clean
+            # option exists within max_extra_km of it.
+            clean = [c for c in order if 'contradictory_claims' not in c['flags']]
+            if clean and 'contradictory_claims' in order[0]['flags'] and clean[0]['distance_km'] <= order[0]['distance_km'] + max_extra_km:
+                order.remove(clean[0])
+                order.insert(0, clean[0])
+                clean[0]['safety_reordered'] = True
+            safety_note = ('Nearest by straight line. In an emergency, call ahead with the questions on each card, or use the '
+                           '108 ambulance: a nearer facility that cannot confirm the service is not the safer choice.')
+        results = order[:k]
+        last = results[-1]['distance_km']
+        runner_ups = [dict(c, why_not=f"{round(c['distance_km'] - last, 1)} km farther than #{len(results)}") for c in order[k:k + MAX_RUNNER_UPS]]
+        near = lambda c: c['distance_km'] is not None and c.get('distance_range_km', [c['distance_km']])[0] <= last + max_extra_km
+        for rank, c in enumerate(results, 1):
+            c['rank'] = rank
+            c['why_ranked'] = (f"#{rank} by straight-line distance among {len(ranked)} credible, branch-resolved options"
+                               + (' (moved up: the nearer record also says the service is not available)' if c.get('safety_reordered') else '')
+                               + '.')
+        strong_nearby = next((c for c in ranked if c['tier'] == 'strong' and c['distance_km'] <= results[0]['distance_km'] + max_extra_km), None)
+        if service in EMERGENCY_SERVICES and results[0]['tier'] != 'strong' and strong_nearby and strong_nearby is not results[0]:
+            out['stronger_option_nearby'] = {'facility_id': strong_nearby['facility_id'], 'name': strong_nearby['name'],
+                                             'distance_km': strong_nearby['distance_km'],
+                                             'note': 'Strong evidence, within max_extra_km of the nearest option'}
+        out.update(method=('Nearest mode: Strong/Moderate evidence only (same gate as default); credible branch-resolved '
+                           'options ordered by conservative straight-line distance (farthest plausible position when a '
+                           'location is uncertain). Unresolved branches and uncertain locations are listed, not ranked.'),
+                   branch_unresolved=[c for c in unresolved if near(c)][:3],
+                   location_uncertain=[c for c in uncertain if near(c)][:3])
+    else:
+        in_budget = [c for c in ranked if c['distance_km'] <= budget]
+        priced = [c for c in in_budget if c['price_info'] and c['price_info']['bound'] != 'free'
+                  and c['price_info']['unit'] != 'unspecified']
+        units = {}
+        for c in priced:
+            units.setdefault(c['price_info']['unit'], []).append(c)
+        unit = max(units, key=lambda u: (len(units[u]), -units[u][0]['distance_km'])) if units else None
+        comparable = units.get(unit, [])
+        comparable = [c for c in comparable if all(price_comparable(c['price_info'], d['price_info']) for d in comparable)]
+        inf = float('inf')
+        if len(comparable) >= 2:
+            comparable.sort(key=lambda c: (c['price_info']['amount_max_inr'] if c['price_info']['amount_max_inr'] is not None else inf,
+                                           c['price_info']['amount_min_inr'] or 0, c['distance_km']))
+            top = comparable[0]
+            same_conditions = len({tuple(c['price_info']['conditions']) for c in comparable}) == 1
+            cheapest = same_conditions and all(surely_cheaper(top['price_info'], c['price_info']) for c in comparable[1:])
+            results = comparable[:k]
+            ranked_by = 'price'
+            if cheapest:
+                note = (f"{top['name']} documents a lower {PRICE_UNIT_TEXT[unit]} price than every other comparable quote within "
+                        f"{budget} km.")
+            else:
+                note = (f"Ordered by documented {PRICE_UNIT_TEXT[unit]} price (upper amount first). No option is called the cheapest: "
+                        + ('conditions differ between quotes' if not same_conditions else 'the documented ranges overlap') + '.')
+        else:
+            results = in_budget[:k]
+            ranked_by = 'distance'
+            note = (f"{len(comparable)} comparable documented price(s) within {budget} km (same service and unit): prices cannot "
+                    f"be ranked, so options are shown nearest first with any documented price on the card.")
+            cheapest = False
+        shown = {c['facility_id'] for c in results}
+        for rank, c in enumerate(results, 1):
+            c['rank'] = rank
+            c['why_ranked'] = (f"#{rank}: {_price_text(c['price_info'])}, {c['distance_km']} km" if ranked_by == 'price'
+                               else f"#{rank} by distance within {budget} km ({_price_text(c['price_info'])}).")
+        last = results[-1]
+        runner_ups = [dict(c, why_not=(f"documented price {_price_text(c['price_info'])} is not lower" if ranked_by == 'price'
+                                       else f"{round(c['distance_km'] - last['distance_km'], 1)} km farther"))
+                      for c in (comparable[k:] if ranked_by == 'price' else in_budget[k:])][:MAX_RUNNER_UPS]
+        within = lambda c: c['distance_km'] is not None and c.get('distance_range_km', [c['distance_km']])[0] <= budget
+        out.update(
+            method=(f'Price mode: Strong/Moderate evidence only (same gate as default); among credible branch-resolved options '
+                    f'within {max_extra_km} km of the nearest one ({budget} km), documented patient prices for this service are '
+                    'compared only when they state the same unit; upper/lower bounds and conditions are kept, never filled in. '
+                    'Options without a comparable price stay visible.'),
+            price_comparison={'unit': unit, 'budget_km': budget, 'comparable_quotes': len(comparable),
+                              'ranked_by': ranked_by, 'cheapest_claim': cheapest, 'note': note},
+            price_unknown_nearby=[c for c in in_budget if not c['price_info'] and c['facility_id'] not in shown][:k],
+            price_not_comparable=[dict(c, not_comparable_because=(
+                'free only with conditions' if c['price_info']['bound'] == 'free' else
+                'unit not stated' if c['price_info']['unit'] == 'unspecified' else
+                f"different unit ({PRICE_UNIT_TEXT[c['price_info']['unit']]})"))
+                for c in in_budget if c['price_info'] and c not in comparable and c['facility_id'] not in shown][:k],
+            branch_unresolved=[c for c in unresolved if within(c)][:3],
+            location_uncertain=[c for c in uncertain if within(c)][:3])
+    for c in runner_ups + out.get('branch_unresolved', []) + out.get('location_uncertain', []) + \
+            out.get('price_unknown_nearby', []) + out.get('price_not_comparable', []):
+        c.pop('rank', None)
+    far = max(c['distance_km'] for c in results)
+    out['band_km'] = next((b for b in bands if far <= b), bands[-1])
+    out['safety_note'] = safety_note
+    out['results'], out['runner_ups'] = results, runner_ups
+    return out
+
+
 def _apply_variant(a, strong_min_claims):
     """Sensitivity variant: require more distinct claims for Strong."""
     if strong_min_claims and a['tier'] == 'strong':
@@ -291,10 +470,18 @@ def _apply_variant(a, strong_min_claims):
 
 
 def recommend(index, service_text, location_text, k=MAX_RESULTS, bands=BANDS_KM, strong_min_claims=None, review=True,
-              preferences=None):
+              preferences=None, sort_mode='default', max_extra_km=25):
     """preferences: optional {'urgency': 'default'|'time_critical'|'can_travel', 'cost': 'any'|'low_cost'}.
-    Without preferences (or with both defaults) the output is exactly the evidence-then-distance ranking."""
+    sort_mode: 'default' (evidence, then distance), 'nearest' (straight-line distance among credible, branch-resolved
+    options) or 'price' (documented comparable service prices within max_extra_km of the nearest credible option).
+    Without preferences and with sort_mode='default' the output is exactly the evidence-then-distance ranking."""
     prefs = normalize_preferences(preferences)
+    if sort_mode not in SORT_MODES:
+        raise ValueError(f'sort_mode must be one of {SORT_MODES}')
+    if sort_mode != 'default' and prefs['applied']:
+        raise ValueError('use either preferences or sort_mode, not both')
+    if isinstance(max_extra_km, bool) or not isinstance(max_extra_km, (int, float)) or not 0 <= max_extra_km <= 300:
+        raise ValueError('max_extra_km must be a number between 0 and 300')
     service = resolve_service(service_text)
     if not service:
         return {'error': f'Unknown service "{service_text}". Choose one of: '
@@ -413,6 +600,12 @@ def recommend(index, service_text, location_text, k=MAX_RESULTS, bands=BANDS_KM,
             extra = None
         tradeoff = _tradeoff_note(results[0], default_first) if results and default_first else None
 
+    mode = None
+    if sort_mode != 'default' and results:
+        mode = _sort_mode(index, service, sort_mode, eligible, k, max_extra_km, bands, o)
+        results, runner_ups, extra = mode.pop('results'), mode.pop('runner_ups'), None
+        chosen_band, n_in_band = mode['band_km'], mode['ranked_count']
+
     first_ask = SERVICES[service]['ask'][0]
     if not results:
         advice = ('No facility with credible evidence within reach. Call the nearest option shown before travelling, '
@@ -431,10 +624,12 @@ def recommend(index, service_text, location_text, k=MAX_RESULTS, bands=BANDS_KM,
         'farther_stronger': extra, 'nearest_beyond': beyond, 'weak_nearby': weak_nearby,
         'considered': {'by_band': counts, 'recommendable_without_location': no_distance},
         'parameters': {'bands_km': list(bands), 'max_results': k, 'strong_min_claims': strong_min_claims},
-        'preferences': prefs,
+        'preferences': prefs, 'sort_mode': sort_mode,
+        **({'sort': mode} if mode else {}),
         **({'preference_model': decision_assumptions(prefs), 'default_order_ids': default_ids,
             'cost_unknown_options': cost_unknown, 'tradeoff_note': tradeoff} if prefs['applied'] else {}),
-        'method': ('Strong/Moderate evidence only; nearest distance band (' + '/'.join(map(str, bands)) + ' km) that has '
+        'method': (mode['method'] if mode else
+                   'Strong/Moderate evidence only; nearest distance band (' + '/'.join(map(str, bands)) + ' km) that has '
                    'any; within it, stronger evidence first, then shorter straight-line distance.'),
         'disclaimer': ('Based on public web listings, not verified by the facility. Availability today is unknown: '
                        'call before travelling. Distances are straight-line, not road travel time.'),

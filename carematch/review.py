@@ -57,7 +57,31 @@ def review(index, result):
     band = result.get('band_km')
     inside = all(c['distance_km'] is not None and band is not None
                  and c['distance_km'] <= max(band, c.get('found_within_km') or band) + 0.05 for c in results)
-    if prefs_on:
+    sort_mode = result.get('sort_mode', 'default')
+    sort = result.get('sort') or {}
+    if sort_mode == 'nearest':
+        d = [c['distance_km'] for c in results]
+        moved = [c for c in results if c.get('safety_reordered')]
+        ordered = all(a <= b + 0.05 for a, b in zip(d[len(moved):], d[len(moved) + 1:])) and \
+            all(c['location_confidence'] != 'low' and 'possible_merged_record' not in c['flags'] for c in results) \
+            if sort.get('ranked_count', 0) else True
+        checks.append(_check('Nearest mode: ordered by straight-line distance among branch-resolved options with a certain location',
+                             ordered and inside, f'distances={d}'))
+    elif sort_mode == 'price':
+        pc = sort.get('price_comparison', {})
+        if pc.get('ranked_by') == 'price':
+            hi = [c['price_info']['amount_max_inr'] if c['price_info']['amount_max_inr'] is not None else float('inf') for c in results]
+            units = {c['price_info']['unit'] for c in results}
+            ordered = all(a <= b for a, b in zip(hi, hi[1:])) and len(units) == 1 and 'unspecified' not in units
+        else:
+            d = [c['distance_km'] for c in results]
+            ordered = all(a <= b + 0.05 for a, b in zip(d, d[1:]))
+        in_budget = all(c['distance_km'] <= pc.get('budget_km', 0) + 0.05 for c in results)
+        honest = not pc.get('cheapest_claim') or pc.get('comparable_quotes', 0) >= 2
+        checks.append(_check('Price mode: same-unit documented prices only, within the extra-distance budget; no "cheapest" '
+                             'claim from fewer than two comparable quotes', ordered and in_budget and honest,
+                             f"ranked_by={pc.get('ranked_by')}, in_budget={in_budget}, cheapest_claim={pc.get('cheapest_claim')}"))
+    elif prefs_on:
         scores = [c['preference']['score'] for c in results]
         ordered = all(a >= b for a, b in zip(scores, scores[1:]))
         checks.append(_check('Ordered by preference score (highest first); all within the search radius',
@@ -83,6 +107,20 @@ def review(index, result):
                       for a, b in zip(keyseq, keyseq[1:]))
         checks.append(_check('Ordered nearest search radius first, then evidence tier, then distance; all within the radius',
                              ordered and inside, f'order ok={ordered}, inside {band} km={inside}'))
+
+    priced = [c for c in every + [x for key in ('branch_unresolved', 'location_uncertain', 'price_unknown_nearby',
+                                                 'price_not_comparable') for x in sort.get(key, [])]
+              if c.get('price_info') or c.get('price_context')]
+    bad_price = []
+    for c in priced:
+        rows = [index.rows[i] for i in index.by_id.get(text(c['facility_id']), [])]
+        quotes = ([c['price_info']] if c.get('price_info') else []) + list(c.get('price_context') or [])
+        for q in quotes:
+            if not any(q['quote'] in fragments(r.get(q['field'])) for r in rows):
+                bad_price.append((c['name'], q['field'], q['quote'][:50]))
+    if priced:
+        checks.append(_check('Every price quote appears word for word in the facility record', not bad_price,
+                             f'not found: {bad_price[:3]}'))
 
     ranked_extra = [c['name'] for c in extras + result.get('runner_ups', []) if 'rank' in c]
     numbered = [c.get('rank') for c in results] == list(range(1, len(results) + 1))
