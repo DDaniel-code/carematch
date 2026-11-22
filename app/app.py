@@ -28,7 +28,7 @@ TIER_CHIP = {'strong': ('strong', 'Strong evidence'), 'moderate': ('moderate', '
              'weak': ('weak', 'Weak · not recommended')}
 # Services where minutes matter: price sorting is shown with a safety note.
 TIME_CRITICAL = {'c_section', 'trauma', 'emergency', 'nicu', 'burn'}
-SORTS = {'Best evidence': 'default', 'Nearest': 'nearest', 'Lowest listed price': 'price'}
+SORTS = {'Best evidence': 'default', 'Nearest': 'nearest', 'Compare listed prices': 'price'}
 _PARAMS = set(inspect.signature(recommend).parameters)
 SUPPORTS = {'default': True, 'nearest': 'sort_mode' in _PARAMS, 'price': {'sort_mode', 'max_extra_km'} <= _PARAMS}
 PRIMARY_RGB, EXTRA_RGB = [26, 95, 122], [95, 107, 118]
@@ -97,13 +97,24 @@ def located(index, card):
     return pos[0], pos[1], reliable
 
 
-def directions_url(lat, lon, mode):
+def directions_url(lat, lon, mode, avoid_tolls=False):
     """Google Maps universal directions URL. Destination only: no origin and nothing about the patient is sent;
-    the phone's own location is used as the starting point."""
+    the phone's own location is used as the starting point. avoid=tolls is a request Google may not be able to meet."""
     params = {'api': '1', 'destination': f'{lat:.5f},{lon:.5f}', 'travelmode': mode}
-    if mode == 'driving':
+    if mode == 'driving' and avoid_tolls:
         params['avoid'] = 'tolls'
     return 'https://www.google.com/maps/dir/?' + urlencode(params)
+
+
+DIRECTIONS = [('Driving', 'driving', False), ('Driving · try to avoid tolls', 'driving', True), ('Walking', 'walking', False)]
+
+
+# ---- strategy comparison (Codex module; optional until it lands) ----------------------------------------------
+
+try:
+    from carematch.strategy_compare import compare_strategies  # noqa: E402
+except ImportError:          # module not in this build yet: the comparison block is simply not shown
+    compare_strategies = None
 
 
 # ---- prices and cost (disclosure only; the engine decides order) --------------------------------------------------
@@ -215,20 +226,19 @@ def render_card(index, c, label, sort_mode, extra=False, nested=False):
             st.caption(c['note'])
 
         loc = located(index, c)
-        cols = st.columns(3)
         phone = c.get('phone')
         if phone:
-            cols[0].link_button(f'Call {phone}', f"tel:{phone.replace(' ', '')}", use_container_width=True)
+            st.link_button(f'Call {phone}', f"tel:{phone.replace(' ', '')}")
         else:
-            cols[0].caption('No phone number in the records')
+            st.caption('No phone number in the records.')
         if loc and loc[2]:
-            cols[1].link_button('Directions · walking', directions_url(loc[0], loc[1], 'walking'), use_container_width=True,
-                                help=f"Opens Google Maps to {c.get('name')} from your phone's own location.")
-            cols[2].link_button('Directions · driving, no tolls', directions_url(loc[0], loc[1], 'driving'),
-                                use_container_width=True,
-                                help=f"Opens Google Maps to {c.get('name')}, avoiding tolls, from your phone's own location.")
+            cols = st.columns(len(DIRECTIONS))
+            for col, (label, mode, avoid) in zip(cols, DIRECTIONS):
+                col.link_button(label, directions_url(loc[0], loc[1], mode, avoid), use_container_width=True,
+                                help=f"Opens Google Maps directions to {c.get('name')} from your phone's own location"
+                                     + ('; Google avoids tolls where it can.' if avoid else '.'))
         else:
-            cols[1].caption('Location approximate: confirm the address by phone before travelling (no directions link).')
+            st.caption('Location approximate: confirm the address by phone before travelling (no directions link).')
 
         if nested:
             if c.get('ask_when_calling'):
@@ -281,10 +291,20 @@ def map_points(index, r):
     return pts
 
 
+def render_pin_list(pts, why):
+    """Text stand-in for the map: the same numbered pins as a list (also what a screen reader gets)."""
+    st.caption(f'Map unavailable ({why}). Pins as a list:')
+    st.markdown('  \n'.join(f"**{esc(p['label'])}** · {esc(p['name'])} · {esc(p['detail'])}" for p in pts))
+
+
 def render_map(index, r):
-    import pydeck as pdk
     o = r['origin']
     pts = map_points(index, r)
+    try:
+        import pydeck as pdk
+    except ImportError:
+        render_pin_list(pts, 'map library not installed')
+        return
     span = max([math.dist((o['lat'], o['lon']), (p['lat'], p['lon'])) * 111 for p in pts] + [o.get('precision_km') or 3, 2])
     zoom = max(3.5, min(13.0, 13.2 - math.log2(span)))
     origin = [{'lat': o['lat'], 'lon': o['lon'], 'radius': max(500, (o.get('precision_km') or 2) * 1000),
@@ -301,17 +321,26 @@ def render_map(index, r):
                   get_color=[255, 255, 255], get_text_anchor="'middle'", get_alignment_baseline="'center'",
                   font_weight=700),
     ]
-    st.pydeck_chart(pdk.Deck(layers=layers, map_provider='carto', map_style='light',
-                             initial_view_state=pdk.ViewState(latitude=o['lat'], longitude=o['lon'], zoom=zoom),
-                             tooltip={'text': '{name}\n{detail}'}), use_container_width=True)
+    try:
+        st.pydeck_chart(pdk.Deck(layers=layers, map_provider='carto', map_style='light',
+                                 initial_view_state=pdk.ViewState(latitude=o['lat'], longitude=o['lon'], zoom=zoom),
+                                 tooltip={'text': '{name}\n{detail}'}), use_container_width=True)
+    except Exception as exc:  # a map failure must not hide the results
+        render_pin_list(pts, type(exc).__name__)
+        return
     st.caption('Numbered pins match the list. The shaded circle is the search centre and its precision. '
                'Distances are straight-line, not road distance or travel time.')
 
 
 def status_line(r, sort_mode):
     n = len(r.get('results', []))
+    sort = r.get('sort') or {}
     if n:
         what = f"{n} option{'s' if n > 1 else ''} with credible evidence within {r['band_km']} km"
+    elif sort.get('no_ranked_reason'):
+        flagged = len(sort.get('branch_unresolved', [])) + len(sort.get('location_uncertain', []))
+        what = (f"{flagged} credible option{'s' if flagged != 1 else ''} nearby, but none can be ranked in this order: "
+                'see the reason below.')
     elif r.get('nearest_beyond'):
         far = r['nearest_beyond'].get('distance_km')
         what = (f"No facility with credible evidence within {BANDS_KM[-1]} km. The nearest one is "
@@ -326,7 +355,54 @@ def status_line(r, sort_mode):
     pc = (r.get('sort') or {}).get('price_comparison') or {}
     if sort_mode == 'price' and pc.get('ranked_by') == 'distance':
         order = 'ordered by distance: too few comparable prices to rank'
+    if pc.get('safety_pinned'):
+        order = 'urgent-care rule keeps the nearest eligible branch without a conflicting claim first'
     return f'<div class="cm-status" role="status"><b>{h(what)}</b>' + (f' · {order}' if n else '') + f'{h(qc)}</div>'
+
+
+def comparison(index, r, sort_mode):
+    """compare_strategies output for this search, computed once per (service, place, distance budget) and reused when
+    the visitor only switches the sort order (the comparison covers all three orders anyway)."""
+    if compare_strategies is None:
+        return None
+    extra = (r.get('sort') or {}).get('max_extra_km', st.session_state.get('max_extra_km', 25))
+    key = (r.get('service'), (r.get('origin') or {}).get('query'), extra)
+    cached = st.session_state.get('_strategy_cache')
+    if cached and cached[0] == key:
+        return cached[1]
+    result = compare_strategies(index, r['service'], r['origin']['query'], r, max_extra_km=extra)
+    st.session_state['_strategy_cache'] = (key, result)
+    return result
+
+
+def render_comparison(index, r, sort_mode):
+    comp = comparison(index, r, sort_mode)
+    if not comp:
+        return
+    if comp.get('error'):
+        st.caption(f"Strategy comparison unavailable ({comp['error']}).")
+        return
+    options = comp.get('options') or []
+    if comp.get('summary'):
+        st.markdown(f"**Compare orders:** {esc(comp['summary'])}")
+    if not any(o.get('name') for o in options):
+        return                       # no results: the summary alone, plain
+    with st.expander(f'Best evidence, nearest and listed-price orders side by side ({len(options)})'):
+        for o in options:
+            if not o.get('name'):
+                st.caption(f"{esc(o['label'])} · No ranked facility. {esc(o.get('reason') or '')}")
+                continue
+            dist = f"{o['distance_km']} km straight-line" if o.get('distance_km') is not None else 'distance unknown'
+            tier = TIER_CHIP.get(o.get('tier'), (None, o.get('tier') or 'evidence not stated'))[1]
+            st.markdown(f"**{esc(o.get('label') or o.get('mode'))}:** {esc(o.get('name') or 'no option')} · {esc(dist)} · "
+                        f"{esc(tier)}")
+            cit = o.get('citation')
+            if cit and cit.get('quote'):
+                st.markdown(f'<div class="cm-quote">“{h(cit["quote"])}”<br><small>— '
+                            f'{h(FIELD_TEXT.get(cit.get("field"), cit.get("field") or "record"))} field</small></div>',
+                            unsafe_allow_html=True)
+            elif o.get('name'):
+                st.caption('No supporting quote returned for this option.')
 
 
 def render_result(index, r, sort_mode, service):
@@ -338,12 +414,18 @@ def render_result(index, r, sort_mode, service):
         for col, alt in zip(cols, o['alternatives']):
             col.button(f'Use {alt}', key=f'alt-{alt}', on_click=_set_place, args=(alt,))
     st.markdown(status_line(r, sort_mode), unsafe_allow_html=True)
+    sort = r.get('sort') or {}
+    unranked = bool(sort.get('no_ranked_reason')) and not r.get('results')
     review = r.get('review')
     if review and not review.get('passed'):
         st.error('A quality check failed for this answer: ' + '; '.join(c['name'] for c in review['checks'] if not c['passed']))
-    if r.get('action_advice'):
+    if unranked:
+        # The engine's generic advice would say "no credible facility"; here credible facilities exist but cannot be
+        # pinned to one branch or one location, so the engine's own reason is shown instead.
+        st.info(f"**Why nothing is ranked:** {esc(sort['no_ranked_reason'])}", icon='📞')
+    elif r.get('action_advice'):
         st.info(f"**Next step:** {esc(r['action_advice'])}", icon='📞')
-    sort = r.get('sort') or {}
+    render_comparison(index, r, sort_mode)
     if sort_mode == 'price' and service in TIME_CRITICAL:
         st.warning('For an emergency, go to the nearest facility that can treat the patient. Sorting by price is meant '
                    'for care that can be planned.', icon='⚠️')
@@ -379,7 +461,8 @@ def render_result(index, r, sort_mode, service):
                            ('branch_unresolved', 'Not ranked: the record may mix several branches'),
                            ('location_uncertain', 'Not ranked: location uncertain')):
             if sort.get(key):
-                with st.expander(f"{title} ({len(sort[key])})"):
+                # When nothing is ranked these lists are the whole answer, so they are shown open.
+                with st.expander(f"{title} ({len(sort[key])})", expanded=unranked):
                     for c in sort[key]:
                         render_card(index, c, '', sort_mode, extra=True, nested=True)
         if r.get('weak_nearby'):
