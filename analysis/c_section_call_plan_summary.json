@@ -1,0 +1,119 @@
+{
+  "service": "c_section",
+  "radius_km": 50,
+  "budget": 10,
+  "assumption": "assumes every selected facility confirms it provides the service",
+  "pins_total": 19586,
+  "pins_reliable_denominator": 14008,
+  "pins_excluded_unreliable": 5578,
+  "credible_facilities": 439,
+  "pins_covered_now": 7402,
+  "pins_uncovered_now": 6606,
+  "candidates": 2018,
+  "candidates_needing_contact": 40,
+  "candidates_with_positive_gain": 821,
+  "held_for_data_check": 767,
+  "plan": [
+    {
+      "rank": 1,
+      "name": "SH Medical Centre",
+      "marginal_gain": 150,
+      "cumulative_gain": 150
+    },
+    {
+      "rank": 2,
+      "name": "SanthaRam Hospital",
+      "marginal_gain": 110,
+      "cumulative_gain": 260
+    },
+    {
+      "rank": 3,
+      "name": "Anu Specialty Hospital",
+      "marginal_gain": 105,
+      "cumulative_gain": 365
+    },
+    {
+      "rank": 4,
+      "name": "Cauvery Heart & Multi-Speciality Hospital",
+      "marginal_gain": 100,
+      "cumulative_gain": 465
+    },
+    {
+      "rank": 5,
+      "name": "Dr. TMA Pai Hospital",
+      "marginal_gain": 89,
+      "cumulative_gain": 554
+    },
+    {
+      "rank": 6,
+      "name": "Chandramathy Amma Memorial Hospital",
+      "marginal_gain": 83,
+      "cumulative_gain": 637
+    },
+    {
+      "rank": 7,
+      "name": "Anbhu Ramachandran Speciality Hospital",
+      "marginal_gain": 79,
+      "cumulative_gain": 716
+    },
+    {
+      "rank": 8,
+      "name": "Dr. Rajendra Prasad Government Medical College Kangra at Tanda",
+      "marginal_gain": 79,
+      "cumulative_gain": 795
+    },
+    {
+      "rank": 9,
+      "name": "Silchar Medical College & Hospital",
+      "marginal_gain": 74,
+      "cumulative_gain": 869
+    },
+    {
+      "rank": 10,
+      "name": "Baby\u2019s Life Hospital",
+      "marginal_gain": 67,
+      "cumulative_gain": 936
+    }
+  ],
+  "baseline": [
+    {
+      "k": 3,
+      "greedy_new_pins": 365,
+      "topk_by_individual_gain_new_pins": 152,
+      "upper_bound": 446
+    },
+    {
+      "k": 5,
+      "greedy_new_pins": 554,
+      "topk_by_individual_gain_new_pins": 154,
+      "upper_bound": 740
+    },
+    {
+      "k": 10,
+      "greedy_new_pins": 936,
+      "topk_by_individual_gain_new_pins": 154,
+      "upper_bound": 1399
+    }
+  ],
+  "if_first_fails": [
+    {
+      "rank": 1,
+      "name": "Sanjeevani Hospital Ad",
+      "marginal_gain": 148,
+      "cumulative_gain": 148
+    },
+    {
+      "rank": 2,
+      "name": "SanthaRam Hospital",
+      "marginal_gain": 110,
+      "cumulative_gain": 258
+    },
+    {
+      "rank": 3,
+      "name": "Anu Specialty Hospital",
+      "marginal_gain": 105,
+      "cumulative_gain": 363
+    }
+  ],
+  "seconds": 10.6
+}
