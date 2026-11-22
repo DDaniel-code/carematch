@@ -28,6 +28,8 @@ def _check(name, passed, detail=''):
 def review(index, result):
     results = result.get('results', [])
     extras = [c for c in (result.get('farther_stronger'), result.get('nearest_beyond')) if c] + result.get('weak_nearby', [])
+    extras += result.get('cost_unknown_options', [])
+    prefs_on = (result.get('preferences') or {}).get('applied', False)
     every = results + extras + result.get('runner_ups', [])
     checks = []
 
@@ -53,14 +55,34 @@ def review(index, result):
                          f'bad distance: {bad_dist}'))
 
     band = result.get('band_km')
-    # nearest search radius first; inside one radius, tier then distance
-    keyseq = [(c.get('found_within_km', band) or 0, TIERS.index(c['tier']),
-               c['distance_km'] if c['distance_km'] is not None else float('inf')) for c in results]
-    ordered = all(a[0] < b[0] or (a[0] == b[0] and (a[1] < b[1] or (a[1] == b[1] and a[2] <= b[2] + 0.05)))
-                  for a, b in zip(keyseq, keyseq[1:]))
-    inside = all(c['distance_km'] is not None and band is not None and c['distance_km'] <= band + 0.05 for c in results)
-    checks.append(_check('Ordered nearest search radius first, then evidence tier, then distance; all within the radius',
-                         ordered and inside, f'order ok={ordered}, inside {band} km={inside}'))
+    inside = all(c['distance_km'] is not None and band is not None
+                 and c['distance_km'] <= max(band, c.get('found_within_km') or band) + 0.05 for c in results)
+    if prefs_on:
+        scores = [c['preference']['score'] for c in results]
+        ordered = all(a >= b for a, b in zip(scores, scores[1:]))
+        checks.append(_check('Ordered by preference score (highest first); all within the search radius',
+                             ordered and inside, f'scores={scores}, inside={inside}'))
+        bad = []
+        for c in results + result.get('runner_ups', []) + result.get('cost_unknown_options', []):
+            rows = [index.rows[i] for i in index.by_id.get(text(c['facility_id']), [])]
+            cites = [(x.get('field'), x.get('quote')) for x in c['preference']['components'] if x.get('quote')]
+            cites += [(s['field'], s['quote']) for x in c['preference']['components'] for s in x.get('signals', [])]
+            for field, quote in cites:
+                ok = any((text(r.get(field)) == quote) if field == 'operatorTypeId'
+                         else (quote in fragments(r.get(field)) or (field == 'description' and quote in text(r.get(field))))
+                         for r in rows)
+                if not ok:
+                    bad.append((c['name'], field, quote[:50]))
+        checks.append(_check('Every preference reason that cites the record quotes it word for word', not bad,
+                             f'not found: {bad[:3]}'))
+    else:
+        # nearest search radius first; inside one radius, tier then distance
+        keyseq = [(c.get('found_within_km', band) or 0, TIERS.index(c['tier']),
+                   c['distance_km'] if c['distance_km'] is not None else float('inf')) for c in results]
+        ordered = all(a[0] < b[0] or (a[0] == b[0] and (a[1] < b[1] or (a[1] == b[1] and a[2] <= b[2] + 0.05)))
+                      for a, b in zip(keyseq, keyseq[1:]))
+        checks.append(_check('Ordered nearest search radius first, then evidence tier, then distance; all within the radius',
+                             ordered and inside, f'order ok={ordered}, inside {band} km={inside}'))
 
     ranked_extra = [c['name'] for c in extras + result.get('runner_ups', []) if 'rank' in c]
     numbered = [c.get('rank') for c in results] == list(range(1, len(results) + 1))

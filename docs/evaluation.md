@@ -107,3 +107,18 @@ Reading: the answer barely depends on the exact band cut-offs. It depends more o
 6. Ordered by tier then distance; all within the search radius.
 7. Only recommendations are numbered; extras and runner-ups are labelled.
 8. Every recommendation says what to confirm by phone; disclaimer present.
+
+## Optional preference model
+
+Time-critical / can-travel / low-cost preferences re-order the same credible options (details:
+[decision_model.md](decision_model.md)). `python -m scripts.run_pref_eval` re-runs the 38 queries in five variants and
+fails if the default ranking changes, a quality check fails, Weak evidence is recommended, or abstention differs:
+
+| Variant | Quality checks | Top-1 changed | Median km to top-1 | Top-1 cost documented |
+| --- | ---: | ---: | ---: | ---: |
+| Default | 38/38 | — (identical to `eval/results.csv`) | 31.5 | — |
+| Time-critical | 38/38 | 17 | 31.5 | 14 |
+| Can travel | 38/38 | 20 | 59.2 | 14 |
+| Low cost | 38/38 | 28 | 77.3 | 35 |
+
+Human labels in `eval/review_sheet.csv` refer to the default ranking and are unchanged.

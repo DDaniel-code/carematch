@@ -19,7 +19,7 @@ st.set_page_config(page_title='CareMatch', page_icon='🏥', layout='centered')
 TIER_TEXT = {'strong': ':green[**Strong evidence**]', 'moderate': ':orange[**Moderate evidence — verify**]',
              'weak': ':gray[**Weak — mentioned, unverified**]'}
 FIELD_TEXT = {'procedure': 'procedures', 'equipment': 'equipment', 'capability': 'capabilities',
-              'description': 'description', 'specialties': 'specialties'}
+              'description': 'description', 'specialties': 'specialties', 'operatorTypeId': 'operator type'}
 EXAMPLES = 'Patna · Lucknow · 800001 · Darbhanga, Bihar · 25.61, 85.14'
 
 
@@ -79,6 +79,23 @@ def render_card(c, heading):
         if c.get('why_ranked'):
             st.markdown('**Why this order:** ' + esc(c['why_ranked']))
 
+        pref = c.get('preference')
+        if pref:
+            st.markdown(f"**Preference score {pref['score']:.2f}** <span style='color:gray'>(a ranking weight from stated "
+                        f"assumptions, not a chance of treatment)</span>", unsafe_allow_html=True)
+            for comp in pref['components']:
+                value = 'n/a' if comp['value'] is None else f"{comp['value']:.2f} × weight {comp['weight']:.2f}"
+                line = f"- *{esc(comp['name'])}* ({value}): {esc(comp['reason'])}"
+                if comp.get('quote'):
+                    line += f"  \n  “{esc(comp['quote'])}” — *{FIELD_TEXT.get(comp['field'], esc(comp['field']))}*"
+                for s in comp.get('signals', []):
+                    line += f"  \n  {esc(s['signal'])}: “{esc(s['quote'])}” — *{FIELD_TEXT.get(s['field'], esc(s['field']))}*"
+                st.markdown(line)
+        if c.get('cost'):
+            cost = c['cost']
+            st.caption('💰 Cost: ' + ({'covered': 'free / government scheme documented', 'insured': 'cashless / insurance documented',
+                                         'unknown': 'not documented in the record (ask when calling)'}[cost['category']]))
+
         if c.get('uncertainties'):
             st.markdown('**Not certain**  \n' + '  \n'.join(f'⚠️ {esc(u)}' for u in c['uncertainties']))
         if c.get('note'):
@@ -124,10 +141,18 @@ def render_result(r):
 
     if r.get('action_advice'):
         st.info(f"**Next step:** {esc(r['action_advice'])}", icon='📞')
+    if (r.get('preferences') or {}).get('applied'):
+        st.caption('Ordered by your preferences. The evidence gate and search radius are the same as the default ranking.')
+        if r.get('tradeoff_note'):
+            st.warning(f"**Trade-off:** {esc(r['tradeoff_note'])}", icon='⚖️')
     if r['results']:
         st.markdown(f"Showing facilities with credible evidence within **{r['band_km']} km**.")
         for c in r['results']:
             render_card(c, f"{c['rank']}. {esc(c['name'])}")
+    if r.get('cost_unknown_options'):
+        st.markdown('---\n**Cost not documented in the record** (may still be free or covered; ask when calling)')
+        for c in r['cost_unknown_options']:
+            render_card(c, esc(c['name']))
     else:
         st.warning(f'No facility with credible evidence within {BANDS_KM[-1]} km. '
                    'This is an honest answer, not an error: the records do not support a recommendation here.')
@@ -144,6 +169,10 @@ def render_result(r):
 
     with st.expander('How we decided'):
         st.markdown(esc(r['method']))
+        if r.get('preference_model'):
+            m = r['preference_model']
+            st.markdown('**Preference model** (re-orders the same credible options)  \n'
+                        + '  \n'.join(f"- {esc(k)}: {esc(v)}" for k, v in m.items() if k not in ('urgency', 'cost')))
         rows = [{'within': f'{km} km', 'strong': v['strong'], 'moderate': v['moderate'], 'weak': v['weak']}
                 for km, v in r['considered']['by_band'].items()]
         st.dataframe(rows, hide_index=True)
@@ -179,14 +208,23 @@ with st.form('search'):
     place = st.text_input('Where is the patient?', key='place',
                           placeholder='City, district, 6-digit PIN code, or "lat, lon"')
     st.caption(f'Examples: {EXAMPLES}')
+    with st.expander('Preferences (optional)'):
+        urgency_options = {'Default: evidence first, then distance': 'default',
+                           'Time-critical: every minute on the road counts': 'time_critical',
+                           'Can travel further for better-prepared care': 'can_travel'}
+        cost_options = {'Cost does not change the order': 'any',
+                        'Prefer free / government-scheme / insured care': 'low_cost'}
+        urgency_label = st.radio('How urgent is it?', list(urgency_options), key='urgency')
+        cost_label = st.radio('Cost', list(cost_options), key='cost')
     submitted = st.form_submit_button('Find care', type='primary')
 
 if submitted or st.session_state.get('place'):
     if not (st.session_state.get('place') or '').strip():
         st.info('Type a place to search from.')
     else:
+        prefs = {'urgency': urgency_options[urgency_label], 'cost': cost_options[cost_label]}
         with st.spinner('Checking the evidence…'):
-            result = recommend(index, labels[service_label], st.session_state.place)
+            result = recommend(index, labels[service_label], st.session_state.place, preferences=prefs)
         if 'error' in result:
             st.error(result['error'])
         else:
