@@ -30,6 +30,18 @@ define → prototype → evaluation → deployment 已完成：App 在 Databrick
 
 **这一轮不做**：LLM Agent、道路导航 API、实时可用性、重写排序架构。
 
+### 第二轮分工（11/21 18:50 起，取代下面"迭代分工与时间"表里的 A/B 列）
+
+联合案例是 **剖宫产 · 50 km · 3 通电话**，回答"这周只能打 10 通电话，先核实哪几家机构，每核实成功一家会新增覆盖哪些 PIN"。
+
+| 谁 | 负责 | 文件归属 |
+| --- | --- | --- |
+| A 线（另一个 Claude tab） | 候选名单（A 表）和最大覆盖贪心排序及基线对照（B 表）。有效 PIN 分母为 14,008，现有覆盖 7,402 个（52.8%） | `carematch/calls.py`、`scripts/call_plan.py`、`tests/test_calls.py`、`analysis/c_section_*.csv` |
+| Codex | 可达性地图，接入 App | `app/pages/**`、`carematch/call_map.py`；改 `app/app.py` 之前要先说 |
+| 本 tab（Main） | README；把呼叫计划的结果接进单文件 notebook 和 `docs/impact.md`；Databricks 重新部署和验证；最终提交检查 | `README.md`、`scripts/build_notebook.py`、`CareMatch.ipynb`、`docs/impact.md`、`docs/system_design.md`、`docs/project_plan.md`、`docs/deploy.md`、`carematch/planner.py`、`carematch/datasource.py` |
+
+验收标准：地图高亮的唯一 PIN 数，必须等于 B 表第 3 行的 `cumulative_gain`。
+
 ### 迭代分工与时间（EST）
 
 | 时段 | A 引擎 | B 平台（本 tab） | 你 |

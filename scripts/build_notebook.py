@@ -4,12 +4,10 @@
     python -m scripts.build_notebook --execute    # also run every cell here on data/*.csv and save the outputs
 
 Part 1 of the notebook is the carematch package itself, inlined module by module, so the notebook, the app and the
-tests always run the same code. Relative imports are rewritten (a top-level `from .x import y` is dropped because
-earlier cells already defined y; one inside a function becomes `y = globals()['y']`) and `__main__` blocks are removed.
+tests always run the same code. Modules keep their own namespaces and relative imports.
 Golden queries and review labels are embedded from eval/ so the file stands alone.
 """
 import argparse
-import ast
 import contextlib
 import csv
 import io
@@ -35,16 +33,21 @@ MODULES = [
                  'Weak or None, with caps for facility type, small clinics and contradictions. Also detects claims about another facility.'),
     ('geo', 'Turns the user\'s place (city, district, PIN, or "lat, lon") into a point with a stated precision, and judges each facility\'s '
             'position by comparing its coordinates, its PIN centre and its city centre.'),
+    ('price', 'Service-specific prices, bounds, conditions and exact source text.'),
+    ('decision', 'Patient-selected preferences and their documented evidence.'),
     ('review', 'Eight automatic quality checks run on every answer, including citation fidelity: every quote must appear word for word in the '
                'named column of the facility record.'),
     ('recommend', 'The ranking: only Strong or Moderate evidence is recommended; take the nearest distance band (25/75/150/300 km) that has any; '
                   'inside it, stronger evidence first, then distance. Builds cards with quotes, uncertainties, phone, questions to ask, '
                   'runner-ups with the reason they lost, and an honest no-answer.'),
+    ('strategy_compare', 'The first choice for each ranking strategy and its source evidence.'),
     ('render', 'Plain-text rendering of a result (used below and in the CLI).'),
     ('datasource', 'Loads the three tables from Spark (Databricks), a SQL warehouse (the app), a Volume snapshot or local CSVs, converting '
                    'every value to the same text so results are identical everywhere.'),
     ('planner', 'District access gaps for planners: distance from every PIN area to the nearest credible facility, joined with NFHS-5 need. '
                 'Used only in Part 6; NFHS never affects a patient\'s ranking.'),
+    ('calls', 'Branch-specific verification leads and budgeted maximum coverage.'),
+    ('lead_model', 'Region-held-out classification of records for verification.'),
 ]
 
 DEMO = [('Dialysis', 'Patna'), ('MRI scan', 'Darbhanga'), ('Burn care', 'Gaya'), ('Trauma care', 'Kohima'),
@@ -54,37 +57,17 @@ DEMO = [('Dialysis', 'Patna'), ('MRI scan', 'Darbhanga'), ('Burn care', 'Gaya'),
 # ---- source inlining ------------------------------------------------------------------------------------------------
 
 def inline_module(name):
-    path = os.path.join(ROOT, 'carematch', f'{name}.py')
-    src = open(path, encoding='utf-8').read()
-    tree = ast.parse(src)
-    lines = src.splitlines(keepends=True)
-    edits = []
-    for node in ast.walk(tree):
-        if isinstance(node, ast.ImportFrom) and node.level > 0:
-            if node.col_offset == 0:
-                repl = ''
-            else:
-                pad = ' ' * node.col_offset
-                repl = ''.join(f"{pad}{a.asname or a.name} = globals()['{a.name}']\n" for a in node.names)
-            edits.append((node.lineno - 1, node.end_lineno, repl))
-    for node in tree.body:
-        if (isinstance(node, ast.If) and isinstance(node.test, ast.Compare)
-                and isinstance(node.test.left, ast.Name) and node.test.left.id == '__name__'):
-            edits.append((node.lineno - 1, node.end_lineno, ''))
-    for start, end, repl in sorted(edits, reverse=True):
-        lines[start:end] = [repl] if repl else []
-    body = ''.join(lines).rstrip() + '\n'
-    return f'# ===== carematch/{name}.py (inlined from the repo by scripts/build_notebook.py) =====\n' + body
-
-
-def top_level_names(code):
-    names = set()
-    for node in ast.parse(code).body:
-        if isinstance(node, (ast.FunctionDef, ast.ClassDef)):
-            names.add(node.name)
-        elif isinstance(node, ast.Assign):
-            names |= {t.id for t in node.targets if isinstance(t, ast.Name)}
-    return names
+    path = os.path.join(ROOT, 'carematch', name + '.py')
+    with open(path, encoding='utf-8') as src:
+        source = src.read()
+    # Keep the source readable inside a Python notebook, including its original regex escapes.
+    for delimiter in ("'" * 3, '"' * 3):
+        if delimiter not in source:
+            literal = 'r' + delimiter + source + delimiter
+            break
+    else:
+        literal = repr(source)
+    return f'load_embedded({name!r}, {literal})'
 
 
 def git_sha():
@@ -120,8 +103,8 @@ those districts also show high need** in NFHS-5?
 | Judging criterion | Where in this notebook |
 | --- | --- |
 | Exploration | Part 3: what a record is, how far each field can be trusted, what the claims can and cannot prove |
-| Modeling | Parts 1, 4, 5: claim classification, evidence tiers, location confidence, banded ranking, quality checks, evaluation, sensitivity |
-| Impact | Part 6: district access gaps × NFHS need, and four recommended actions |
+| Modeling | Parts 1, 4, 5, 7: claim classification, evidence tiers, location confidence, banded ranking, quality checks, evaluation, sensitivity; a region-held-out lead model |
+| Impact | Parts 6, 7: district access gaps × NFHS need, four recommended actions, and which 3–10 facilities to verify first for the most new coverage |
 
 **How to run.** On Databricks Free Edition (serverless): import this file and *Run all*; Part 2 reads the three Unity
 Catalog tables through Spark. Locally: put the exported CSVs in `data/` and run all cells. The outputs saved in this file
@@ -135,6 +118,21 @@ The same engine is deployed as a Databricks App (Streamlit) for health workers; 
 
 SETUP = r'''import csv, json, math, os, re, statistics, sys, time
 from collections import Counter
+from types import ModuleType
+
+# Use a private package so importing these modules cannot shadow an installed CareMatch.
+package = ModuleType('_carematch_submission')
+package.__path__ = []
+sys.modules[package.__name__] = package
+
+def load_embedded(name, source):
+    fullname = package.__name__ + '.' + name
+    module = ModuleType(fullname)
+    module.__package__ = package.__name__
+    module.__file__ = os.path.join(os.getcwd(), 'carematch', name + '.py')
+    sys.modules[fullname] = module
+    setattr(package, name, module)
+    exec(compile(source, module.__file__, 'exec'), module.__dict__)
 
 ON_DATABRICKS = 'spark' in globals()
 print('Running on', 'Databricks (Spark)' if ON_DATABRICKS else 'local Python', sys.version.split()[0])
@@ -155,10 +153,8 @@ def show(rows, cols, headers=None, limit=None):
 
 PART1 = """## Part 1 · The engine
 
-Pure Python, standard library only, {lines:,} lines. The modules below run in dependency order. No model is trained
-and no LLM is involved: every rule is written down, tested, and calibrated on the full table
-(`docs/evidence_calibration.md` in the repo), so the same input always gives the same answer and every answer can be
-traced back to the text that produced it.
+The {lines:,} lines below embed the same modules used by the app. The patient ranking uses deterministic rules.
+Part 7 also evaluates a separate statistical model for selecting facilities to verify by phone.
 """
 
 PART2 = """## Part 2 · Load the data
@@ -284,7 +280,10 @@ dups = [q for q, *_, r in runs if len({c['facility_id'] for c in r.get('results'
 tiers = Counter(c['tier'] for *_, r in runs for c in r.get('results', []))
 lat = sorted(latencies)
 print(f'Queries: {len(runs)}  errors: {len(errors)}  answered within 300 km: {len(answered)}  honest no-answer: {len(runs) - len(answered) - len(errors)}')
-print(f'All 8 quality checks passed: {sum(1 for *_, r in runs if r.get("review", {}).get("passed"))}/{len(runs)}'
+counts = [len(r.get('review', {}).get('checks', [])) for *_, r in runs]
+span = f'{min(counts)}' if min(counts) == max(counts) else f'{min(counts)}–{max(counts)}'
+print(f'All quality checks passed ({span} checks per answer): '
+      f'{sum(1 for *_, r in runs if r.get("review", {}).get("passed"))}/{len(runs)}'
       + (f'  failures: {dict(failed_checks)}' if failed_checks else ''))
 print(f'Quotes shown in recommendations: {quotes} (each verified verbatim against its source column by the review)')
 print(f'Duplicate facility inside a top 3: {len(dups)}')
@@ -412,6 +411,10 @@ LIMITS = """## Limits, and what we would do next
 - **NFHS-5 is 2019–21** with older district boundaries (the match rate is printed above); it is used only for the planner
   view and never changes a patient's ranking.
 - **English-only rules.** Claim classification uses English patterns calibrated on this table.
+- **Prices are rarely documented.** Only a handful of records state a patient price for the service itself, so the
+  price order usually falls back to distance and says so; a price is shown only as quoted, with its unit and conditions.
+- **Verification leads are leads.** The call plan and the lead model choose whom to phone; neither changes what a patient
+  is recommended, and coverage gains assume the facility confirms the service.
 
 Next: add public facility registries, road travel time, a phone-confirmation loop so confirmed answers improve future
 rankings, and local-language labels for health workers.
@@ -421,15 +424,67 @@ Repository: {repo}. Design and evaluation details: `docs/system_design.md`, `doc
 """
 
 
+PART7 = """## Part 7 · Which choice changes, and where should a planner call first?
+
+Three short demonstrations built on the same engine. None of them changes what a patient is recommended.
+"""
+
+PART7_COMPARE = """**Same search, three orders.** Best evidence, nearest and compare-listed-prices can put different facilities first.
+The comparison names each first choice with its quote, and says when the starting point is too approximate to trust
+a small distance difference.
+"""
+
+PART7_CALLS = """**Ten calls, most new coverage.** For C-section within 50 km, 7,402 of 14,008 reliably located PIN areas already
+have a facility with credible evidence. Each candidate below has obstetric or surgical leads but no credible C-section
+claim. Choosing greedily (each call adds the most still-uncovered PINs) is compared with simply taking the candidates
+with the largest individual reach, which overlap. Gains assume the facility confirms the service.
+"""
+
+PART7_LEADS = """**A statistical second opinion on whom to verify.** A logistic regression is trained with Strong C-section evidence
+as a proxy positive and every other record unlabeled, using no C-section or maternity wording at all, and is evaluated
+on whole regions of India it never saw. It is compared with a simple rule (hospitals first, then more specialties).
+"""
+
+STRATEGY_DEMO = '''from _carematch_submission.strategy_compare import compare_strategies
+service, place = 'dialysis', 'Delhi'
+comparison = compare_strategies(index, service, place, recommend(index, service, place))
+print(place, service, comparison['summary'], sep=' · ')
+for opt in comparison['options']:
+    print(opt['label'], opt['name'], opt['distance_km'], opt['tier'])
+    if opt['citation']:
+        print(' ', opt['facility_id'], opt['citation']['field'], opt['citation']['quote'])'''
+
+CALL_DEMO = '''from _carematch_submission.calls import current_coverage, candidates, greedy_plan, topk_baseline
+coverage = current_coverage(index)
+leads, checks = candidates(index, cov=coverage)
+plan = greedy_plan(leads, budget=10)
+print('Possible extra PIN coverage if the selected facilities confirm the service, within 50 km.')
+for k in (3, 5, 10):
+    actual = plan[:k]
+    print(k, 'calls:', sum(step['marginal_gain'] for step in actual), 'PINs; independent-gain baseline:',
+          topk_baseline(leads, k)['unique_new_pins'])
+if plan:
+    first = plan[0]['candidate']
+    followup = greedy_plan(leads, budget=2, exclude=[first['facility_id']])
+    print('If the first call answers no, two calls remain:', sum(r['marginal_gain'] for r in followup), 'potential PINs.')
+    for step in plan[:3]:
+        print(step['candidate']['name'], step['marginal_gain'], step['candidate']['leads'][:1])'''
+
+LEAD_DEMO = '''from _carematch_submission.lead_model import build_dataset, cross_validate, baseline_scores, metrics
+data = build_dataset(index)
+scores, _ = cross_validate(data, C=0.3)
+print('Region-held-out recovery of proxy positives. Actual availability requires a call.')
+for name, predictions in [('Logistic regression', scores), ('Hospital and specialty baseline', baseline_scores(data))]:
+    result = metrics(data['y'], predictions)
+    print(f"{name}: ROC-AUC {result['roc_auc']}, PR-AUC {result['pr_auc']} (base rate {result['prevalence']}), "
+          f"precision@50 {result['precision_at_50']}, precision@200 {result['precision_at_200']}")'''
+
+
 def build(execute=False):
-    module_cells, seen, lines = [], {}, 0
+    module_cells, lines = [], 0
     for name, about in MODULES:
         code = inline_module(name)
         lines += len(code.splitlines())
-        for n in top_level_names(code):
-            if n in seen:
-                raise SystemExit(f'Name clash: {n} is defined in both {seen[n]} and {name}')
-            seen[n] = name
         module_cells += [new_markdown_cell(f'**`carematch/{name}.py`** · {about}'), new_code_cell(code)]
     cells = [new_markdown_cell(INTRO.format(repo=REPO, sha=git_sha())), new_code_cell(SETUP),
              new_markdown_cell(PART1.format(lines=lines))] + module_cells
@@ -439,7 +494,13 @@ def build(execute=False):
             'models_agree', 'human_quote_supports', 'human_one_facility', 'human_note')
     review = {r['id']: {k: r.get(k, '') for k in keep} for r in read_csv('eval/review_sheet.csv')}
 
-    cells += [new_markdown_cell(PART2), new_code_cell(LOAD),
+    cells += [new_code_cell("""from _carematch_submission.datasource import load, load_nfhs
+from _carematch_submission.textutil import is_empty, normalize
+from _carematch_submission.services import SERVICES
+from _carematch_submission.recommend import CareIndex, recommend
+from _carematch_submission.render import to_text
+from _carematch_submission.planner import district_table, maternal_priorities, dialysis_priorities, gap_kind"""),
+              new_markdown_cell(PART2), new_code_cell(LOAD),
               new_markdown_cell(PART3), new_code_cell(EXPLORE_FIELDS), new_code_cell(EXPLORE_LOCATION),
               new_code_cell(EXPLORE_IDENTITY), new_code_cell(EXPLORE_EVIDENCE),
               new_markdown_cell(PART4), new_code_cell(f'DEMO = {DEMO!r}\n\n' + DEMO_CELL),
@@ -450,7 +511,11 @@ def build(execute=False):
               new_code_cell('# Review labels, embedded from eval/review_sheet.csv\n'
                             f'REVIEW = {review!r}\n\n' + EVAL_REVIEW),
               new_markdown_cell(PART6), new_code_cell(GAPS_RUN), new_code_cell(GAPS_PRIORITY), new_code_cell(GAPS_FINDINGS),
-              new_markdown_cell(ACTIONS), new_markdown_cell(LIMITS.format(repo=REPO))]
+              new_markdown_cell(ACTIONS),
+              new_markdown_cell(PART7), new_markdown_cell(PART7_COMPARE), new_code_cell(STRATEGY_DEMO),
+              new_markdown_cell(PART7_CALLS), new_code_cell(CALL_DEMO),
+              new_markdown_cell(PART7_LEADS), new_code_cell(LEAD_DEMO),
+              new_markdown_cell(LIMITS.format(repo=REPO))]
 
     nb = new_notebook(cells=cells, metadata={
         'kernelspec': {'display_name': 'Python 3', 'language': 'python', 'name': 'python3'},
